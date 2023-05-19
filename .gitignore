@@ -1,0 +1,43 @@
+# Python-specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Dependency directories
+venv/
+env/
+envs/
+.env
+
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Development and IDE files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Compiled files
+dist/
+build/
+*.egg-info/
+
+# Testing
+htmlcov/
+.coverage
+.tox/
+
+# Miscellaneous
+.DS_Store

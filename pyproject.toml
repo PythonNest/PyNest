@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[project]
+name = "NestPY"
+version = "0.1.0"
+description = "NestPy is a FastAPI Abstraction for building microservices, influenced by NestJS."
+readme = "README.md"
+requires-python = ">=3.8.1"
+license = "MIT"
+authors = [
+    { name = "Itay Dar", email = "itay2803@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+dependencies = [
+    "anyio==3.6.2",
+    "click==8.1.3",
+    "fastapi==0.95.1",
+    "fastapi-utils==0.2.1",
+    "greenlet==2.0.2",
+    "h11==0.14.0",
+    "idna==3.4",
+    "pydantic==1.10.7",
+    "python-dotenv==1.0.0",
+    "sniffio==1.3.0",
+    "SQLAlchemy==1.4.48",
+    "starlette==0.26.1",
+    "typing_extensions==4.5.0",
+    "uvicorn==0.22.0",
+]
+
+
+[tool.pip]
+index-url = "https://pypi.org/simple"
+trusted-host = ["pypi.org", "files.pythonhosted.org"]
+
+[project.optional-dependencies]
+test = [
+  "pytest == 6.2.5",
+]
+
+[project.scripts]
+nest = "nest.cli.cli:nest_cli"
+
+[tool.setuptools.packages.find]
+include = [ "nest*" ]
+namespaces = false
