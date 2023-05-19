@@ -21,7 +21,7 @@ nest create-nest-app -n my_app_name
 once you have created your app, you can run it with the following command:
 
 ```bash
-python main.py
+cd my_app_name && uvicorn "app:app" --host "0.0.0.0" --port "80" --reload
 ```
 
 Now you can visit http://localhost:80/docs in your browser to see the default API documentation.
