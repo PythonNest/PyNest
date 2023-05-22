@@ -4,9 +4,9 @@ build-backend = "hatchling.build"
 
 
 [project]
-name = "NestPY"
+name = "py-nest"
 version = "0.1.0"
-description = "NestPy is a FastAPI Abstraction for building microservices, influenced by NestJS."
+description = "PyNest is a FastAPI Abstraction for building microservices, influenced by NestJS."
 readme = "README.md"
 requires-python = ">=3.8.1"
 license = "MIT"
