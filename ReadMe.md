@@ -31,7 +31,7 @@ Now you can visit http://localhost:80/docs in your browser to see the default AP
 To add a new module to your application, you can use the nest generate module command:
 
 ```bash
-nest generate module -n users
+nest generate-module -n users
 ```
 
 This will create a new module called users in your application.
