@@ -1,5 +1,3 @@
-
-
 def generate_main():
     return """import uvicorn
 

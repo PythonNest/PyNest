@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "PyNest"
-version = "0.1.0"
+version = "0.1.1"
 description = "PyNest is a FastAPI Abstraction for building microservices, influenced by NestJS."
 readme = "README.md"
 requires-python = ">=3.8.1"

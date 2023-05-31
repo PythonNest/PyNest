@@ -1,6 +1,6 @@
 import click
 from nest.cli.click_handlers import create_nest_app, create_nest_module
-from pathlib import Path
+
 
 @click.group()
 def nest_cli() -> None:

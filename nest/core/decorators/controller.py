@@ -1,12 +1,17 @@
-from fastapi_utils.cbv import _cbv as cbv
+from fastapi_utils.cbv import _cbv as ClassBasedView
 from fastapi_utils.inferring_router import InferringRouter
 
 
 def Controller(tag: str = None):
     """
     Decorator that turns a class into a controller, allowing you to define routes using FastAPI decorators.
-    :param tag: The tag to use for OpenAPI documentation (optional).
-    :return: The decorated class.
+
+    Args:
+        tag (str, optional): The tag to use for OpenAPI documentation.
+
+    Returns:
+        class: The decorated class.
+
     """
 
     def wrapper(cls):
@@ -33,16 +38,34 @@ def Controller(tag: str = None):
                         raise Exception("Invalid method")
 
         def get_router():
+            """
+            Returns the router associated with the controller.
+
+            Returns:
+                InferringRouter: The router associated with the controller.
+
+            """
             return router
 
         cls.get_router = get_router
 
-        return cbv(router=router, cls=cls)
+        return ClassBasedView(router=router, cls=cls)
 
     return wrapper
 
 
 def Get(path: str, **kwargs):
+    """
+    Decorator that defines a GET route for the controller.
+
+    Args:
+        path (str): The URL path for the route.
+        **kwargs: Additional keyword arguments to configure the route.
+
+    Returns:
+        function: The decorated function.
+
+    """
     def decorator(func):
         func.method = "GET"
         func.__path__ = path
@@ -53,6 +76,17 @@ def Get(path: str, **kwargs):
 
 
 def Post(path: str, **kwargs):
+    """
+    Decorator that defines a POST route for the controller.
+
+    Args:
+        path (str): The URL path for the route.
+        **kwargs: Additional keyword arguments to configure the route.
+
+    Returns:
+        function: The decorated function.
+
+    """
     def decorator(func):
         func.method = "POST"
         func.__path__ = path
@@ -63,6 +97,17 @@ def Post(path: str, **kwargs):
 
 
 def Delete(path: str, **kwargs):
+    """
+    Decorator that defines a DELETE route for the controller.
+
+    Args:
+        path (str): The URL path for the route.
+        **kwargs: Additional keyword arguments to configure the route.
+
+    Returns:
+        function: The decorated function.
+
+    """
     def decorator(func):
         func.method = "DELETE"
         func.__path__ = path
@@ -73,6 +118,17 @@ def Delete(path: str, **kwargs):
 
 
 def Put(path: str, **kwargs):
+    """
+    Decorator that defines a PUT route for the controller.
+
+    Args:
+        path (str): The URL path for the route.
+        **kwargs: Additional keyword arguments to configure the route.
+
+    Returns:
+        function: The decorated function.
+
+    """
     def decorator(func):
         func.method = "PUT"
         func.__path__ = path
@@ -83,6 +139,17 @@ def Put(path: str, **kwargs):
 
 
 def Patch(path: str, **kwargs):
+    """
+    Decorator that defines a PATCH route for the controller.
+
+    Args:
+        path (str): The URL path for the route.
+        **kwargs: Additional keyword arguments to configure the route.
+
+    Returns:
+        function: The decorated function.
+
+    """
     def decorator(func):
         func.method = "PATCH"
         func.__path__ = path

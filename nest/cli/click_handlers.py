@@ -1,5 +1,6 @@
 import subprocess
 import os
+import time
 from pathlib import Path
 
 from nest.common.templates.controller import generate_controller
@@ -15,61 +16,176 @@ from nest.common.templates.entity import generate_entity
 
 
 def create_file(path: Path, content: str) -> None:
+    """
+    Create a file at the specified path with the given content.
+
+    Args:
+        path (Path): The path to the file.
+        content (str): The content to be written to the file.
+
+    Returns:
+        None
+    """
     with open(path, "w") as f:
         f.write(content)
 
 
 def create_folder(path: Path) -> None:
+    """
+    Create a folder at the specified path.
+
+    Args:
+        path (Path): The path to the folder.
+
+    Returns:
+        None
+    """
     if not os.path.exists(path):
         os.makedirs(path)
 
 
 def create_readme(path: Path) -> None:
+    """
+    Create a README.md file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the README.md file.
+
+    Returns:
+        None
+    """
     readme_template = generate_readme_template()
     create_file(path, readme_template)
 
 
 def create_main(path: Path) -> None:
+    """
+    Create a main.py file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the main.py file.
+
+    Returns:
+        None
+    """
     main_template = generate_main()
     create_file(path, main_template)
 
 
 def create_models(path: Path, name: str) -> None:
+    """
+    Create a models file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the models file.
+        name (str): The name of the model.
+
+    Returns:
+        None
+    """
     models_template = generate_model(name)
     create_file(path, models_template)
 
 
 def create_requirements(path: Path) -> None:
+    """
+    Create a requirements.txt file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the requirements.txt file.
+
+    Returns:
+        None
+    """
     requirements_template = generate_requirements()
     create_file(path, requirements_template)
 
 
 def create_app(path: Path) -> None:
+    """
+    Create an app.py file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the app.py file.
+
+    Returns:
+        None
+    """
     app_template = generate_app()
     create_file(path, app_template)
 
 
 def create_orm_config(path: Path, db_type: str) -> None:
+    """
+    Create an orm_config.py file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the orm_config.py file.
+        db_type (str): The type of the database.
+
+    Returns:
+        None
+    """
     orm_config_template = generate_orm_config(db_type)
     create_file(path, orm_config_template)
 
 
 def create_controller(path: Path, name: str) -> None:
+    """
+    Create a controller file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the controller file.
+        name (str): The name of the controller.
+
+    Returns:
+        None
+    """
     controller_template = generate_controller(name)
     create_file(path, controller_template)
 
 
 def create_service(path: Path, name: str) -> None:
+    """
+    Create a service file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the service file.
+        name (str): The name of the service.
+
+    Returns:
+        None
+    """
     service_template = generate_service(name)
     create_file(path, service_template)
 
 
 def create_module(path: Path, name: str) -> None:
+    """
+    Create a module file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the module file.
+        name (str): The name of the module.
+
+    Returns:
+        None
+    """
     module_template = generate_module(name)
     create_file(path, module_template)
 
 
 def create_entity(path: Path, name: str) -> None:
+    """
+    Create an entity file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the entity file.
+        name (str): The name of the entity.
+
+    Returns:
+        None
+    """
     entity_template = generate_entity(name)
     create_file(path, entity_template)
 
@@ -118,29 +234,57 @@ def create_nest_app(name: str, db_type: str = "sqlite"):
     path = Path(os.getcwd())
     root_path = path / name
     create_folder(path / name)
+    print("Start creating nest app ...")
     create_app(root_path / "app.py")
+    print("app.py created successfully")
     create_orm_config(root_path / "orm_config.py", db_type)
+    print("orm_config.py created successfully")
     create_main(root_path / "main.py")
+    print("main.py created successfully")
     create_requirements(root_path / "requirements.txt")
+    print("requirements.txt created successfully")
     create_readme(root_path / "README.md")
+    print("README.md created successfully")
 
+    time.sleep(1)
+
+    print("Start creating src folder ...")
     src_path = root_path / "src"
     create_folder(src_path)
     create_file(src_path / "__init__.py", "")
 
+    print("Start creating examples module folder ... ")
     examples_path = src_path / "examples"
     create_folder(examples_path)
     create_file(examples_path / "__init__.py", "")
     create_controller(examples_path / "examples_controller.py", "examples")
+    print("controller created successfully")
     create_service(examples_path / "examples_service.py", "examples")
+    print("service created successfully")
     create_models(examples_path / "examples_model.py", "examples")
+    print("model created successfully")
     create_entity(examples_path / "examples_entity.py", "examples")
+    print("entity created successfully")
     create_module(examples_path / "examples_module.py", "examples")
+    print("module created successfully")
 
+    time.sleep(1)
+
+    print("Install relevant requirements ...")
     install_requirements(root_path, db_type)
 
 
 def find_target_folder(path, target="src"):
+    """
+    Find the target folder within the specified path.
+
+    Args:
+        path (str): The starting path to search from.
+        target (str, optional): The name of the target folder. Defaults to "src".
+
+    Returns:
+        str: The path of the target folder if found, or None if not found.
+    """
     copy_path = Path(path).resolve()
 
     # Check if the current path contains the target folder
@@ -155,17 +299,30 @@ def find_target_folder(path, target="src"):
         if src_path.is_dir():
             return str(src_path)
 
-    # traverse down the directory tree until the target folder is found or leaf is reached
+    # Traverse down the directory tree until the target folder is found or leaf is reached
     for root, dirs, files in os.walk(path):
         for dir in dirs:
             if dir == target:
                 return os.path.join(root, dir)
 
-    # If target folder is not found, return None or raise an exception
+    # If target folder is not found, return None
     return None
 
 
 def append_module_to_app(path_to_app_py: Path, new_module: str):
+    """
+    Append a module import statement to the app.py file.
+
+    Args:
+        path_to_app_py (Path): The path to the app.py file.
+        new_module (str): The name of the new module to import.
+
+    Raises:
+        FileNotFoundError: If the app.py file does not exist.
+
+    Returns:
+        None
+    """
     if not os.path.exists(path_to_app_py):
         raise FileNotFoundError(f"File {path_to_app_py} not found")
     with open(path_to_app_py, 'r') as file:
@@ -229,7 +386,3 @@ def create_nest_module(name: str):
     append_module_to_app(src_path.parent / "app.py", name)
 
     print(f"Module {name} created successfully!")
-
-
-if __name__ == '__main__':
-    create_nest_module("test")
