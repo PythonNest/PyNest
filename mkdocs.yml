@@ -1,0 +1,26 @@
+site_name: PyNest
+
+site_url: https://pytesty.github.io/PyNest/
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+
+plugins:
+- search
+- mkdocstrings
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+nav:
+  - Overview: index.md
+  - Getting Started: installation.md
+  - Usage: usage.md
+  - API Reference: api.md
+  - License: license.md

@@ -12,3 +12,8 @@ SQLAlchemy==1.4.48
 starlette==0.26.1
 typing_extensions==4.5.0
 uvicorn==0.22.0
+
+
+# docs release
+mkdocstrings-python
+mkdocs-material
