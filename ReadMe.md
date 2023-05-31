@@ -107,7 +107,7 @@ config = OrmService(
 )
 ```
 
-Once we set up this 3 files, we can start creating our modules. each module is a folder with the following structure (I wil use the product module as an example):
+Once we set up this 3 files, we can start creating our modules. each module is a folder with the following structure:
 
 ```text 
 ├── products
