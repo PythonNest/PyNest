@@ -1,28 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://pytesty.github.io/PyNest/</loc>
-         <lastmod>2023-05-31</lastmod>
+         <loc>https://PyNest.github.io/PyNest/</loc>
+         <lastmod>2023-06-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://pytesty.github.io/PyNest/api/</loc>
-         <lastmod>2023-05-31</lastmod>
+         <loc>https://PyNest.github.io/PyNest/api/</loc>
+         <lastmod>2023-06-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://pytesty.github.io/PyNest/installation/</loc>
-         <lastmod>2023-05-31</lastmod>
+         <loc>https://PyNest.github.io/PyNest/database/</loc>
+         <lastmod>2023-06-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://pytesty.github.io/PyNest/license/</loc>
-         <lastmod>2023-05-31</lastmod>
+         <loc>https://PyNest.github.io/PyNest/decorators/</loc>
+         <lastmod>2023-06-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://pytesty.github.io/PyNest/usage/</loc>
-         <lastmod>2023-05-31</lastmod>
+         <loc>https://PyNest.github.io/PyNest/installation/</loc>
+         <lastmod>2023-06-01</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://PyNest.github.io/PyNest/license/</loc>
+         <lastmod>2023-06-01</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://PyNest.github.io/PyNest/usage/</loc>
+         <lastmod>2023-06-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
