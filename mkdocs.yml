@@ -1,6 +1,6 @@
 site_name: PyNest
 
-site_url: https://pytesty.github.io/PyNest/
+site_url: https://PyNest.github.io/PyNest/
 
 theme:
   name: material
@@ -21,6 +21,8 @@ markdown_extensions:
 nav:
   - Overview: index.md
   - Getting Started: installation.md
-  - Usage: usage.md
-  - API Reference: api.md
+  - API Reference:
+    - database: database.md
+    - decorators: decorators.md
+    - App: api.md
   - License: license.md

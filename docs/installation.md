@@ -1,11 +1,14 @@
-## Getting Started
 To get started with PyNest, you'll need to install it using pip:
 
 ```bash
 pip install PyNest
 ```
 
-### Start with cli
+## Start with cli
+
+
+#### Create a new project
+
 ```bash
 nest create-nest-app -n my_app_name
 ```
@@ -41,7 +44,7 @@ uvicorn "app:app" --host "0.0.0.0" --port "80" --reload
 
 Now you can visit [OpenAPI](http://localhost:80/docs) in your browser to see the default API documentation.
 
-### Adding modules
+#### Adding modules
 
 To add a new module to your application, you can use the nest generate module command:
 
@@ -64,8 +67,6 @@ This will create a new module called ```users``` in your application with the fo
 The users module will immediately register itself with the application and will be available for use.
 
 You can then start defining routes and other application components using decorators and other PyNest constructs.
-
-For more information on how to use PyNest, check out the official documentation at https://github.com/PyNest.
 
 ## Starting a new project manually
 
