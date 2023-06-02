@@ -73,7 +73,7 @@ The users module will immediately register itself with the application and will 
 
 You can then start defining routes and other application components using decorators and other PyNest constructs.
 
-For more information on how to use PyNest, check out the official documentation at https://github.com/PyNest.
+For more information on how to use PyNest, check out the official documentation at https://pythonnest.github.io/PyNest/api/.
 
 ## Starting a new project manually
 
