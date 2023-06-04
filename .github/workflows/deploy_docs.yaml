@@ -17,7 +17,7 @@ jobs:
   deploy_docs:
     environment:
       name: github-pages
-      url: ${{ secrets.DEPLOYMENT_URL }}
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
     steps:
