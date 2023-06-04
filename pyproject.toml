@@ -50,7 +50,7 @@ test = [
 ]
 
 [project.scripts]
-nest = "nest.cli.cli:nest_cli"
+pynest = "nest.cli.cli:nest_cli"
 
 [tool.setuptools.packages.find]
 include = [ "nest*" ]
