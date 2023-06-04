@@ -55,3 +55,7 @@ pynest = "nest.cli.cli:nest_cli"
 [tool.setuptools.packages.find]
 include = [ "nest*" ]
 namespaces = false
+
+[project.urls]
+"Homepage" = "https://github.com/PythonNest/PyNest"
+"Documentation" = "https://pythonnest.github.io/PyNest/"
