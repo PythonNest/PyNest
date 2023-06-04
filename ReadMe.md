@@ -351,10 +351,3 @@ PyNest is [MIT licensed](LICENSE).
 ## Credits
 
 PyNest is inspired by [NestJS](https://nestjs.com/).
-
-## Support
-
-If you like this project, please consider supporting me on [Patreon](https://www.patreon.com/alejandrohdezma).
-
-## Author
-
