@@ -10,7 +10,7 @@ pip install PyNest
 #### Create a new project
 
 ```bash
-nest create-nest-app -n my_app_name
+pynest create-nest-app -n my_app_name
 ```
 
 this command will create a new project with the following structure:
