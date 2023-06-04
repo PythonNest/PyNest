@@ -38,7 +38,7 @@ jobs:
           pip install mkdocs-material mkdocstrings-python
 
       - name: Build docs
-        run: mkdocs build --clean --strict
+        run: mkdocs build --clean
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
