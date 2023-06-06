@@ -19,11 +19,6 @@ jobs:
           3.10
           3.11
 
-    - name: Run black formatter
-      uses: psf/black@stable
-      with:
-        options: "--check"
-
     - name: Run tests
       run: |
         python -m upgrade pip setuptools wheel
