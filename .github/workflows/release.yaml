@@ -114,4 +114,4 @@ jobs:
       contents: read
       pages: write
       id-token: write
-    uses: ./.github/workflows/deploy_docs.yml
+    uses: ./.github/workflows/deploy_docs.yaml
