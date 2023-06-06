@@ -19,7 +19,7 @@ env:
 
 jobs:
   run-tests:
-    uses: ./.github/workflows/tests.yml
+    uses: ./.github/workflows/tests.yaml
 
   release-package:
     runs-on: ubuntu-latest
