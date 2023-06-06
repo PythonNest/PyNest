@@ -21,6 +21,5 @@ jobs:
 
     - name: Run tests
       run: |
-        python -m upgrade pip setuptools wheel
         pip install requirements_dev.txt
         pytest tests
