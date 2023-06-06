@@ -1,7 +1,12 @@
 import os
 
 import pytest
-from nest.core.database.orm_config import ConfigFactory, SQLiteConfig, PostgresConfig, MySQLConfig
+from nest.core.database.orm_config import (
+    ConfigFactory,
+    SQLiteConfig,
+    PostgresConfig,
+    MySQLConfig,
+)
 from nest.core.database.base_orm import OrmService
 
 
@@ -9,9 +14,7 @@ from nest.core.database.base_orm import OrmService
 def orm_service():
     return OrmService(
         db_type="sqlite",
-        config_params=dict(
-            db_name=os.getenv("SQLITE_DB_NAME", "default_nest_db")
-        ),
+        config_params=dict(db_name=os.getenv("SQLITE_DB_NAME", "default_nest_db")),
     )
 
 
@@ -45,5 +48,3 @@ def test_orm_service_config_url(orm_service):
 def test_orm_service_engine(orm_service):
     engine = orm_service.engine
     assert engine
-
-

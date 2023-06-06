@@ -199,7 +199,9 @@ def install_requirements(path: Path, db_type: str) -> None:
         subprocess.run(["pip", "install", "mysql-connector-python==8.0.33"])
     elif db_type == "postgresql":
         subprocess.run(["pip", "install", "psycopg2-binary==2.9.6"])
-        print("You need to install postgresql in your system\nfor production use only psycopg2")
+        print(
+            "You need to install postgresql in your system\nfor production use only psycopg2"
+        )
 
 
 def create_nest_app(name: str, db_type: str = "sqlite"):
@@ -325,34 +327,49 @@ def append_module_to_app(path_to_app_py: Path, new_module: str):
     """
     if not os.path.exists(path_to_app_py):
         raise FileNotFoundError(f"File {path_to_app_py} not found")
-    with open(path_to_app_py, 'r') as file:
+    with open(path_to_app_py, "r") as file:
         lines = file.readlines()
 
-    imports_end_index = [i for i, line in enumerate(lines) if 'import' in line][-1]
+    imports_end_index = [i for i, line in enumerate(lines) if "import" in line][-1]
 
     split_new_module = new_module.split("_")
     capitalized_new_module = "".join([word.capitalize() for word in split_new_module])
 
-    new_module_import = f'from src.{new_module}.{new_module}_module import {capitalized_new_module}Module\n'
+    new_module_import = f"from src.{new_module}.{new_module}_module import {capitalized_new_module}Module\n"
 
-    lines = lines[:imports_end_index + 1] + [new_module_import] + lines[imports_end_index + 1:]
+    lines = (
+        lines[: imports_end_index + 1]
+        + [new_module_import]
+        + lines[imports_end_index + 1 :]
+    )
 
     # Find the line index where the modules list starts
     modules_start_index = next(
-        (i for i, line in enumerate(lines) if 'modules=[' in line),
-        len(lines) - 1  # If modules list not found, append the new module at the end
+        (i for i, line in enumerate(lines) if "modules=[" in line),
+        len(lines) - 1,  # If modules list not found, append the new module at the end
     )
 
     # Find the line index where the modules list ends
     modules_end_index = next(
-        (i for i, line in enumerate(lines[modules_start_index:], start=modules_start_index) if ']' in line),
-        len(lines) - 1  # If closing bracket not found, append the new module at the end
+        (
+            i
+            for i, line in enumerate(
+                lines[modules_start_index:], start=modules_start_index
+            )
+            if "]" in line
+        ),
+        len(lines)
+        - 1,  # If closing bracket not found, append the new module at the end
     )
 
     # Insert the new module before the closing bracket or at the end of the file
-    new_lines = lines[:modules_end_index] + [f'        {capitalized_new_module}Module,\n'] + lines[modules_end_index:]
+    new_lines = (
+        lines[:modules_end_index]
+        + [f"        {capitalized_new_module}Module,\n"]
+        + lines[modules_end_index:]
+    )
 
-    with open(path_to_app_py, 'w') as file:
+    with open(path_to_app_py, "w") as file:
         file.writelines(new_lines)
 
 

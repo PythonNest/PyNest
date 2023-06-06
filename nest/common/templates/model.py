@@ -1,6 +1,8 @@
 def generate_model(controller_name: str) -> str:
     split_controller_name = controller_name.split("_")
-    capitalized_controller_name = "".join([word.capitalize() for word in split_controller_name])
+    capitalized_controller_name = "".join(
+        [word.capitalize() for word in split_controller_name]
+    )
     template = f"""from pydantic import BaseModel
     
     

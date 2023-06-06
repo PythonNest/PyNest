@@ -32,14 +32,7 @@ class BaseOrmProvider(BaseOrmConfig):
 
     """
 
-    def __init__(
-            self,
-            host: str,
-            db_name: str,
-            user: str,
-            password: str,
-            port: int
-    ):
+    def __init__(self, host: str, db_name: str, user: str, password: str, port: int):
         """
         Initializes the BaseOrmProvider instance.
 
@@ -81,14 +74,7 @@ class PostgresConfig(BaseOrmProvider):
 
     """
 
-    def __init__(
-            self,
-            host: str,
-            db_name: str,
-            user: str,
-            password: str,
-            port: int
-    ):
+    def __init__(self, host: str, db_name: str, user: str, password: str, port: int):
         """
         Initializes the PostgresConfig instance.
 
@@ -110,7 +96,7 @@ class PostgresConfig(BaseOrmProvider):
             str: The engine URL.
 
         """
-        return f'postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
+        return f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}"
 
 
 class MySQLConfig(BaseOrmProvider):
@@ -126,14 +112,7 @@ class MySQLConfig(BaseOrmProvider):
 
     """
 
-    def __init__(
-            self,
-            host: str,
-            db_name: str,
-            user: str,
-            password: str,
-            port: int
-    ):
+    def __init__(self, host: str, db_name: str, user: str, password: str, port: int):
         """
         Initializes the MySQLConfig instance.
 
@@ -155,7 +134,7 @@ class MySQLConfig(BaseOrmProvider):
             str: The engine URL.
 
         """
-        return f'mysql+mysqlconnector://{self.user}:{self.password}@{self.host}'
+        return f"mysql+mysqlconnector://{self.user}:{self.password}@{self.host}"
 
 
 class SQLiteConfig(BaseOrmConfig):
@@ -185,7 +164,7 @@ class SQLiteConfig(BaseOrmConfig):
             str: The engine URL.
 
         """
-        return f'sqlite:///{self.db_name}.db'
+        return f"sqlite:///{self.db_name}.db"
 
 
 class ConfigFactory:

@@ -1,4 +1,3 @@
-
 def generate_app():
     return """from orm_config import config
 from nest.core.app import App

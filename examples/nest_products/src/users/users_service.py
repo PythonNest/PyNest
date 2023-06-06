@@ -5,7 +5,6 @@ from nest.core.decorators import db_request_handler
 
 
 class UsersService:
-
     def __init__(self):
         self.config = config
         self.session = self.config.get_db()
@@ -13,9 +12,7 @@ class UsersService:
     @db_request_handler
     def add_user(self, user: User):
         user_entity = UserEntity(
-            name=user.name,
-            email=user.email,
-            password=user.password
+            name=user.name, email=user.email, password=user.password
         )
         self.session.add(user_entity)
         self.session.commit()
@@ -28,4 +25,3 @@ class UsersService:
     @db_request_handler
     def get_user(self, user_id: int):
         return self.session.query(UserEntity).filter(UserEntity.id == user_id).first()
-

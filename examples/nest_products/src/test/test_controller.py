@@ -8,12 +8,11 @@ from examples.nest_products.src.test.test_model import Test
 class TestController:
 
     service: TestService = Depends(TestService)
-    
+
     @Get("/get_test")
     def get_test(self):
         return self.service.get_test()
-                
+
     @Post("/add_test")
     def add_test(self, test: Test):
         return self.service.add_test(test)
- 

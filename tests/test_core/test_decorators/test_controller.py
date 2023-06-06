@@ -39,7 +39,7 @@ def test_controller():
         ("delete_endpoint", "/delete", "DELETE endpoint"),
         ("put_endpoint", "/put", "PUT endpoint"),
         ("patch_endpoint", "/patch", "PATCH endpoint"),
-    ]
+    ],
 )
 def test_endpoints(test_controller, function, endpoint, expected_message):
     attribute = getattr(test_controller, function)

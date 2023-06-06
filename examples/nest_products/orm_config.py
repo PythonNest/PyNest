@@ -12,5 +12,5 @@ config = OrmService(
         user=os.getenv("POSTGRESQL_USER"),
         password=os.getenv("POSTGRESQL_PASSWORD"),
         port=int(os.getenv("POSTGRESQL_PORT")),
-    )
+    ),
 )

@@ -1,6 +1,8 @@
 def generate_service(controller_name: str) -> str:
     split_controller_name = controller_name.split("_")
-    capitalized_controller_name = "".join([word.capitalize() for word in split_controller_name])
+    capitalized_controller_name = "".join(
+        [word.capitalize() for word in split_controller_name]
+    )
     template = f"""from src.{controller_name}.{controller_name}_model import {capitalized_controller_name}
 from src.{controller_name}.{controller_name}_entity import {capitalized_controller_name} as {capitalized_controller_name}Entity
 from orm_config import config
@@ -29,5 +31,5 @@ class {capitalized_controller_name}Service:
     return template
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(generate_service("users_profiles"))

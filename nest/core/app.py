@@ -3,7 +3,6 @@ from fastapi import FastAPI, APIRouter
 
 
 class App(FastAPI):
-
     def __init__(self, description: str, modules: List, init_db: Callable = None):
         """
         Initializes the App instance.

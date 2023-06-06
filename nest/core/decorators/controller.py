@@ -25,15 +25,40 @@ def Controller(tag: str = None):
                     if not method.__path__.startswith("/"):
                         method.__path__ = "/" + method.__path__
                     if method.method == "GET":
-                        router.add_api_route(method.__path__, method, methods=["GET"], **method.__kwargs__)
+                        router.add_api_route(
+                            method.__path__,
+                            method,
+                            methods=["GET"],
+                            **method.__kwargs__
+                        )
                     elif method.method == "POST":
-                        router.add_api_route(method.__path__, method, methods=["POST"], **method.__kwargs__)
+                        router.add_api_route(
+                            method.__path__,
+                            method,
+                            methods=["POST"],
+                            **method.__kwargs__
+                        )
                     elif method.method == "PUT":
-                        router.add_api_route(method.__path__, method, methods=["PUT"], **method.__kwargs__)
+                        router.add_api_route(
+                            method.__path__,
+                            method,
+                            methods=["PUT"],
+                            **method.__kwargs__
+                        )
                     elif method.method == "DELETE":
-                        router.add_api_route(method.__path__, method, methods=["DELETE"], **method.__kwargs__)
+                        router.add_api_route(
+                            method.__path__,
+                            method,
+                            methods=["DELETE"],
+                            **method.__kwargs__
+                        )
                     elif method.method == "PATCH":
-                        router.add_api_route(method.__path__, method, methods=["PATCH"], **method.__kwargs__)
+                        router.add_api_route(
+                            method.__path__,
+                            method,
+                            methods=["PATCH"],
+                            **method.__kwargs__
+                        )
                     else:
                         raise Exception("Invalid method")
 
@@ -66,6 +91,7 @@ def Get(path: str, **kwargs):
         function: The decorated function.
 
     """
+
     def decorator(func):
         func.method = "GET"
         func.__path__ = path
@@ -87,6 +113,7 @@ def Post(path: str, **kwargs):
         function: The decorated function.
 
     """
+
     def decorator(func):
         func.method = "POST"
         func.__path__ = path
@@ -108,6 +135,7 @@ def Delete(path: str, **kwargs):
         function: The decorated function.
 
     """
+
     def decorator(func):
         func.method = "DELETE"
         func.__path__ = path
@@ -129,6 +157,7 @@ def Put(path: str, **kwargs):
         function: The decorated function.
 
     """
+
     def decorator(func):
         func.method = "PUT"
         func.__path__ = path
@@ -150,6 +179,7 @@ def Patch(path: str, **kwargs):
         function: The decorated function.
 
     """
+
     def decorator(func):
         func.method = "PATCH"
         func.__path__ = path

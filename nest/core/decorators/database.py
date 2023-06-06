@@ -11,6 +11,7 @@ def db_request_handler(func):
     Returns:
         function: The decorated function.
     """
+
     def wrapper(self, *args, **kwargs):
         try:
             result = func(self, *args, **kwargs)

@@ -1,2 +1,3 @@
 pytest==7.0.1
 fastapi==0.95.1
+black==21.12b0

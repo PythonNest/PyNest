@@ -1,4 +1,3 @@
-
 def generate_orm_config(db_type: str):
     base_template = """from nest.core.database.base_orm import OrmService
 import os

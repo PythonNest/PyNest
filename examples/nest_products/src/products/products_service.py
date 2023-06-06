@@ -12,9 +12,7 @@ class ProductsService:
     @db_request_handler
     def add_product(self, product: Product):
         product_entity = ProductEntity(
-            name=product.name,
-            price=product.price,
-            description=product.description
+            name=product.name, price=product.price, description=product.description
         )
         self.session.add(product_entity)
         self.session.commit()
@@ -26,8 +24,14 @@ class ProductsService:
 
     @db_request_handler
     def get_product(self, product_id: int):
-        return self.session.query(ProductEntity).filter(ProductEntity.id == product_id).first()
+        return (
+            self.session.query(ProductEntity)
+            .filter(ProductEntity.id == product_id)
+            .first()
+        )
 
     @db_request_handler
     def last_product(self):
-        return self.session.query(ProductEntity).order_by(ProductEntity.id.desc()).first()
+        return (
+            self.session.query(ProductEntity).order_by(ProductEntity.id.desc()).first()
+        )

@@ -6,10 +6,6 @@ from src.test.test_module import TestModule
 
 app = App(
     description="FastAPI + SQLAlchemy + PostgreSQL",
-    modules=[
-        UsersModule,
-        ProductsModule,
-        TestModule
-    ],
-    init_db=config.create_all()
+    modules=[UsersModule, ProductsModule, TestModule],
+    init_db=config.create_all(),
 )

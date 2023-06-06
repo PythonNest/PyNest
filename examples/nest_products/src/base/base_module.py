@@ -4,7 +4,10 @@ from examples.nest_products.src import BaseProvider
 
 
 class BaseModule:
-
-    def __init__(self, providers: List[Type[BaseProvider]] = None, controllers: List[Type[BaseController]] = None):
+    def __init__(
+        self,
+        providers: List[Type[BaseProvider]] = None,
+        controllers: List[Type[BaseController]] = None,
+    ):
         providers: List[Type[BaseProvider]] = providers
         controllers: List[Type[BaseController]] = controllers

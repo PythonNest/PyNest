@@ -1,5 +1,3 @@
-
-
 def generate_readme_template() -> str:
     return """# PyNest service
 
