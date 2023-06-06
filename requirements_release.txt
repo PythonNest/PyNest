@@ -1,0 +1,10 @@
+# package release
+setuptools
+wheel
+build
+twine
+git-changelog
+
+# docs release
+mkdocstrings-python
+mkdocs-material
