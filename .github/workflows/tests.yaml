@@ -1,0 +1,31 @@
+name: Tests
+
+on: [push, workflow_call]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Python
+      id: setup_python
+      uses: actions/setup-python@v4
+      with:
+        python-version: |
+          3.7
+          3.8
+          3.9
+          3.10
+          3.11
+
+    - name: Run black formatter
+      uses: psf/black@stable
+      with:
+        options: "--check"
+
+    - name: Run tests
+      run: |
+        python -m upgrade pip setuptools wheel
+        pip install requirements_dev.txt
+        pytest tests
