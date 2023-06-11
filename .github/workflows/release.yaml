@@ -81,7 +81,7 @@ jobs:
 
       - name: Publish package to TestPyPI
         run: |
-          python -m twine upload -u ${{ secrets.TEST_PYPI_API_USER }} -p ${{ secrets.TEST_PYPI_API_TOKEN }} --repository-url https://test.pypi.org/legacy/ dist/*
+          python -m twine upload -r testpypi -u ${{ secrets.TEST_PYPI_API_USER }} -p ${{ secrets.TEST_PYPI_API_TOKEN }} dist/*
 
       - name: Install test package
         run: |
