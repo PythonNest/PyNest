@@ -1,11 +1,11 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
 
 [project]
 name = "PyNest"
-version = "0.0.1"
+version = "0.0.2"
 description = "PyNest is a FastAPI Abstraction for building microservices, influenced by NestJS."
 readme = "README.md"
 requires-python = ">=3.8.1"
