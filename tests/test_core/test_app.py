@@ -1,6 +1,8 @@
 from nest.core import App, Controller, Put, Get, Post, Delete, Patch, Depends
 import pytest
 from fastapi.routing import APIRoute
+from fastapi import FastAPI
+
 
 @Controller('test')
 class TestController:
@@ -39,6 +41,7 @@ def app():
         modules=[TestModule]
     )
 
+
 @pytest.mark.parametrize('route', [
     '/get',
     '/post',
@@ -54,3 +57,14 @@ def test_get(app, route):
                 route_exist = True
     assert route_exist
 
+
+def test_app_description(app):
+    assert app.description == 'Test App'
+
+
+def test_app_modules(app):
+    assert app.modules == [TestModule]
+
+
+def test_app_type(app):
+    assert isinstance(app, FastAPI)
