@@ -51,10 +51,10 @@ Now you can visit [OpenAPI](http://localhost:80/docs) in your browser to see the
 
 ### Adding modules
 
-To add a new module to your application, you can use the nest generate module command:
+To add a new module to your application, you can use the pynest generate module command:
 
 ```bash
-nest generate-module -n users
+pynest generate-module -n users
 ```
 
 This will create a new module called ```users``` in your application with the following structure:
