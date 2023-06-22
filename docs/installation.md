@@ -1,7 +1,7 @@
 To get started with PyNest, you'll need to install it using pip:
 
 ```bash
-pip install PyNest
+pip install py-nest
 ```
 
 ## Start with cli
@@ -82,7 +82,7 @@ To start a new project manually, you'll need to create a project that follows th
 ├── main.py
 ├── src
 │    ├── __init__.py
-│    ├── examples
+│    ├── products
 │    │    ├── __init__.py
 │    │    ├── products_controller.py
 │    │    ├── products_service.py

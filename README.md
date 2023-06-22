@@ -10,12 +10,12 @@ This framework is not a direct port of NestJS to Python but rather a re-imaginin
 To get started with PyNest, you'll need to install it using pip:
 
 ```bash
-pip install PyNest
+pip install py-nest
 ```
 
 ### Start with cli
 ```bash
-nest create-nest-app -n my_app_name
+pynest create-nest-app -n my_app_name
 ```
 
 this command will create a new project with the following structure:
@@ -89,7 +89,7 @@ To start a new project manually, you'll need to create a project that follows th
 ├── main.py
 ├── src
 │    ├── __init__.py
-│    ├── examples
+│    ├── products
 │    │    ├── __init__.py
 │    │    ├── products_controller.py
 │    │    ├── products_service.py
@@ -339,10 +339,23 @@ PyNest leverages Python's type annotations to provide better tooling and help pr
 
 PyNest includes a code generation tool that can create boilerplate code for modules, controllers, and other components. This saves you time and helps you focus on writing the code that matters.
 
+## Future Plans
+
+- [ ] Create Marketplace for modules where developers can share their modules and download modules created by others.
+- [ ] Crete Abstraction class to Modules and Services to allow for easy creation of modules and services.
+- [ ] Add inheritance between controllers for creating more complex controllers.
+- [ ] Add support for other databases (mongoDB, redis, etc.)
+- [ ] Create out-of-the-box authentication module that can be easily integrated into any application.
+- [ ] Add support for other testing frameworks and create testing templates.
+- [ ] Add support for other web frameworks (Flask, Django, etc.) - Same Architecture, different engine.
+
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to grab one of the open issues,
+or open a new one if you have an idea for a new feature or improvement.
+
+This would bring a huge impact to the project and the community.
 
 ## License
 
