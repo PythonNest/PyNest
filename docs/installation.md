@@ -1,7 +1,7 @@
 To get started with PyNest, you'll need to install it using pip:
 
 ```bash
-pip install py-nest
+pip install pynest-api
 ```
 
 ## Start with cli

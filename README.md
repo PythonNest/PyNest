@@ -10,7 +10,7 @@ This framework is not a direct port of NestJS to Python but rather a re-imaginin
 To get started with PyNest, you'll need to install it using pip:
 
 ```bash
-pip install py-nest
+pip install pynest-api
 ```
 
 ### Start with cli
