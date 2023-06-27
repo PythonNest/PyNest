@@ -23,7 +23,3 @@ class {capitalized_controller_name}Controller:
         return self.service.add_{controller_name}({controller_name})
  """
     return template
-
-
-if __name__ == "__main__":
-    print(generate_controller("examples"))

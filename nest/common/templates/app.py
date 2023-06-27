@@ -4,7 +4,7 @@ from nest.core.app import App
 from src.examples.examples_module import ExamplesModule
 
 app = App(
-    description="NestPy App Template",
+    description="PyNest service",
     modules=[
         ExamplesModule,
     ],

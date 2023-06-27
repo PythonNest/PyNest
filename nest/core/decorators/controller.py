@@ -2,17 +2,23 @@ from fastapi_utils.cbv import _cbv as ClassBasedView
 from fastapi_utils.inferring_router import InferringRouter
 
 
-def Controller(tag: str = None):
+def Controller(tag: str = None, prefix: str = None):
     """
     Decorator that turns a class into a controller, allowing you to define routes using FastAPI decorators.
 
     Args:
         tag (str, optional): The tag to use for OpenAPI documentation.
+        prefix (str, optional): The prefix to use for all routes.
 
     Returns:
         class: The decorated class.
 
     """
+    if prefix:
+        if not prefix.startswith("/"):
+            prefix = "/" + prefix
+        if prefix.endswith("/"):
+            prefix = prefix[:-1]
 
     def wrapper(cls):
         router = InferringRouter(tags=[tag] if tag else None)
@@ -22,6 +28,8 @@ def Controller(tag: str = None):
                 if not method.__path__:
                     raise Exception("Missing path")
                 else:
+                    if prefix:
+                        method.__path__ = prefix + method.__path__
                     if not method.__path__.startswith("/"):
                         method.__path__ = "/" + method.__path__
                     if method.method == "GET":
@@ -64,11 +72,8 @@ def Controller(tag: str = None):
 
         def get_router():
             """
-            Returns the router associated with the controller.
-
             Returns:
                 InferringRouter: The router associated with the controller.
-
             """
             return router
 

@@ -1,5 +1,8 @@
+from nest import __version__ as version
+
+
 def generate_requirements():
-    template = """anyio==3.6.2
+    template = f"""anyio==3.6.2
 click==8.1.3
 fastapi==0.95.1
 fastapi-utils==0.2.1
@@ -13,5 +16,6 @@ SQLAlchemy==1.4.48
 starlette==0.26.1
 typing_extensions==4.5.0
 uvicorn==0.22.0
+pynest-api=={version}
     """
     return template

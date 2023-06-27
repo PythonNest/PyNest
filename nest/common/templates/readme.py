@@ -23,7 +23,7 @@ This is a template for a PyNest service.
 2. Run service using uvicorn
 
     ```bash
-    uvicorn "app:app" --host "0.0.0.0" --port "80"
+    uvicorn "app:app" --host "0.0.0.0" --port "80" --reload
     ```
    
 ## Step 3 - Send requests

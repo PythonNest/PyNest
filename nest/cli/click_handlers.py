@@ -250,12 +250,12 @@ def create_nest_app(name: str, db_type: str = "sqlite"):
 
     time.sleep(1)
 
-    print("Start creating src folder ...")
+    print("creating src folder ...")
     src_path = root_path / "src"
     create_folder(src_path)
     create_file(src_path / "__init__.py", "")
 
-    print("Start creating examples module folder ... ")
+    print("creating examples module folder ... ")
     examples_path = src_path / "examples"
     create_folder(examples_path)
     create_file(examples_path / "__init__.py", "")
@@ -271,9 +271,7 @@ def create_nest_app(name: str, db_type: str = "sqlite"):
     print("module created successfully")
 
     time.sleep(1)
-
-    print("Install relevant requirements ...")
-    install_requirements(root_path, db_type)
+    print("Project created successfully")
 
 
 def find_target_folder(path, target="src"):
@@ -338,9 +336,9 @@ def append_module_to_app(path_to_app_py: Path, new_module: str):
     new_module_import = f"from src.{new_module}.{new_module}_module import {capitalized_new_module}Module\n"
 
     lines = (
-        lines[: imports_end_index + 1]
-        + [new_module_import]
-        + lines[imports_end_index + 1 :]
+            lines[: imports_end_index + 1]
+            + [new_module_import]
+            + lines[imports_end_index + 1:]
     )
 
     # Find the line index where the modules list starts
@@ -354,8 +352,8 @@ def append_module_to_app(path_to_app_py: Path, new_module: str):
         (
             i
             for i, line in enumerate(
-                lines[modules_start_index:], start=modules_start_index
-            )
+            lines[modules_start_index:], start=modules_start_index
+        )
             if "]" in line
         ),
         len(lines)
@@ -364,9 +362,9 @@ def append_module_to_app(path_to_app_py: Path, new_module: str):
 
     # Insert the new module before the closing bracket or at the end of the file
     new_lines = (
-        lines[:modules_end_index]
-        + [f"        {capitalized_new_module}Module,\n"]
-        + lines[modules_end_index:]
+            lines[:modules_end_index]
+            + [f"        {capitalized_new_module}Module,\n"]
+            + lines[modules_end_index:]
     )
 
     with open(path_to_app_py, "w") as file:

@@ -29,7 +29,3 @@ class {capitalized_controller_name}Service:
         return self.session.query({capitalized_controller_name}Entity).all()
  """
     return template
-
-
-if __name__ == "__main__":
-    print(generate_service("users_profiles"))

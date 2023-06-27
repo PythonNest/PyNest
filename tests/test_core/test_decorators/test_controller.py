@@ -3,7 +3,7 @@ import pytest
 from nest.core.decorators.controller import Controller, Get, Post, Delete, Put, Patch
 
 
-@Controller("test")
+@Controller(tag="test", prefix="/api/v1")
 class TestController:
     @Get("/get")
     def get_endpoint(self):
@@ -43,7 +43,7 @@ def test_controller():
 )
 def test_endpoints(test_controller, function, endpoint, expected_message):
     attribute = getattr(test_controller, function)
-    assert attribute.__path__ == endpoint
+    assert attribute.__path__ == "/api/v1" + endpoint
     assert attribute.__kwargs__ == {}
     assert attribute.method == function.split("_")[0].upper()
     assert attribute() == {"message": f"{function.split('_')[0].upper()} endpoint"}
