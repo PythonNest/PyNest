@@ -8,10 +8,11 @@ name = "pynest-api"
 description = "PyNest is a FastAPI Abstraction for building microservices, influenced by NestJS."
 readme = "README.md"
 requires-python = ">=3.8.1"
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 authors = [
     { name = "Itay Dar", email = "itay2803@gmail.com" },
 ]
+dynamic = ["version"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -41,7 +42,6 @@ dependencies = [
 [tool.setuptools.dynamic]
 version = { attr = "nest.__init__.__version__" }
 
-
 [tool.pip]
 index-url = "https://pypi.org/simple"
 trusted-host = ["pypi.org", "files.pythonhosted.org"]
@@ -62,10 +62,9 @@ force-exclude = '''
 )/
 '''
 
-
 [project.optional-dependencies]
 test = [
-  "pytest == 6.2.5",
+    "pytest == 6.2.5",
 ]
 
 [project.scripts]
@@ -80,7 +79,6 @@ exclude = [
     "/*venv*"
 ]
 ignore_missing_imports = true
-
 
 [project.urls]
 "Homepage" = "https://github.com/PythonNest/PyNest"
