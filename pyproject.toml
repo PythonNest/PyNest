@@ -5,7 +5,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pynest-api"
-version = "0.0.1"
 description = "PyNest is a FastAPI Abstraction for building microservices, influenced by NestJS."
 readme = "README.md"
 requires-python = ">=3.8.1"
@@ -39,10 +38,30 @@ dependencies = [
     "uvicorn==0.22.0",
 ]
 
+[tool.setuptools.dynamic]
+version = { attr = "nest.__init__.__version__" }
+
 
 [tool.pip]
 index-url = "https://pypi.org/simple"
 trusted-host = ["pypi.org", "files.pythonhosted.org"]
+
+[tools.black]
+force-exclude = '''
+/(
+  | /*venv*
+  | /.git
+  | /dist
+  | /pytest_compare.egg-info
+  | *.bac
+  | .mypy_cache
+  | .coverage
+  | /htmlcov
+  | /docs
+  | /site
+)/
+'''
+
 
 [project.optional-dependencies]
 test = [
@@ -53,8 +72,15 @@ test = [
 pynest = "nest.cli.cli:nest_cli"
 
 [tool.setuptools.packages.find]
-include = [ "nest*" ]
+include = ["nest*"]
 namespaces = false
+
+[tool.mypy]
+exclude = [
+    "/*venv*"
+]
+ignore_missing_imports = true
+
 
 [project.urls]
 "Homepage" = "https://github.com/PythonNest/PyNest"
