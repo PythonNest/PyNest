@@ -1,6 +1,19 @@
-# PyNest
+<p align="center">
+  <img src="docs/imgs/pynest_logo-modified.png" title="pynest logo" width="200">
+</p>
+<p align="center">
+    <em>PyNest is a Python framework built on top of FastAPI that follows the modular architecture of NestJS</em>
+</p>
+<p align="center">
+<a href="https://pypi.org/project/pynest-api" target="_blank">
+    <img src="https://img.shields.io/pypi/v/pynest-api?color=%2334D058&label=pypi%20package" alt="Package version">
+</a>
+<a href="https://pypi.org/project/pynest-api" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/pynest-api.svg?color=%2334D058" alt="Supported Python versions">
+</a>
+</p>
 
-PyNest is a Python framework built on top of FastAPI that follows the modular architecture of NestJS. It is designed to help structure your APIs in an intuitive, easy to understand, and enjoyable way.
+PyNest is designed to help structure your APIs in an intuitive, easy to understand, and enjoyable way.
 
 With PyNest, you can build scalable and maintainable APIs with ease. The framework supports dependency injection, type annotations, decorators, and code generation, making it easy to write clean and testable code.
 
