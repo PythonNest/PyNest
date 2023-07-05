@@ -2,6 +2,9 @@ name: Release Package
 
 on:
   workflow_dispatch:
+    permissions:
+      users:
+        - ItayTheDar
     inputs:
       increment_version:
         description: 'Increment version by major, minor, or patch'
