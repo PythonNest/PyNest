@@ -7,8 +7,10 @@ def generate_service(controller_name: str) -> str:
 from src.{controller_name}.{controller_name}_entity import {capitalized_controller_name} as {capitalized_controller_name}Entity
 from orm_config import config
 from nest.core.decorators import db_request_handler
+from functools import lru_cache
 
 
+@lru_cache()
 class {capitalized_controller_name}Service:
 
     def __init__(self):
