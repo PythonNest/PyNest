@@ -13,6 +13,7 @@ from nest.common.templates.orm_config import generate_orm_config
 from nest.common.templates.readme import generate_readme_template
 from nest.common.templates.requierments import generate_requirements
 from nest.common.templates.entity import generate_entity
+from nest.common.templates.dockerfile import generate_dockerfile
 
 
 def create_file(path: Path, content: str) -> None:
@@ -190,6 +191,20 @@ def create_entity(path: Path, name: str) -> None:
     create_file(path, entity_template)
 
 
+def create_dockerfile(path: Path) -> None:
+    """
+    Create a Dockerfile file at the specified path using a template.
+
+    Args:
+        path (Path): The path to the Dockerfile file.
+
+    Returns:
+        None
+    """
+    dockerfile_template = generate_dockerfile()
+    create_file(path, dockerfile_template)
+
+
 def install_requirements(path: Path, db_type: str) -> None:
     os.chdir(path)
     subprocess.run("python -m venv venv && source venv/bin/activate", shell=True)
@@ -269,6 +284,9 @@ def create_nest_app(name: str, db_type: str = "sqlite"):
     print("entity created successfully")
     create_module(examples_path / "examples_module.py", "examples")
     print("module created successfully")
+    if db_type == "sqlite":
+        create_dockerfile(root_path / "Dockerfile")
+        print("Dockerfile created successfully")
 
     time.sleep(1)
     print("Project created successfully")
