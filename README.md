@@ -11,9 +11,12 @@
 <a href="https://pypi.org/project/pynest-api" target="_blank">
     <img src="https://img.shields.io/pypi/pyversions/pynest-api.svg?color=%2334D058" alt="Supported Python versions">
 </a>
+<a href="https://github.com/PythonNest/PyNest/blob/main/LICENSE" target="_blank">
+    <img src="https://img.shields.io/github/license/PythonNest/Pynest" alt="Supported Python versions">
+</a>
 </p>
 
-# PyNest - Description
+# Description
 
 PyNest is designed to help structure your APIs in an intuitive, easy to understand, and enjoyable way.
 
