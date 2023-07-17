@@ -239,8 +239,10 @@ from src.products.products_model import Product
 from src.products.products_entity import Product as ProductEntity
 from orm_config import config
 from nest.core.decorators import db_request_handler
+from functools import lru_cache
 
 
+@lru_cache()
 class ProductsService:
     def __init__(self):
         self.config = config
