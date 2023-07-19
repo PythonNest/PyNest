@@ -167,6 +167,40 @@ class SQLiteConfig(BaseOrmConfig):
         return f"sqlite:///{self.db_name}.db"
 
 
+class MongoConfig(BaseOrmConfig):
+    """
+    ORM configuration for Mongo.
+
+    Args:
+        db_name (str): The name of the Mongo database.
+
+    """
+
+    def __init__(self, db_name: str, host: str, port: int):
+        """
+        Initializes the MongoConfig instance.
+
+        Args:
+            db_name (str): The name of the Mongo database.
+            host (str): The database host.
+            port (int): The database port number.
+
+        """
+        self.db_name = db_name
+        self.host = host
+        self.port = port
+
+    def get_engine_url(self) -> str:
+        """
+        Returns the engine URL for the ORM.
+
+        Returns:
+            str: The engine URL.
+
+        """
+        return f"mongodb://{self.host}:{self.port}/{self.db_name}"
+
+
 class ConfigFactory:
     """
     Factory class for retrieving the appropriate ORM configuration based on the database type.
@@ -203,5 +237,7 @@ class ConfigFactory:
             return MySQLConfig
         elif self.db_type == "sqlite":
             return SQLiteConfig
+        elif self.db_type == "mongodb":
+            return MongoConfig
         else:
             raise Exception(f"Database type {self.db_type} is not supported")

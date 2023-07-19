@@ -207,9 +207,6 @@ def create_dockerfile(path: Path) -> None:
 
 def install_requirements(path: Path, db_type: str) -> None:
     os.chdir(path)
-    subprocess.run("python -m venv venv && source venv/bin/activate", shell=True)
-    subprocess.run(["python", "-m", "pip", "install", "--upgrade", "pip"])
-    subprocess.run(["pip", "install", "-r", "requirements.txt"])
     if db_type == "mysql":
         subprocess.run(["pip", "install", "mysql-connector-python==8.0.33"])
     elif db_type == "postgresql":
@@ -284,6 +281,7 @@ def create_nest_app(name: str, db_type: str = "sqlite"):
     print("entity created successfully")
     create_module(examples_path / "examples_module.py", "examples")
     print("module created successfully")
+    install_requirements(root_path, db_type)
     if db_type == "sqlite":
         create_dockerfile(root_path / "Dockerfile")
         print("Dockerfile created successfully")
