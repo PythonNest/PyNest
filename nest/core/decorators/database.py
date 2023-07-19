@@ -23,12 +23,16 @@ def db_request_handler(func):
             result = func(self, *args, **kwargs)
             p_time = time.time() - s
             logging.info(f"request finished after {p_time}")
-            self.session.close()
+            if hasattr(self, 'session'):
+                # Check if self is an instance of OrmService
+                self.session.close()
             return result
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
-            self.session.close()
+            if hasattr(self, 'session'):
+                # Check if self is an instance of OrmService
+                self.session.rollback()
+                self.session.close()
             return HTTPException(status_code=500, detail=str(e))
 
     return wrapper
