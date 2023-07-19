@@ -68,3 +68,15 @@ class OrmService:
             return session()
         except Exception as e:
             raise e
+
+
+class MongoService:
+
+    def __init__(self, config_params: dict = None):
+        self.config = ConfigFactory(db_type="mongodb").get_config()
+        self.config_url = self.config(**config_params).get_engine_url()
+
+
+
+
+
