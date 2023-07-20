@@ -36,17 +36,18 @@ class OdmService:
             document_models (beanie.Document): a list of beanie.Document instances
         """
 
-        self.config = ConfigFactory(db_type=db_type).get_config()
-        self.config_url = self.config(**config_params).get_engine_url()
+        self.config_object = ConfigFactory(db_type=db_type).get_config()
+        self.config = self.config_object(**config_params)
+        self.config_url = self.config.get_engine_url()
         self.document_models = document_models
 
-    def create_all(self):
+    async def create_all(self):
         self.check_document_models()
         self.client = AsyncIOMotorClient(self.config_url)
-        asyncio.run(init_beanie(
+        await init_beanie(
             database=self.client[self.config.db_name],
             document_models=self.document_models
-        ))
+        )
 
     def check_document_models(self):
         """
@@ -57,7 +58,8 @@ class OdmService:
         """
         if not isinstance(self.document_models, list):
             raise Exception("document_models should be a list")
-        for document_model in self.document_models:
-            if not isinstance(document_model, Document):
-                raise Exception(
-                    "Each item in document_models should be an instance of beanie.Document")
+        # for document_model in self.document_models:
+        #     if not isinstance(document_model, Document):
+        #         raise Exception(
+        #             "Each item in document_models should be an instance of beanie.Document"
+        #         )

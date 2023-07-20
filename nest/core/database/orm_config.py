@@ -1,5 +1,5 @@
 from pydantic import BaseConfig
-from core.database.config import ConfigFactoryBase
+from nest.core.database.config import ConfigFactoryBase
 from nest.core.database.config import BaseProvider
 
 
