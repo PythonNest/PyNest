@@ -4,6 +4,7 @@ def generate_entity(name: str, db_type: str) -> str:
     if db_type == "mongodb":
         template = f"""from beanie import Document
         
+        
 class {capitalized_name}(Document):
     name: str
     

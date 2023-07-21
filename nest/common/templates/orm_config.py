@@ -51,7 +51,7 @@ config = OrmService(
         return f"""{base_template}
 
 config = OdmService(
-    db_type=os.getenv("DB_TYPE"),
+    db_type={db_type},
     config_params={{
         "db_name": os.getenv("DB_NAME"),
         "host": os.getenv("DB_HOST"),

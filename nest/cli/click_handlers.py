@@ -332,31 +332,29 @@ def find_target_folder(path, target="src"):
     return None
 
 
-def append_module_to_app(path_to_app_py: Path, new_module: str):
-    """
-    Append a module import statement to the app.py file.
+def get_import_string(path_to_file: Path, new_module: str, db_type: str):
+    split_new_module = new_module.split("_")
+    capitalized_new_module = "".join([word.capitalize() for word in split_new_module])
 
-    Args:
-        path_to_app_py (Path): The path to the app.py file.
-        new_module (str): The name of the new module to import.
+    if path_to_file.name == "app.py":
+        new_import = f"from src.{new_module}.{new_module}_module import {capitalized_new_module}Module\n"
+    elif path_to_file.name == "orm_config.py":
+        new_import = f"from src.{new_module}.{new_module}_entity import {capitalized_new_module}\n"
+    else:
+        raise ValueError(f"File {path_to_file} is not supported")
 
-    Raises:
-        FileNotFoundError: If the app.py file does not exist.
+    return new_import, capitalized_new_module
 
-    Returns:
-        None
-    """
+
+def append_import(path_to_app_py: Path, new_module: str, db_type: str):
     if not os.path.exists(path_to_app_py):
         raise FileNotFoundError(f"File {path_to_app_py} not found")
     with open(path_to_app_py, "r") as file:
         lines = file.readlines()
 
-    imports_end_index = [i for i, line in enumerate(lines) if "import" in line][-1]
+    new_module_import, capitalized_new_module = get_import_string(path_to_app_py, new_module, db_type)
 
-    split_new_module = new_module.split("_")
-    capitalized_new_module = "".join([word.capitalize() for word in split_new_module])
-
-    new_module_import = f"from src.{new_module}.{new_module}_module import {capitalized_new_module}Module\n"
+    imports_end_index = [i for i, line in enumerate(lines) if " import " in line][-1]
 
     lines = (
             lines[: imports_end_index + 1]
@@ -364,13 +362,10 @@ def append_module_to_app(path_to_app_py: Path, new_module: str):
             + lines[imports_end_index + 1:]
     )
 
-    # Find the line index where the modules list starts
-    modules_start_index = next(
-        (i for i, line in enumerate(lines) if "modules=[" in line),
-        len(lines) - 1,  # If modules list not found, append the new module at the end
-    )
+    return lines, capitalized_new_module
 
-    # Find the line index where the modules list ends
+
+def get_module_end_index(lines, modules_start_index):
     modules_end_index = next(
         (
             i
@@ -382,6 +377,36 @@ def append_module_to_app(path_to_app_py: Path, new_module: str):
         len(lines)
         - 1,  # If closing bracket not found, append the new module at the end
     )
+    return modules_end_index
+
+
+def append_module_to_app(path_to_app_py: Path, new_module: str, db_type: str):
+    """
+    Append a module import statement to the app.py file.
+
+    Args:
+        path_to_app_py (Path): The path to the app.py file.
+        new_module (str): The name of the new module to import.
+        db_type (str): The type of database to use.
+
+    Raises:
+        FileNotFoundError: If the app.py file does not exist.
+
+    Returns:
+        None
+    """
+    split_new_module = new_module.split("_")
+    capitalized_new_module = "".join([word.capitalize() for word in split_new_module])
+
+    lines, _ = append_import(path_to_app_py, new_module, db_type)
+    # Find the line index where the modules list starts
+    modules_start_index = next(
+        (i for i, line in enumerate(lines) if "modules=[" in line),
+        len(lines) - 1,  # If modules list not found, append the new module at the end
+    )
+
+    # Find the line index where the modules list ends
+    modules_end_index = get_module_end_index(lines, modules_start_index)
 
     # Insert the new module before the closing bracket or at the end of the file
     new_lines = (
@@ -399,8 +424,32 @@ def get_db_type(config_file: Path):
         lines = file.readlines()
     for line in lines:
         if "db_type" in line:
-            return line.split("=")[1].strip().replace('"', "")
+            return line.split("=")[1].strip().replace('"', "").replace(",", "")
     raise Exception("db_type not found in orm_config.py")
+
+
+def add_document_to_odm_config(config_file: Path, new_module: str, db_type: str):
+    split_new_module = new_module.split("_")
+    capitalized_new_module = "".join([word.capitalize() for word in split_new_module])
+
+    lines, _ = append_import(config_file, new_module, db_type)
+    modules_start_index = next(
+        (i for i, line in enumerate(lines) if "document_models=[" in line),
+        len(lines) - 1,  # If modules list not found, append the new module at the end
+    )
+
+    modules_end_index = get_module_end_index(lines, modules_start_index)
+    if modules_end_index - modules_start_index == 0:
+        lines[modules_start_index] = lines[modules_start_index].split("[")[0] + f"[{capitalized_new_module}, " + lines[modules_end_index].split("[")[1]
+    else:
+        lines = (
+                lines[:modules_end_index]
+                + [f"        {capitalized_new_module}Module,\n"]
+                + lines[modules_end_index:]
+        )
+
+    with open(config_file, "w") as file:
+        file.writelines(lines)
 
 
 def create_nest_module(name: str):
@@ -418,7 +467,10 @@ def create_nest_module(name: str):
     ├── module_name_entity.py
     ├── module_name_module.py
     """
-    src_path = Path(find_target_folder(os.getcwd(), "src"))
+    src_path = Path("/Users/itayd/PycharmProjects/testMongo") / "src"
+    if name in [x.name for x in src_path.iterdir()]:
+        raise Exception(f"module {name} already exists")
+    # src_path = Path(find_target_folder(os.getcwd(), "src"))
     if not src_path:
         raise Exception("src folder not found")
 
@@ -426,6 +478,7 @@ def create_nest_module(name: str):
     if not config_file.exists():
         raise Exception("orm_config.py file not found")
     db_type = get_db_type(config_file)
+    add_document_to_odm_config(config_file, name, db_type)
     module_path = src_path / name
     create_folder(module_path)
     create_file(module_path / "__init__.py", "")
@@ -434,6 +487,6 @@ def create_nest_module(name: str):
     create_models(module_path / f"{name}_model.py", name)
     create_entity(module_path / f"{name}_entity.py", name, db_type)
     create_module(module_path / f"{name}_module.py", name)
-    append_module_to_app(src_path.parent / "app.py", name)
+    append_module_to_app(src_path.parent / "app.py", name, db_type)
 
     print(f"Module {name} created successfully!")
