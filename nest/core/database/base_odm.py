@@ -43,9 +43,9 @@ class OdmService:
 
     async def create_all(self):
         self.check_document_models()
-        self.client = AsyncIOMotorClient(self.config_url)
+        client = AsyncIOMotorClient(self.config_url)
         await init_beanie(
-            database=self.client[self.config.db_name],
+            database=client[self.config.db_name],
             document_models=self.document_models
         )
 

@@ -59,8 +59,6 @@ class BaseProvider(BaseOdmConfig):
     Args:
         host (str): The database host.
         db_name (str): The name of the database.
-        user (str): The username for database authentication.
-        password (str): The password for database authentication.
         port (int): The database port number.
 
     """
@@ -72,8 +70,6 @@ class BaseProvider(BaseOdmConfig):
         Args:
             host (str): The database host.
             db_name (str): The name of the database.
-            user (str): The username for database authentication.
-            password (str): The password for database authentication.
             port (int): The database port number.
 
         """
