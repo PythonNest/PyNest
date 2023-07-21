@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-
-
-class Test(BaseModel):
+    
+    
+class Examples(BaseModel):
     name: str
+    
