@@ -1,4 +1,4 @@
-name: Release Package
+name: Release Beta
 
 on:
   workflow_dispatch:
