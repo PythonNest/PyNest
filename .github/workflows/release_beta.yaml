@@ -5,6 +5,17 @@ on:
     permissions:
       users:
         - ItayTheDar
+    inputs:
+      increment_version:
+        description: 'Increment version by major, minor, or patch'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
 
 env:
   VERSION_FILE_PATH: nest/__init__.py
