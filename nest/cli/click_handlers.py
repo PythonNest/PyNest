@@ -389,6 +389,32 @@ def append_module_to_app(path_to_app_py: Path, new_module: str, db_type: str):
         new_module (str): The name of the new module to import.
         db_type (str): The type of database to use.
 
+    return new_import, capitalized_new_module
+
+    Returns:
+        None
+    """
+    split_new_module = new_module.split("_")
+    capitalized_new_module = "".join([word.capitalize() for word in split_new_module])
+
+    lines, _ = append_import(path_to_app_py, new_module, db_type)
+    # Find the line index where the modules list starts
+    modules_start_index = next(
+        (i for i, line in enumerate(lines) if "modules=[" in line),
+        len(lines) - 1,  # If modules list not found, append the new module at the end
+    )
+    return modules_end_index
+
+
+def append_module_to_app(path_to_app_py: Path, new_module: str, db_type: str):
+    """
+    Append a module import statement to the app.py file.
+
+    Args:
+        path_to_app_py (Path): The path to the app.py file.
+        new_module (str): The name of the new module to import.
+        db_type (str): The type of database to use.
+
     Raises:
         FileNotFoundError: If the app.py file does not exist.
 
@@ -404,6 +430,9 @@ def append_module_to_app(path_to_app_py: Path, new_module: str, db_type: str):
         (i for i, line in enumerate(lines) if "modules=[" in line),
         len(lines) - 1,  # If modules list not found, append the new module at the end
     )
+
+    # Find the line index where the modules list ends
+    modules_end_index = get_module_end_index(lines, modules_start_index)
 
     # Find the line index where the modules list ends
     modules_end_index = get_module_end_index(lines, modules_start_index)
@@ -467,10 +496,10 @@ def create_nest_module(name: str):
     ├── module_name_entity.py
     ├── module_name_module.py
     """
-    src_path = Path("/Users/itayd/PycharmProjects/testMongo") / "src"
+    src_path = Path(find_target_folder(os.getcwd(), "src"))
+
     if name in [x.name for x in src_path.iterdir()]:
         raise Exception(f"module {name} already exists")
-    # src_path = Path(find_target_folder(os.getcwd(), "src"))
     if not src_path:
         raise Exception("src folder not found")
 
