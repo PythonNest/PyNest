@@ -5,9 +5,6 @@ on:
     permissions:
       users:
         - ItayTheDar
-    inputs:
-      increment_version:
-        description: 'Create a new beta release, deploy to TestPyPI, and install the package'
 
 env:
   VERSION_FILE_PATH: nest/__init__.py
