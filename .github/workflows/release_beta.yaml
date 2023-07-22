@@ -73,13 +73,14 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Update CHANGELOG.md
-        run: git-changelog . -o $CHANGELOG_FILE_PATH
-
       - name: Install python dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements-release.txt
+
+      - name: Update CHANGELOG.md
+        run: git-changelog . -o $CHANGELOG_FILE_PATH
+
 
       - name: Build package
         run: python -m build
