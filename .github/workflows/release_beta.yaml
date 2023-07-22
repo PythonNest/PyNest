@@ -7,7 +7,15 @@ on:
         - ItayTheDar
     inputs:
       increment_version:
-        description: 'Create a new beta release, deploy to TestPyPI, and install the package'
+        description: 'Increment version by major, minor, or patch'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
 
 env:
   VERSION_FILE_PATH: nest/__init__.py
