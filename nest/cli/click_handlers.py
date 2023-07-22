@@ -102,7 +102,7 @@ def create_requirements(path: Path) -> None:
     create_file(path, requirements_template)
 
 
-def create_app(path: Path) -> None:
+def create_app(path: Path, db_type) -> None:
     """
     Create an app.py file at the specified path using a template.
 
@@ -112,7 +112,7 @@ def create_app(path: Path) -> None:
     Returns:
         None
     """
-    app_template = generate_app()
+    app_template = generate_app(db_type)
     create_file(path, app_template)
 
 
@@ -131,7 +131,7 @@ def create_orm_config(path: Path, db_type: str) -> None:
     create_file(path, orm_config_template)
 
 
-def create_controller(path: Path, name: str) -> None:
+def create_controller(path: Path, name: str, db_type: str) -> None:
     """
     Create a controller file at the specified path using a template.
 
@@ -142,22 +142,23 @@ def create_controller(path: Path, name: str) -> None:
     Returns:
         None
     """
-    controller_template = generate_controller(name)
+    controller_template = generate_controller(name, db_type)
     create_file(path, controller_template)
 
 
-def create_service(path: Path, name: str) -> None:
+def create_service(path: Path, name: str, db_type: str) -> None:
     """
     Create a service file at the specified path using a template.
 
     Args:
         path (Path): The path to the service file.
         name (str): The name of the service.
+        db_type (str): The type of the database.
 
     Returns:
         None
     """
-    service_template = generate_service(name)
+    service_template = generate_service(name, db_type)
     create_file(path, service_template)
 
 
@@ -176,7 +177,7 @@ def create_module(path: Path, name: str) -> None:
     create_file(path, module_template)
 
 
-def create_entity(path: Path, name: str) -> None:
+def create_entity(path: Path, name: str, db_type: str) -> None:
     """
     Create an entity file at the specified path using a template.
 
@@ -187,7 +188,7 @@ def create_entity(path: Path, name: str) -> None:
     Returns:
         None
     """
-    entity_template = generate_entity(name)
+    entity_template = generate_entity(name, db_type)
     create_file(path, entity_template)
 
 
@@ -207,9 +208,9 @@ def create_dockerfile(path: Path) -> None:
 
 def install_requirements(path: Path, db_type: str) -> None:
     os.chdir(path)
-    subprocess.run("python -m venv venv && source venv/bin/activate", shell=True)
-    subprocess.run(["python", "-m", "pip", "install", "--upgrade", "pip"])
-    subprocess.run(["pip", "install", "-r", "requirements.txt"])
+    # subprocess.run("python -m venv venv && source venv/bin/activate", shell=True)
+    # subprocess.run(["python", "-m", "pip", "install", "--upgrade", "pip"])
+    # subprocess.run(["pip", "install", "-r", "requirements.txt"])
     if db_type == "mysql":
         subprocess.run(["pip", "install", "mysql-connector-python==8.0.33"])
     elif db_type == "postgresql":
@@ -217,6 +218,8 @@ def install_requirements(path: Path, db_type: str) -> None:
         print(
             "You need to install postgresql in your system\nfor production use only psycopg2"
         )
+    elif db_type == "mongodb":
+        subprocess.run(["pip", "install", "motor", "beanie"])
 
 
 def create_nest_app(name: str, db_type: str = "sqlite"):
@@ -248,11 +251,12 @@ def create_nest_app(name: str, db_type: str = "sqlite"):
 
     │    ├── another module
     """
+
     path = Path(os.getcwd())
     root_path = path / name
     create_folder(path / name)
     print("Start creating nest app ...")
-    create_app(root_path / "app.py")
+    create_app(root_path / "app.py", db_type)
     print("app.py created successfully")
     create_orm_config(root_path / "orm_config.py", db_type)
     print("orm_config.py created successfully")
@@ -274,19 +278,20 @@ def create_nest_app(name: str, db_type: str = "sqlite"):
     examples_path = src_path / "examples"
     create_folder(examples_path)
     create_file(examples_path / "__init__.py", "")
-    create_controller(examples_path / "examples_controller.py", "examples")
+    create_controller(examples_path / "examples_controller.py", "examples", db_type)
     print("controller created successfully")
-    create_service(examples_path / "examples_service.py", "examples")
+    create_service(examples_path / "examples_service.py", "examples", db_type)
     print("service created successfully")
     create_models(examples_path / "examples_model.py", "examples")
     print("model created successfully")
-    create_entity(examples_path / "examples_entity.py", "examples")
+    create_entity(examples_path / "examples_entity.py", "examples", db_type)
     print("entity created successfully")
     create_module(examples_path / "examples_module.py", "examples")
     print("module created successfully")
     if db_type == "sqlite":
         create_dockerfile(root_path / "Dockerfile")
         print("Dockerfile created successfully")
+    install_requirements(root_path, db_type)
 
     time.sleep(1)
     print("Project created successfully")
@@ -327,31 +332,29 @@ def find_target_folder(path, target="src"):
     return None
 
 
-def append_module_to_app(path_to_app_py: Path, new_module: str):
-    """
-    Append a module import statement to the app.py file.
+def get_import_string(path_to_file: Path, new_module: str, db_type: str):
+    split_new_module = new_module.split("_")
+    capitalized_new_module = "".join([word.capitalize() for word in split_new_module])
 
-    Args:
-        path_to_app_py (Path): The path to the app.py file.
-        new_module (str): The name of the new module to import.
+    if path_to_file.name == "app.py":
+        new_import = f"from src.{new_module}.{new_module}_module import {capitalized_new_module}Module\n"
+    elif path_to_file.name == "orm_config.py":
+        new_import = f"from src.{new_module}.{new_module}_entity import {capitalized_new_module}\n"
+    else:
+        raise ValueError(f"File {path_to_file} is not supported")
 
-    Raises:
-        FileNotFoundError: If the app.py file does not exist.
+    return new_import, capitalized_new_module
 
-    Returns:
-        None
-    """
+
+def append_import(path_to_app_py: Path, new_module: str, db_type: str):
     if not os.path.exists(path_to_app_py):
         raise FileNotFoundError(f"File {path_to_app_py} not found")
     with open(path_to_app_py, "r") as file:
         lines = file.readlines()
 
-    imports_end_index = [i for i, line in enumerate(lines) if "import" in line][-1]
+    new_module_import, capitalized_new_module = get_import_string(path_to_app_py, new_module, db_type)
 
-    split_new_module = new_module.split("_")
-    capitalized_new_module = "".join([word.capitalize() for word in split_new_module])
-
-    new_module_import = f"from src.{new_module}.{new_module}_module import {capitalized_new_module}Module\n"
+    imports_end_index = [i for i, line in enumerate(lines) if " import " in line][-1]
 
     lines = (
             lines[: imports_end_index + 1]
@@ -359,13 +362,10 @@ def append_module_to_app(path_to_app_py: Path, new_module: str):
             + lines[imports_end_index + 1:]
     )
 
-    # Find the line index where the modules list starts
-    modules_start_index = next(
-        (i for i, line in enumerate(lines) if "modules=[" in line),
-        len(lines) - 1,  # If modules list not found, append the new module at the end
-    )
+    return lines, capitalized_new_module
 
-    # Find the line index where the modules list ends
+
+def get_module_end_index(lines, modules_start_index):
     modules_end_index = next(
         (
             i
@@ -377,6 +377,36 @@ def append_module_to_app(path_to_app_py: Path, new_module: str):
         len(lines)
         - 1,  # If closing bracket not found, append the new module at the end
     )
+    return modules_end_index
+
+
+def append_module_to_app(path_to_app_py: Path, new_module: str, db_type: str):
+    """
+    Append a module import statement to the app.py file.
+
+    Args:
+        path_to_app_py (Path): The path to the app.py file.
+        new_module (str): The name of the new module to import.
+        db_type (str): The type of database to use.
+
+    Raises:
+        FileNotFoundError: If the app.py file does not exist.
+
+    Returns:
+        None
+    """
+    split_new_module = new_module.split("_")
+    capitalized_new_module = "".join([word.capitalize() for word in split_new_module])
+
+    lines, _ = append_import(path_to_app_py, new_module, db_type)
+    # Find the line index where the modules list starts
+    modules_start_index = next(
+        (i for i, line in enumerate(lines) if "modules=[" in line),
+        len(lines) - 1,  # If modules list not found, append the new module at the end
+    )
+
+    # Find the line index where the modules list ends
+    modules_end_index = get_module_end_index(lines, modules_start_index)
 
     # Insert the new module before the closing bracket or at the end of the file
     new_lines = (
@@ -387,6 +417,39 @@ def append_module_to_app(path_to_app_py: Path, new_module: str):
 
     with open(path_to_app_py, "w") as file:
         file.writelines(new_lines)
+
+
+def get_db_type(config_file: Path):
+    with open(config_file, "r") as file:
+        lines = file.readlines()
+    for line in lines:
+        if "db_type" in line:
+            return line.split("=")[1].strip().replace('"', "").replace(",", "")
+    raise Exception("db_type not found in orm_config.py")
+
+
+def add_document_to_odm_config(config_file: Path, new_module: str, db_type: str):
+    split_new_module = new_module.split("_")
+    capitalized_new_module = "".join([word.capitalize() for word in split_new_module])
+
+    lines, _ = append_import(config_file, new_module, db_type)
+    modules_start_index = next(
+        (i for i, line in enumerate(lines) if "document_models=[" in line),
+        len(lines) - 1,  # If modules list not found, append the new module at the end
+    )
+
+    modules_end_index = get_module_end_index(lines, modules_start_index)
+    if modules_end_index - modules_start_index == 0:
+        lines[modules_start_index] = lines[modules_start_index].split("[")[0] + f"[{capitalized_new_module}, " + lines[modules_end_index].split("[")[1]
+    else:
+        lines = (
+                lines[:modules_end_index]
+                + [f"        {capitalized_new_module}Module,\n"]
+                + lines[modules_end_index:]
+        )
+
+    with open(config_file, "w") as file:
+        file.writelines(lines)
 
 
 def create_nest_module(name: str):
@@ -404,18 +467,26 @@ def create_nest_module(name: str):
     ├── module_name_entity.py
     ├── module_name_module.py
     """
-    src_path = Path(find_target_folder(os.getcwd(), "src"))
+    src_path = Path("/Users/itayd/PycharmProjects/testMongo") / "src"
+    if name in [x.name for x in src_path.iterdir()]:
+        raise Exception(f"module {name} already exists")
+    # src_path = Path(find_target_folder(os.getcwd(), "src"))
     if not src_path:
         raise Exception("src folder not found")
 
+    config_file = src_path.parent / "orm_config.py"
+    if not config_file.exists():
+        raise Exception("orm_config.py file not found")
+    db_type = get_db_type(config_file)
+    add_document_to_odm_config(config_file, name, db_type)
     module_path = src_path / name
     create_folder(module_path)
     create_file(module_path / "__init__.py", "")
-    create_controller(module_path / f"{name}_controller.py", name)
-    create_service(module_path / f"{name}_service.py", name)
+    create_controller(module_path / f"{name}_controller.py", name, db_type)
+    create_service(module_path / f"{name}_service.py", name, db_type)
     create_models(module_path / f"{name}_model.py", name)
-    create_entity(module_path / f"{name}_entity.py", name)
+    create_entity(module_path / f"{name}_entity.py", name, db_type)
     create_module(module_path / f"{name}_module.py", name)
-    append_module_to_app(src_path.parent / "app.py", name)
+    append_module_to_app(src_path.parent / "app.py", name, db_type)
 
     print(f"Module {name} created successfully!")

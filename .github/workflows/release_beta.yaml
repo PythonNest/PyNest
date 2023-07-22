@@ -1,0 +1,58 @@
+name: Release Package
+
+on:
+  workflow_dispatch:
+    permissions:
+      users:
+        - ItayTheDar
+    inputs:
+      increment_version:
+        description: 'Create a new beta release, deploy to TestPyPI, and install the package'
+
+env:
+  VERSION_FILE_PATH: nest/__init__.py
+  CHANGELOG_FILE_PATH: CHANGELOG.md
+
+jobs:
+  run-tests:
+    uses: ./.github/workflows/tests.yaml
+
+  release-package:
+    runs-on: ubuntu-latest
+    needs: run-tests
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.RELEASE_GIT_TOKEN }}
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-release.txt
+
+      - name: Build package
+        run: python -m build
+
+      - name: Publish package to TestPyPI
+        run: |
+          python -m twine upload dist/* -r testpypi -u ${{ secrets.TEST_PYPI_API_USER }} -p ${{ secrets.TEST_PYPI_API_TOKEN }}
+
+      - name: Install test package
+        run: |
+          pip install --index-url https://test.pypi.org/simple/ --no-deps pynest-api
+          
+          # import to check if package is installed correctly
+          python -c "import nest"
+
+      - name: Copy pip url
+        run: |
+          echo "pip install --index-url https://test.pypi.org/simple/ --no-deps pynest-api"

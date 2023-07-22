@@ -1,5 +1,11 @@
 def generate_orm_config(db_type: str):
-    base_template = """from nest.core.database.base_orm import OrmService
+    if db_type == "mongodb":
+        service_import = "from nest.core.database.base_odm import OdmService\n" \
+                         "from src.examples.examples_entity import Examples"
+    else:
+        service_import = "from nest.core.database.base_orm import OrmService"
+
+    base_template = f"""{service_import}
 import os
 from dotenv import load_dotenv
 
@@ -40,6 +46,19 @@ config = OrmService(
         port=int(os.getenv("MYSQL_PORT")),
     )
 )
+        """
+    elif db_type == "mongodb":
+        return f"""{base_template}
+
+config = OdmService(
+    db_type="{db_type}",
+    config_params={{
+        "db_name": os.getenv("DB_NAME"),
+        "host": os.getenv("DB_HOST"),
+        "port": os.getenv("DB_PORT"),
+    }},
+    document_models=[Examples]
+)       
         """
     else:
         raise ValueError(f"Unsupported db type: {db_type}")

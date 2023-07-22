@@ -1,67 +1,9 @@
-from abc import abstractmethod
+from pydantic import BaseConfig
+from nest.core.database.config import ConfigFactoryBase
+from nest.core.database.config import BaseProvider
 
 
-class BaseOrmConfig:
-    """
-    Base abstract class for ORM (Object-Relational Mapping) configurations.
-
-    """
-
-    @abstractmethod
-    def get_engine_url(self) -> str:
-        """
-        Returns the engine URL for the ORM.
-
-        Returns:
-            str: The engine URL.
-
-        """
-        pass
-
-
-class BaseOrmProvider(BaseOrmConfig):
-    """
-    Base class for ORM providers that implement the BaseOrmConfig interface.
-
-    Args:
-        host (str): The database host.
-        db_name (str): The name of the database.
-        user (str): The username for database authentication.
-        password (str): The password for database authentication.
-        port (int): The database port number.
-
-    """
-
-    def __init__(self, host: str, db_name: str, user: str, password: str, port: int):
-        """
-        Initializes the BaseOrmProvider instance.
-
-        Args:
-            host (str): The database host.
-            db_name (str): The name of the database.
-            user (str): The username for database authentication.
-            password (str): The password for database authentication.
-            port (int): The database port number.
-
-        """
-        self.host = host
-        self.db_name = db_name
-        self.user = user
-        self.password = password
-        self.port = port
-
-    def get_engine_url(self) -> str:
-        """
-        Returns the engine URL for the ORM.
-
-        Returns:
-            str: The engine URL.
-
-        """
-        pass
-
-
-class PostgresConfig(BaseOrmProvider):
+class PostgresConfig(BaseProvider):
     """
     ORM configuration for PostgreSQL.
 
@@ -99,7 +41,7 @@ class PostgresConfig(BaseOrmProvider):
         return f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}"
 
 
-class MySQLConfig(BaseOrmProvider):
+class MySQLConfig(BaseProvider):
     """
     ORM configuration for MySQL.
 
@@ -137,7 +79,7 @@ class MySQLConfig(BaseOrmProvider):
         return f"mysql+mysqlconnector://{self.user}:{self.password}@{self.host}"
 
 
-class SQLiteConfig(BaseOrmConfig):
+class SQLiteConfig(BaseConfig):
     """
     ORM configuration for SQLite.
 
@@ -167,7 +109,7 @@ class SQLiteConfig(BaseOrmConfig):
         return f"sqlite:///{self.db_name}.db"
 
 
-class ConfigFactory:
+class ConfigFactory(ConfigFactoryBase):
     """
     Factory class for retrieving the appropriate ORM configuration based on the database type.
 
@@ -184,7 +126,7 @@ class ConfigFactory:
             db_type (str): The type of database.
 
         """
-        self.db_type = db_type
+        super().__init__(db_type)
 
     def get_config(self):
         """
