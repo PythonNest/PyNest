@@ -17,7 +17,7 @@ jobs:
   run-tests:
     uses: ./.github/workflows/tests.yaml
 
-  release-package:
+  release-beta:
     runs-on: ubuntu-latest
     needs: run-tests
     permissions:
