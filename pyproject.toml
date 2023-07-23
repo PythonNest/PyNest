@@ -24,7 +24,6 @@ classifiers = [
 dependencies = [
     "click==8.1.6",
     "fastapi==0.100.0",
-    "fastapi-utils==0.2.1",
     "python-dotenv==1.0.0",
     "SQLAlchemy==2.0.19",
     "uvicorn==0.23.1",

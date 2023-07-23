@@ -1,5 +1,5 @@
-from fastapi_utils.cbv import _cbv as ClassBasedView
 from fastapi.routing import APIRouter
+from nest.core.decorators.helpers import class_based_view as ClassBasedView
 
 
 def Controller(tag: str = None, prefix: str = None):
