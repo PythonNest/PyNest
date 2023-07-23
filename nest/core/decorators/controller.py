@@ -1,5 +1,5 @@
 from fastapi_utils.cbv import _cbv as ClassBasedView
-from fastapi_utils.inferring_router import InferringRouter
+from fastapi.routing import APIRouter
 
 
 def Controller(tag: str = None, prefix: str = None):
@@ -21,7 +21,7 @@ def Controller(tag: str = None, prefix: str = None):
             prefix = prefix[:-1]
 
     def wrapper(cls):
-        router = InferringRouter(tags=[tag] if tag else None)
+        router = APIRouter(tags=[tag] if tag else None)
 
         for name, method in cls.__dict__.items():
             if callable(method) and hasattr(method, "method"):
