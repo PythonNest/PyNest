@@ -18,10 +18,8 @@ class OdmService:
         document_models (beanie.Document): a list of beanie.Document instances
 
     Attributes:
-        Base: The declarative base class for defining ORM models.
         config: The configuration factory for the chosen database type.
         config_url: The URL generated from the database configuration parameters.
-        client: The Motor client for database connection.
 
     """
 
@@ -53,13 +51,11 @@ class OdmService:
         """
         Checks that the document_models argument is a list of beanie.Document instances.
 
-        Args:
-            document_models (beanie.Document): a list of beanie.Document instances
         """
         if not isinstance(self.document_models, list):
             raise Exception("document_models should be a list")
-        # for document_model in self.document_models:
-        #     if not isinstance(document_model, Document):
-        #         raise Exception(
-        #             "Each item in document_models should be an instance of beanie.Document"
-        #         )
+        for document_model in self.document_models:
+            if not issubclass(document_model, Document):
+                raise Exception(
+                    "Each item in document_models should be a subclass of beanie.Document"
+                )
