@@ -27,7 +27,6 @@ dependencies = [
     "python-dotenv==1.0.0",
     "SQLAlchemy==2.0.19",
     "uvicorn==0.23.1",
-    "pydantic==1.8.2",
 ]
 
 [tool.setuptools.dynamic]
