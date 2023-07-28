@@ -58,7 +58,7 @@ class BaseProvider(BaseConfig):
 
     """
 
-    def __init__(self, host: str, db_name: str, port: int, user: str, password: str):
+    def __init__(self, host: str, db_name: str, user: str, password: str, port: int):
         """
         Initializes the BaseOdmProvider instance.
 
@@ -72,9 +72,9 @@ class BaseProvider(BaseConfig):
         """
         self.host = host
         self.db_name = db_name
-        self.port = port
         self.user = user
         self.password = password
+        self.port = port
 
     def get_engine_url(self) -> str:
         """

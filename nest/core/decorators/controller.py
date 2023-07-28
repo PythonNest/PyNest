@@ -70,10 +70,10 @@ def Controller(tag: str = None, prefix: str = None):
                     else:
                         raise Exception("Invalid method")
 
-        def get_router():
+        def get_router() -> APIRouter:
             """
             Returns:
-                InferringRouter: The router associated with the controller.
+                APIRouter: The router associated with the controller.
             """
             return router
 

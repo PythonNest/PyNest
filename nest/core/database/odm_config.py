@@ -19,9 +19,9 @@ class MongoDBConfig(BaseProvider):
             self,
             host: str,
             db_name: str,
-            port: int = 27017,
             user: str = None,
             password: str = None,
+            port: int = 27017,
             srv: bool = False
     ):
         """
@@ -37,7 +37,7 @@ class MongoDBConfig(BaseProvider):
 
         """
         self.srv = srv
-        super().__init__(host, db_name, port, user, password)
+        super().__init__(host, db_name, user, password, port)
 
     def get_engine_url(self) -> str:
         """
@@ -47,7 +47,7 @@ class MongoDBConfig(BaseProvider):
             str: The engine URL.
 
         """
-        return f"mongodb{'+srv' if self.srv else ''}://{self.host}:{self.port}"
+        return f"mongodb{'+srv' if self.srv else ''}://{self.user}:{self.password}@{self.host}:{self.port}"
 
 
 class ConfigFactory(ConfigFactoryBase):
