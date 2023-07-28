@@ -20,7 +20,7 @@ def Controller(tag: str = None, prefix: str = None):
         if prefix.endswith("/"):
             prefix = prefix[:-1]
 
-    def wrapper(cls):
+    def wrapper(cls) -> ClassBasedView:
         router = APIRouter(tags=[tag] if tag else None)
 
         for name, method in cls.__dict__.items():

@@ -507,7 +507,8 @@ def create_nest_module(name: str):
     if not config_file.exists():
         raise Exception("orm_config.py file not found")
     db_type = get_db_type(config_file)
-    add_document_to_odm_config(config_file, name, db_type)
+    if db_type == "mongodb":
+        add_document_to_odm_config(config_file, name, db_type)
     module_path = src_path / name
     create_folder(module_path)
     create_file(module_path / "__init__.py", "")
