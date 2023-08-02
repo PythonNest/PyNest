@@ -1,5 +1,5 @@
-from fastapi_utils.cbv import _cbv as ClassBasedView
-from fastapi_utils.inferring_router import InferringRouter
+from fastapi.routing import APIRouter
+from nest.core.decorators.helpers import class_based_view as ClassBasedView
 
 
 def Controller(tag: str = None, prefix: str = None):
@@ -20,8 +20,8 @@ def Controller(tag: str = None, prefix: str = None):
         if prefix.endswith("/"):
             prefix = prefix[:-1]
 
-    def wrapper(cls):
-        router = InferringRouter(tags=[tag] if tag else None)
+    def wrapper(cls) -> ClassBasedView:
+        router = APIRouter(tags=[tag] if tag else None)
 
         for name, method in cls.__dict__.items():
             if callable(method) and hasattr(method, "method"):
@@ -70,10 +70,10 @@ def Controller(tag: str = None, prefix: str = None):
                     else:
                         raise Exception("Invalid method")
 
-        def get_router():
+        def get_router() -> APIRouter:
             """
             Returns:
-                InferringRouter: The router associated with the controller.
+                APIRouter: The router associated with the controller.
             """
             return router
 

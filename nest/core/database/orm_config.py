@@ -76,7 +76,7 @@ class MySQLConfig(BaseProvider):
             str: The engine URL.
 
         """
-        return f"mysql+mysqlconnector://{self.user}:{self.password}@{self.host}"
+        return f"mysql+mysqlconnector://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}"
 
 
 class SQLiteConfig(BaseConfig):

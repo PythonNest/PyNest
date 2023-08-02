@@ -34,7 +34,7 @@ class ConfigFactoryBase:
         assert self.db_type, "db_type is required"
 
 
-class BaseOdmConfig:
+class BaseConfig:
     """
     Base abstract class for ODM (Object-Document Mapping) configurations.
 
@@ -52,18 +52,13 @@ class BaseOdmConfig:
         pass
 
 
-class BaseProvider(BaseOdmConfig):
+class BaseProvider(BaseConfig):
     """
-    Base class for ODM providers that implement the BaseOdmConfig interface.
-
-    Args:
-        host (str): The database host.
-        db_name (str): The name of the database.
-        port (int): The database port number.
+    Base class for Objets Mapping providers that implement the BaseConfig interface.
 
     """
 
-    def __init__(self, host: str, db_name: str, port: int):
+    def __init__(self, host: str, db_name: str, user: str, password: str, port: int):
         """
         Initializes the BaseOdmProvider instance.
 
@@ -71,10 +66,14 @@ class BaseProvider(BaseOdmConfig):
             host (str): The database host.
             db_name (str): The name of the database.
             port (int): The database port number.
+            user (str): The username for database authentication.
+            password (str): The password for database authentication.
 
         """
         self.host = host
         self.db_name = db_name
+        self.user = user
+        self.password = password
         self.port = port
 
     def get_engine_url(self) -> str:

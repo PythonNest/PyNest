@@ -1,4 +1,4 @@
-from nest.core.database.config import BaseOdmConfig, ConfigFactoryBase, BaseProvider
+from nest.core.database.config import ConfigFactoryBase, BaseProvider
 
 
 class MongoDBConfig(BaseProvider):
@@ -15,7 +15,15 @@ class MongoDBConfig(BaseProvider):
 
     """
 
-    def __init__(self, host: str, db_name: str, port: int = 27017, srv: bool = False):
+    def __init__(
+            self,
+            host: str,
+            db_name: str,
+            user: str = None,
+            password: str = None,
+            port: int = 27017,
+            srv: bool = False
+    ):
         """
         Initializes the MongoDBConfig instance.
 
@@ -29,7 +37,7 @@ class MongoDBConfig(BaseProvider):
 
         """
         self.srv = srv
-        super().__init__(host, db_name, port)
+        super().__init__(host, db_name, user, password, port)
 
     def get_engine_url(self) -> str:
         """
@@ -39,7 +47,7 @@ class MongoDBConfig(BaseProvider):
             str: The engine URL.
 
         """
-        return f"mongodb{'+srv' if self.srv else ''}://{self.host}:{self.port}"
+        return f"mongodb{'+srv' if self.srv else ''}://{self.user}:{self.password}@{self.host}:{self.port}"
 
 
 class ConfigFactory(ConfigFactoryBase):
