@@ -25,14 +25,26 @@ python-dotenv = "==1.0.0"
 SQLAlchemy = "==2.0.19"
 uvicorn = "==0.23.1"
 
+[tool.poetry.group.test]
+optional = true
+
 [tool.poetry.group.test.dependencies]
 pytest = "*"
+
+[tool.poetry.group.lint]
+optional = true
 
 [tool.poetry.group.lint.dependencies]
 black = "^23.1.0"
 
+[tool.poetry.group.codespell]
+optional = true
+
 [tool.poetry.group.codespell.dependencies]
 codespell = "^2.2.0"
+
+[tool.poetry.group.typing]
+optional = true
 
 [tool.poetry.group.typing.dependencies]
 mypy = "^0.991"
