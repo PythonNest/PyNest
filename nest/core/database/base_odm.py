@@ -22,7 +22,12 @@ class OdmService:
 
     """
 
-    def __init__(self, db_type="mongodb", config_params: dict = None, document_models: List[Document] = None):
+    def __init__(
+        self,
+        db_type="mongodb",
+        config_params: dict = None,
+        document_models: List[Document] = None,
+    ):
         """
         Initializes the OrmService instance.
 
@@ -42,8 +47,7 @@ class OdmService:
         self.check_document_models()
         client = AsyncIOMotorClient(self.config_url)
         await init_beanie(
-            database=client[self.config.db_name],
-            document_models=self.document_models
+            database=client[self.config.db_name], document_models=self.document_models
         )
 
     def check_document_models(self):

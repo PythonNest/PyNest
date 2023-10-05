@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-    
+
 
 config = OdmService(
     db_type="mongodb",
@@ -13,6 +13,5 @@ config = OdmService(
         "host": os.getenv("DB_HOST"),
         "port": os.getenv("DB_PORT"),
     },
-    document_models=[Examples]
-)       
-        
+    document_models=[Examples],
+)

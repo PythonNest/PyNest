@@ -1,9 +1,7 @@
 import os
 
 import pytest
-from nest.core.database.orm_config import (
-    ConfigFactory
-)
+from nest.core.database.orm_config import ConfigFactory
 from nest.core.database.base_orm import OrmService
 
 
@@ -57,12 +55,17 @@ def test_sqlite_url(sqlite_config_factory):
 
 def test_postgres_url(postgres_config_factory):
     config_url = postgres_config_factory.get_engine_url()
-    assert config_url == "postgresql+psycopg2://postgres:postgres@localhost:5432/default_nest_db"
+    assert (
+        config_url
+        == "postgresql+psycopg2://postgres:postgres@localhost:5432/default_nest_db"
+    )
 
 
 def test_mysql_url(mysql_config_factory):
     config_url = mysql_config_factory.get_engine_url()
-    assert config_url == "mysql+mysqlconnector://root:root@localhost:3306/default_nest_db"
+    assert (
+        config_url == "mysql+mysqlconnector://root:root@localhost:3306/default_nest_db"
+    )
 
 
 @pytest.fixture(scope="module")

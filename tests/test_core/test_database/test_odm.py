@@ -27,11 +27,7 @@ def odm_service():
 @pytest.fixture(scope="module")
 def mongodb_config():
     return MongoDBConfig(
-        db_name="db_name"
-        , host="host"
-        , user="user"
-        , password="password"
-        , port="port"
+        db_name="db_name", host="host", user="user", password="password", port="port"
     )
 
 

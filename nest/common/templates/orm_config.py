@@ -1,7 +1,9 @@
 def generate_orm_config(db_type: str):
     if db_type == "mongodb":
-        service_import = "from nest.core.database.base_odm import OdmService\n" \
-                         "from src.examples.examples_entity import Examples"
+        service_import = (
+            "from nest.core.database.base_odm import OdmService\n"
+            "from src.examples.examples_entity import Examples"
+        )
     else:
         service_import = "from nest.core.database.base_orm import OrmService"
 

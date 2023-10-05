@@ -8,10 +8,15 @@ def nest_cli() -> None:
 
 
 @nest_cli.command(
-    name="create-nest-app", help="Create a new nest app.",
+    name="create-nest-app",
+    help="Create a new nest app.",
 )
 @click.option(
-    "--app-name", "-n", help="The name of the nest app.", required=True, type=str,
+    "--app-name",
+    "-n",
+    help="The name of the nest app.",
+    required=True,
+    type=str,
 )
 @click.option(
     "--db-type",
@@ -30,7 +35,11 @@ def create_nest_app_command(app_name: str, db_type: str = "sqlite"):
     help="Generate a new module (controller, service, entity, model, module).",
 )
 @click.option(
-    "--name", "-n", help="The name of the module.", required=True, type=str,
+    "--name",
+    "-n",
+    help="The name of the module.",
+    required=True,
+    type=str,
 )
 def generate_module(name: str):
     create_nest_module(name=name)

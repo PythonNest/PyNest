@@ -23,13 +23,13 @@ def db_request_handler(func):
             result = func(self, *args, **kwargs)
             p_time = time.time() - s
             logging.info(f"request finished after {p_time}")
-            if hasattr(self, 'session'):
+            if hasattr(self, "session"):
                 # Check if self is an instance of OrmService
                 self.session.close()
             return result
         except Exception as e:
             logging.error(e)
-            if hasattr(self, 'session'):
+            if hasattr(self, "session"):
                 # Check if self is an instance of OrmService
                 self.session.rollback()
                 self.session.close()

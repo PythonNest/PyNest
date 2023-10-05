@@ -352,14 +352,16 @@ def append_import(path_to_app_py: Path, new_module: str, db_type: str):
     with open(path_to_app_py, "r") as file:
         lines = file.readlines()
 
-    new_module_import, capitalized_new_module = get_import_string(path_to_app_py, new_module, db_type)
+    new_module_import, capitalized_new_module = get_import_string(
+        path_to_app_py, new_module, db_type
+    )
 
     imports_end_index = [i for i, line in enumerate(lines) if " import " in line][-1]
 
     lines = (
-            lines[: imports_end_index + 1]
-            + [new_module_import]
-            + lines[imports_end_index + 1:]
+        lines[: imports_end_index + 1]
+        + [new_module_import]
+        + lines[imports_end_index + 1 :]
     )
 
     return lines, capitalized_new_module
@@ -370,8 +372,8 @@ def get_module_end_index(lines, modules_start_index):
         (
             i
             for i, line in enumerate(
-            lines[modules_start_index:], start=modules_start_index
-        )
+                lines[modules_start_index:], start=modules_start_index
+            )
             if "]" in line
         ),
         len(lines)
@@ -439,9 +441,9 @@ def append_module_to_app(path_to_app_py: Path, new_module: str, db_type: str):
 
     # Insert the new module before the closing bracket or at the end of the file
     new_lines = (
-            lines[:modules_end_index]
-            + [f"        {capitalized_new_module}Module,\n"]
-            + lines[modules_end_index:]
+        lines[:modules_end_index]
+        + [f"        {capitalized_new_module}Module,\n"]
+        + lines[modules_end_index:]
     )
 
     with open(path_to_app_py, "w") as file:
@@ -469,12 +471,16 @@ def add_document_to_odm_config(config_file: Path, new_module: str, db_type: str)
 
     modules_end_index = get_module_end_index(lines, modules_start_index)
     if modules_end_index - modules_start_index == 0:
-        lines[modules_start_index] = lines[modules_start_index].split("[")[0] + f"[{capitalized_new_module}, " + lines[modules_end_index].split("[")[1]
+        lines[modules_start_index] = (
+            lines[modules_start_index].split("[")[0]
+            + f"[{capitalized_new_module}, "
+            + lines[modules_end_index].split("[")[1]
+        )
     else:
         lines = (
-                lines[:modules_end_index]
-                + [f"        {capitalized_new_module}Module,\n"]
-                + lines[modules_end_index:]
+            lines[:modules_end_index]
+            + [f"        {capitalized_new_module}Module,\n"]
+            + lines[modules_end_index:]
         )
 
     with open(config_file, "w") as file:
