@@ -1,4 +1,3 @@
-import asyncio
 from typing import List
 
 from motor.motor_asyncio import AsyncIOMotorClient

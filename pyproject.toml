@@ -30,6 +30,8 @@ optional = true
 
 [tool.poetry.group.test.dependencies]
 pytest = "*"
+motor = "==3.2.0"
+beanie = "==1.20.0"
 
 [tool.poetry.group.lint]
 optional = true
