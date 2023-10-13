@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/imgs/pynest_logo-modified.png" title="pynest logo" width="200">
+  <img src="docs/imgs/pynest_new_logo_opt.png" title="pynest logo" width="300">
 </p>
 <p align="center">
     <em>PyNest is a Python framework built on top of FastAPI that follows the modular architecture of NestJS</em>
@@ -12,7 +12,7 @@
         <img src="https://img.shields.io/pypi/pyversions/pynest-api.svg?color=%2334D058" alt="Python">
     </a>
     <a href="https://pepy.tech/project/pynest-api">
-        <img src="https://static.pepy.tech/personalized-badge/pynest-api?period=month&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads" alt="Downloads">
+        <img src="https://static.pepy.tech/personalized-badge/pynest-api?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads" alt="Downloads">
     </a>
     <a href="https://github.com/PythonNest/PyNest/blob/main/LICENSE">
         <img src="https://img.shields.io/github/license/PythonNest/Pynest" alt="License">
