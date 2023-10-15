@@ -27,7 +27,6 @@ class {capitalized_controller_name}Service:
 
 """
     else:
-
         template = f"""from src.{controller_name}.{controller_name}_model import {capitalized_controller_name}
 from src.{controller_name}.{controller_name}_entity import {capitalized_controller_name} as {capitalized_controller_name}Entity
 from orm_config import config

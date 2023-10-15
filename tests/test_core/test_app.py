@@ -4,51 +4,40 @@ from fastapi.routing import APIRoute
 from fastapi import FastAPI
 
 
-@Controller('test')
+@Controller("test")
 class TestController:
-
-    @Get('/get')
+    @Get("/get")
     def get(self):
-        return {'message': 'Hello, World!'}
+        return {"message": "Hello, World!"}
 
-    @Post('/post')
+    @Post("/post")
     def post(self):
-        return {'message': 'Hello, World!'}
+        return {"message": "Hello, World!"}
 
-    @Put('/put')
+    @Put("/put")
     def put(self):
-        return {'message': 'Hello, World!'}
+        return {"message": "Hello, World!"}
 
-    @Delete('/delete')
+    @Delete("/delete")
     def delete(self):
-        return {'message': 'Hello, World!'}
+        return {"message": "Hello, World!"}
 
-    @Patch('/patch')
+    @Patch("/patch")
     def patch(self):
-        return {'message': 'Hello, World!'}
+        return {"message": "Hello, World!"}
 
 
 class TestModule:
-
     def __init__(self):
         self.controllers = [TestController]
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def app():
-    return App(
-        description='Test App',
-        modules=[TestModule]
-    )
+    return App(description="Test App", modules=[TestModule])
 
 
-@pytest.mark.parametrize('route', [
-    '/get',
-    '/post',
-    '/put',
-    '/delete',
-    '/patch'
-])
+@pytest.mark.parametrize("route", ["/get", "/post", "/put", "/delete", "/patch"])
 def test_get(app, route):
     route_exist = False
     for app_route in app.routes:
@@ -59,7 +48,7 @@ def test_get(app, route):
 
 
 def test_app_description(app):
-    assert app.description == 'Test App'
+    assert app.description == "Test App"
 
 
 def test_app_modules(app):

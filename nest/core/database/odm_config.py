@@ -16,13 +16,13 @@ class MongoDBConfig(BaseProvider):
     """
 
     def __init__(
-            self,
-            host: str,
-            db_name: str,
-            user: str = None,
-            password: str = None,
-            port: int = 27017,
-            srv: bool = False
+        self,
+        host: str,
+        db_name: str,
+        user: str = None,
+        password: str = None,
+        port: int = 27017,
+        srv: bool = False,
     ):
         """
         Initializes the MongoDBConfig instance.

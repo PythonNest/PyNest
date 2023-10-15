@@ -32,10 +32,11 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
       - name: Install MKDocs
-        run: |
-          pip install --upgrade pip
-          pip install mkdocs-material mkdocstrings-python
+        run: poetry install --only docs
 
       - name: Build docs
         run: mkdocs build --clean

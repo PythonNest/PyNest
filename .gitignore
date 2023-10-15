@@ -9,6 +9,7 @@ venv/
 env/
 envs/
 .env
+poetry.lock
 
 # Compiled source
 *.com

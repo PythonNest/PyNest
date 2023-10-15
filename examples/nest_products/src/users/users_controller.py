@@ -6,7 +6,6 @@ from examples.nest_products.src.users.users_model import User
 
 @Controller("users")
 class UsersController:
-
     users_service: UsersService = Depends(UsersService)
 
     @Get(path="/get_users")

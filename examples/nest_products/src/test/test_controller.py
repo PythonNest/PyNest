@@ -6,7 +6,6 @@ from examples.nest_products.src.test.test_model import Test
 
 @Controller("test")
 class TestController:
-
     service: TestService = Depends(TestService)
 
     @Get("/get_test")

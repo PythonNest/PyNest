@@ -6,10 +6,10 @@ app = App(
     description="PyNest service",
     modules=[
         ExamplesModule,
-    ]
+    ],
 )
 
 
 @app.on_event("startup")
 async def startup():
-    await config.create_all() 
+    await config.create_all()
