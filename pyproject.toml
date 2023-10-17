@@ -60,7 +60,7 @@ mkdocstrings-python = "*"
 mkdocs-material = "*"
 
 [tool.poetry.scripts]
-lemodel = "nest.cli.cli:nest_cli"
+pynest = "nest.cli.cli:nest_cli"
 
 [build-system]
 requires = ["poetry-core"]
