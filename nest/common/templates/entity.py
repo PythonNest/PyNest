@@ -6,7 +6,7 @@ def generate_entity(name: str, db_type: str) -> str:
         
         
 class {capitalized_name}(Document):
-    name: str
+    title: str
     
     class Config:
         schema_extra = {{
