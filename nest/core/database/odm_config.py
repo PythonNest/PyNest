@@ -47,7 +47,9 @@ class MongoDBConfig(BaseProvider):
             str: The engine URL.
 
         """
-        return f"mongodb{'+srv' if self.srv else ''}://{self.user}:{self.password}@{self.host}:{self.port}"
+        if self.user and self.password:
+            return f"mongodb{'+srv' if self.srv else ''}://{self.user}:{self.password}@{self.host}:{self.port}"
+        return f"mongodb{'+srv' if self.srv else ''}://{self.host}:{self.port}"
 
 
 class ConfigFactory(ConfigFactoryBase):
