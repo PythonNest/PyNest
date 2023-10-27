@@ -1,13 +1,12 @@
-from nest.core import Controller, Get, Post, Depends
-
-from examples.nest_products.src.users.users_service import UsersService
-from examples.nest_products.src.users.users_model import User
-
+from nest.core import Depends
+from nest.core.decorators import Controller, Get, Post
+from src.users.users_service import UsersService
+from src.users.users_model import User
 
 @Controller("users")
 class UsersController:
-    users_service: UsersService = Depends(UsersService)
-
+    users_service: UsersService  =  Depends(UsersService)
+    
     @Get(path="/get_users")
     def get_users(self):
         return self.users_service.get_users()

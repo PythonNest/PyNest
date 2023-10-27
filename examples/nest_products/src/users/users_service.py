@@ -1,9 +1,9 @@
-from examples.nest_products.src.users.users_model import User
-from examples.nest_products.src.users.users_entity import User as UserEntity
-from examples.nest_products.orm_config import config
-from nest.core.decorators import db_request_handler
+from src.users.users_model import User
+from src.users.users_entity import User as UserEntity
+from nest.core.database.orm_config import config
+from nest.core.decorators import db_request_handler, Injectable
 
-
+@Injectable
 class UsersService:
     def __init__(self):
         self.config = config

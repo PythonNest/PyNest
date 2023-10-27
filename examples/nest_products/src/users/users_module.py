@@ -1,8 +1,10 @@
-from examples.nest_products.src.users.users_controller import UsersController
-from examples.nest_products.src.users.users_service import UsersService
+from src.users.users_controller import UsersController
+from src.users.users_service import UsersService
+from nest.core.decorators import Module
 
-
+@Module(
+    controllers=[UsersController],
+    providers = [UsersService]
+)
 class UsersModule:
-    def __init__(self):
-        self.providers = [UsersService]
-        self.controllers = [UsersController]
+    pass

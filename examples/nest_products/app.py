@@ -1,11 +1,9 @@
-from orm_config import config
-from nest.core import App
-from src.users.users_module import UsersModule
-from src.products.products_module import ProductsModule
-from src.test.test_module import TestModule
+from nest.core import PyNestFactory
+from app_module import AppModule
 
-app = App(
-    description="FastAPI + SQLAlchemy + PostgreSQL",
-    modules=[UsersModule, ProductsModule, TestModule],
-    init_db=config.create_all(),
-)
+
+app = PyNestFactory.create( 
+    AppModule,
+    description="This is my FastAPI app.", title="My App", version="1.0.0", debug=True)
+http_server = app.get_server()
+
