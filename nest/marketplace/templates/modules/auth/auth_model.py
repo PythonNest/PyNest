@@ -18,7 +18,6 @@ class UserId(BaseModel):
 class User(UserId):
     username: str
     password: str
-    email: str
 
 """
 

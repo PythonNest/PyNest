@@ -12,7 +12,7 @@ class AuthController:
         return self.service.register(user)
 
     @Post("login")
-    def login(self, user_login: UserLogin):
+    def login(self, user_login: User):
         return self.service.login(user_login)
 
 """
