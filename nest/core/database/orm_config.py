@@ -1,6 +1,4 @@
-from pydantic import BaseConfig
-from nest.core.database.config import ConfigFactoryBase
-from nest.core.database.config import BaseProvider
+from nest.core.database.base_config import ConfigFactoryBase, BaseProvider, BaseConfig
 
 
 class PostgresConfig(BaseProvider):
@@ -30,7 +28,7 @@ class PostgresConfig(BaseProvider):
         """
         super().__init__(host, db_name, user, password, port)
 
-    def get_engine_url(self) -> str:
+    def get_engine_url(self, is_async: bool = False) -> str:
         """
         Returns the engine URL for the ORM.
 
@@ -109,6 +107,88 @@ class SQLiteConfig(BaseConfig):
         return f"sqlite:///{self.db_name}.db"
 
 
+class AsyncSQLiteConfig(SQLiteConfig):
+    """
+    ORM configuration for SQLite.
+
+    Args:
+        db_name (str): The name of the SQLite database file.
+
+    """
+
+    def __init__(self, db_name: str):
+        """
+        Initializes the SQLiteConfig instance.
+
+        Args:
+            db_name (str): The name of the SQLite database file.
+
+        """
+        super().__init__(db_name)
+
+    def get_engine_url(self) -> str:
+        """
+        Returns the engine URL for the ORM.
+
+        Returns:
+            str: The engine URL.
+
+        """
+        return f"sqlite+aiosqlite:///{self.db_name}.db"
+
+
+class AsyncPostgresConfig(PostgresConfig):
+    def __init__(self, host: str, db_name: str, user: str, password: str, port: int):
+        """
+        Initializes the PostgresConfig instance.
+
+        Args:
+            host (str): The database host.
+            db_name (str): The name of the database.
+            user (str): The username for database authentication.
+            password (str): The password for database authentication.
+            port (int): The database port number.
+
+        """
+        super().__init__(host, db_name, user, password, port)
+
+    def get_engine_url(self, is_async: bool = False) -> str:
+        """
+        Returns the engine URL for the ORM.
+
+        Returns:
+            str: The engine URL.
+
+        """
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}"
+
+
+class AsyncMySQLConfig(MySQLConfig):
+    def __init__(self, host: str, db_name: str, user: str, password: str, port: int):
+        """
+        Initializes the MySQLConfig instance.
+
+        Args:
+            host (str): The database host.
+            db_name (str): The name of the database.
+            user (str): The username for database authentication.
+            password (str): The password for database authentication.
+            port (int): The database port number.
+
+        """
+        super().__init__(host, db_name, user, password, port)
+
+    def get_engine_url(self) -> str:
+        """
+        Returns the engine URL for the ORM.
+
+        Returns:
+            str: The engine URL.
+
+        """
+        return f"mysql+aiomysql://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}"
+
+
 class ConfigFactory(ConfigFactoryBase):
     """
     Factory class for retrieving the appropriate ORM configuration based on the database type.
@@ -145,5 +225,37 @@ class ConfigFactory(ConfigFactoryBase):
             return MySQLConfig
         elif self.db_type == "sqlite":
             return SQLiteConfig
+        else:
+            raise Exception(f"Database type {self.db_type} is not supported")
+
+
+class AsyncConfigFactory(ConfigFactoryBase):
+    def __init__(self, db_type: str):
+        """
+        Initializes the ConfigFactory instance.
+
+        Args:
+            db_type (str): The type of database.
+
+        """
+        super().__init__(db_type)
+
+    def get_config(self):
+        """
+        Returns the appropriate ORM configuration class based on the database type.
+
+        Returns:
+            class: The ORM configuration class.
+
+        Raises:
+            Exception: If the database type is not supported.
+
+        """
+        if self.db_type == "postgresql":
+            return AsyncPostgresConfig
+        elif self.db_type == "mysql":
+            return AsyncMySQLConfig
+        elif self.db_type == "sqlite":
+            return AsyncSQLiteConfig
         else:
             raise Exception(f"Database type {self.db_type} is not supported")

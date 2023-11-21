@@ -2,7 +2,7 @@ import os
 
 import pytest
 from nest.core.database.orm_config import ConfigFactory
-from nest.core.database.base_orm import OrmService
+from nest.core.database.orm_provider import OrmProvider, AsyncOrmProvider
 
 
 @pytest.fixture(scope="module")
@@ -70,7 +70,7 @@ def test_mysql_url(mysql_config_factory):
 
 @pytest.fixture(scope="module")
 def sqlite_orm_service():
-    return OrmService(
+    return OrmProvider(
         db_type="sqlite",
         config_params=dict(db_name=os.getenv("SQLITE_DB_NAME", "default_nest_db")),
     )
@@ -78,7 +78,7 @@ def sqlite_orm_service():
 
 @pytest.fixture(scope="module")
 def postgres_orm_service():
-    return OrmService(
+    return OrmProvider(
         db_type="postgresql",
         config_params=dict(
             db_name=os.getenv("POSTGRES_DB_NAME", "default_nest_db"),
@@ -92,7 +92,7 @@ def postgres_orm_service():
 
 @pytest.fixture(scope="module")
 def mysql_orm_service():
-    return OrmService(
+    return OrmProvider(
         db_type="mysql",
         config_params=dict(
             db_name=os.getenv("MYSQL_DB_NAME", "default_nest_db"),

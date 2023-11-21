@@ -6,9 +6,9 @@ from beanie import Document, init_beanie
 from nest.core.database.odm_config import ConfigFactory
 
 
-class OdmService:
+class OdmProvider:
     """
-    Provides an interface for working with an ODM (Object-Document Mapping) service.
+    Provides an interface for working with an ODM (Object-Document Mapping).
 
     Args:
         db_type (str, optional): The type of database. Defaults to "mongodb".
