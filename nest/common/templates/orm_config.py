@@ -1,11 +1,11 @@
 def generate_orm_config(db_type: str):
     if db_type == "mongodb":
         service_import = (
-            "from nest.core.database.base_odm import OdmService\n"
+            "from nest.core.database.base_odm import OdmProvider\n"
             "from src.examples.examples_entity import Examples"
         )
     else:
-        service_import = "from nest.core.database.base_orm import OrmService"
+        service_import = "from nest.core.database.base_orm import OrmProvider"
 
     base_template = f"""{service_import}
 import os
@@ -16,7 +16,7 @@ load_dotenv()
 
     if db_type == "sqlite":
         return f"""{base_template}
-config = OrmService(
+config = OrmProvider(
     db_type="{db_type}",
     config_params=dict(
         db_name=os.getenv("SQLITE_DB_NAME", "default_nest_db"),
@@ -25,7 +25,7 @@ config = OrmService(
         """
     elif db_type == "postgresql":
         return f"""{base_template}
-config = OrmService(
+config = OrmProvider(
     db_type="{db_type}",
     config_params=dict(
         host=os.getenv("POSTGRESQL_HOST"),
@@ -38,7 +38,7 @@ config = OrmService(
         """
     elif db_type == "mysql":
         return f"""{base_template}
-config = OrmService(
+config = OrmProvider(
     db_type="{db_type}",
     config_params=dict(
         host=os.getenv("MYSQL_HOST"),
@@ -52,7 +52,7 @@ config = OrmService(
     elif db_type == "mongodb":
         return f"""{base_template}
 
-config = OdmService(
+config = OrmProvider(
     db_type="{db_type}",
     config_params={{
         "db_name": os.getenv("DB_NAME"),
