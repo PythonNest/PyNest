@@ -28,7 +28,7 @@ class PostgresConfig(BaseProvider):
         """
         super().__init__(host, db_name, user, password, port)
 
-    def get_engine_url(self, is_async: bool = False) -> str:
+    def get_engine_url(self) -> str:
         """
         Returns the engine URL for the ORM.
 
@@ -152,7 +152,7 @@ class AsyncPostgresConfig(PostgresConfig):
         """
         super().__init__(host, db_name, user, password, port)
 
-    def get_engine_url(self, is_async: bool = False) -> str:
+    def get_engine_url(self) -> str:
         """
         Returns the engine URL for the ORM.
 
