@@ -22,7 +22,7 @@ jobs:
 
     - name: Start the application
       run: |
-        pynest create-nest-app -n NestApp -d sqlite
+        pynest create-nest-app -n NestApp -db sqlite
         cd NestApp
         pynest generate-module -n user
         uvicorn main:app -p 8000 --reload &
@@ -31,3 +31,5 @@ jobs:
     - name: Test the application
       run: |
         curl http://localhost:8000/docs
+        curl get http://localhost:8000/get_user
+        curl post http://localhost:8000/add_user -d '{"name": "test"}'
