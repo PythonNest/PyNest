@@ -1,7 +1,7 @@
 from nest.core import Controller, Get, Post, Depends
 
-from nest.marketplace.modules.redis.redis_service import RedisService
-from nest.marketplace.modules.redis.redis_model import RedisInput
+from nest.plugins.modules.redis.redis_service import RedisService
+from nest.plugins.modules.redis.redis_model import RedisInput
 
 
 @Controller("redis")

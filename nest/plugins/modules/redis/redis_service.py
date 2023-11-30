@@ -2,7 +2,7 @@ import redis
 
 from functools import lru_cache
 from fastapi import HTTPException
-from nest.marketplace.modules.redis.redis_model import RedisInput, RedisConfig
+from nest.plugins.modules.redis.redis_model import RedisInput, RedisConfig
 
 
 @lru_cache(maxsize=1)
