@@ -2,7 +2,9 @@
 
 ## Introduction
 
-This documentation introduces a new feature in PyNest that enables the creation of asynchronous applications using SQLAlchemy 2.0. This feature allows for efficient and scalable database operations in Python's asynchronous programming environment.
+This documentation introduces a new feature in PyNest that enables the creation of asynchronous applications using
+SQLAlchemy 2.0. This feature allows for efficient and scalable database operations in Python's asynchronous programming
+environment.
 
 ### Requirements
 
@@ -70,6 +72,28 @@ config = AsyncOrmProvider(
 
 Note: you can add any parameters that needed in order to configure the database connection.
 
+Now we need to declare the App object and register the module in
+
+`app.py`
+
+```python
+from orm_config import config
+from nest.core.app import App
+from src.examples.examples_module import ExamplesModule
+
+app = App(
+    description="PyNest service",
+    modules=[
+        ExamplesModule,
+    ]
+)
+
+
+@app.on_event("startup")
+async def startup():
+    await config.create_all()
+```
+
 ## Core Concepts
 ### AsyncOrmProvider
 AsyncOrmProvider is a key component in managing asynchronous database connections. It configures the connection pool and other parameters for efficient database access.
@@ -81,28 +105,46 @@ AsyncSession from sqlalchemy.ext.asyncio is used for executing asynchronous data
 ### Creating Models
 Define your models using SQLAlchemy's declarative base. For example, the Examples model:
 
+### AsyncSession
+
+AsyncSession, from sqlalchemy.ext.asyncio is used
+for executing asynchronous database operations.It is essential for leveraging the full capabilities of SQLAlchemy 2.0 in
+an async environment.
+
+## Implementing Async Features
+
+### Creating Models
+
+Define your models using SQLAlchemy's declarative base. For example, the Examples model:
+
 ```python
 from orm_config import config
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
+
 
 class Examples(config.Base):
     __tablename__ = "examples"
-    
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(1000), nullable=False)
 ```
 
 ### Creating Service
-Implement services to handle business logic. 
+
+Implement services to handle business logic.
 There are two ways of creating service.
-1. In that way, the service does not init any parameter, and that each function that depends on the database is getting the async session fron the controller
+
+1. In that way, the service does not init any parameter, and that each function that depends on the database is getting
+   the async session fron the controller
+
 ```python
 from src.examples.examples_model import Examples
 from src.examples.examples_entity import Examples as ExamplesEntity
 from nest.core.decorators.database import async_db_request_handler
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 
 class ExamplesService:
 
@@ -122,7 +164,9 @@ class ExamplesService:
         return result.scalars().all()
 ```
 
-2. In that way, the service init the async session in the constructor, and each function that depends on the database is using the session that was init in the constructor
+2. In that way, the service init the async session in the constructor, and each function that depends on the database is
+   using the session that was init in the constructor
+
 ```python
 from src.examples.examples_model import Examples
 from src.examples.examples_entity import Examples as ExamplesEntity
@@ -157,8 +201,8 @@ class ExamplesService:
             return result.scalars().all()
 ```
 
-
-create a controller to handle the requests and responses. The controller should call the service to execute business logic.
+create a controller to handle the requests and responses. The controller should call the service to execute business
+logic.
 
 Here we have also two ways of creating the controller.
 
@@ -175,19 +219,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 @Controller("examples", prefix="examples")
 class ExamplesController:
-
     service: ExamplesService = Depends(ExamplesService)
-    
+
     @Get("/")
     async def get_examples(self, session: AsyncSession = Depends(config.get_db)):
         return await self.service.get_examples(session)
-                
+
     @Post("/")
     async def add_examples(self, examples: Examples, session: AsyncSession = Depends(config.get_db)):
         return await self.service.add_examples(examples, session)
 ```
 
-2. In that way, the controller's functions not passing the async session object since the service init the async session in his constructor.
+2. In that way, the controller's functions not passing the async session object since the service init the async session
+   in his constructor.
 
 ```python
 from nest.core import Controller, Get, Post, Depends
@@ -198,26 +242,27 @@ from src.examples.examples_model import Examples
 
 @Controller("examples", prefix="examples")
 class ExamplesController:
-
     service: ExamplesService = Depends(ExamplesService)
-    
+
     @Get("/")
     async def get_examples(self):
         return await self.service.get_examples()
-                
+
     @Post("/")
     async def add_examples(self, examples: Examples):
         return await self.service.add_examples(examples)
 ```
 
-> **Hint:** Keep in mind that there are no difference between the two methods, the only difference is the way of getting the async session object, and how to use it. Choose you favorite syntax and use it.
-
+> **Hint:** Keep in mind that there are no difference between the two methods, the only difference is the way of getting
+> the async session object, and how to use it. Choose you favorite syntax and use it.
 
 ## async_db_request_handler decorator
 
-The async_db_request_handler decorator is used to handle the async session object. It is used in the service layer to handle exceptions and rollback the session if needed.
+The async_db_request_handler decorator is used to handle the async session object. It is used in the service layer to
+handle exceptions and rollback the session if needed.
 
 Code:
+
 ```python
 def async_db_request_handler(func):
     """

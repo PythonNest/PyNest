@@ -37,3 +37,6 @@ jobs:
 
     - name: Run tests
       run: poetry run pytest tests
+
+  integration-test:
+    uses: ./.github/workflows/integration_test.yaml
