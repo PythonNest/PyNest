@@ -25,7 +25,7 @@ jobs:
         pynest create-nest-app -n NestApp -db sqlite
         cd NestApp
         pynest generate-module -n user
-        uvicorn main:app -p 8000 --reload &
+        uvicorn "app:app" --host "0.0.0.0" --port "80" --reload &
         sleep 10  # Wait for the server to start
 
     - name: Test the application
