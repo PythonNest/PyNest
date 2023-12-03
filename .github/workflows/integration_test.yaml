@@ -1,7 +1,10 @@
 name: Integration Test
 
-on: [push, pull_request]
-
+on:
+    workflow_dispatch:
+        permissions:
+        users:
+            - ItayTheDar
 jobs:
   test:
     runs-on: ubuntu-latest
