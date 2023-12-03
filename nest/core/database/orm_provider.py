@@ -13,16 +13,17 @@ class Base(DeclarativeBase):
     """
     Base class for ORM models.
     """
+
     pass
 
 
 class BaseOrmProvider(ABC):
     def __init__(
-            self,
-            db_type: str = "postgresql",
-            config_params: dict = None,
-            async_mode: bool = False,
-            **kwargs
+        self,
+        db_type: str = "postgresql",
+        config_params: dict = None,
+        async_mode: bool = False,
+        **kwargs
     ):
         """
         Initializes the BaseOrmProvider instance.
@@ -37,14 +38,14 @@ class BaseOrmProvider(ABC):
         config_factory = AsyncConfigFactory if async_mode else ConfigFactory
 
         engine_function = create_async_engine if async_mode else create_engine
-        if 'engine_params' in kwargs:
-            engine_params: Dict[str, Any] = kwargs.pop('engine_params')
+        if "engine_params" in kwargs:
+            engine_params: Dict[str, Any] = kwargs.pop("engine_params")
         else:
             engine_params = {}
 
         session_function = async_sessionmaker if async_mode else sessionmaker
-        if 'session_params' in kwargs:
-            session_params: Dict[str, Any] = kwargs.pop('session_params')
+        if "session_params" in kwargs:
+            session_params: Dict[str, Any] = kwargs.pop("session_params")
         else:
             session_params = {}
 
@@ -95,13 +96,14 @@ class AsyncOrmProvider(BaseOrmProvider):
     Asynchronous ORM provider.
     """
 
-    def __init__(self, db_type: str = "postgresql", config_params: dict = None, **kwargs):
-        kwargs['engine_params'] = dict(echo=True)
-        kwargs['session_params'] = dict(
-            expire_on_commit=False,
-            class_=AsyncSession
+    def __init__(
+        self, db_type: str = "postgresql", config_params: dict = None, **kwargs
+    ):
+        kwargs["engine_params"] = dict(echo=True)
+        kwargs["session_params"] = dict(expire_on_commit=False, class_=AsyncSession)
+        super().__init__(
+            db_type=db_type, config_params=config_params, async_mode=True, **kwargs
         )
-        super().__init__(db_type=db_type, config_params=config_params, async_mode=True, **kwargs)
 
     async def create_all(self):
         async with self.engine.begin() as conn:
