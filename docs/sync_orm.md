@@ -50,7 +50,7 @@ once you have created your app, this is the code that support the asynchronous f
 `orm_config.py`
 
 ```python
-from nest.core.database.base_orm import OrmProvider
+from nest.core.database.orm_provider import OrmProvider
 import os
 from dotenv import load_dotenv
 

@@ -20,10 +20,11 @@ markdown_extensions:
 
 nav:
   - Overview: index.md
-    - Usage:
-        - Sync Application: sync_orm.md
-        - Async Application: async_orm.md
-  - Getting Started: installation.md
+  - Usage:
+      - Blank Application: blank.md
+      - Sync Application: sync_orm.md
+      - Async Application: async_orm.md
+      - MongoDB Application: mongodb.md
   - API Reference:
     - database: database.md
     - decorators: decorators.md
