@@ -69,7 +69,7 @@ def _init_cbv(cls: Type[Any]) -> None:
                 name=name,
                 kind=inspect.Parameter.KEYWORD_ONLY,
                 annotation=hint,
-                **parameter_kwargs
+                **parameter_kwargs,
             )
         )
     new_signature = old_signature.replace(parameters=new_parameters)

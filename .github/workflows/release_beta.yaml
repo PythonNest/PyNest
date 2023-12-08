@@ -1,4 +1,4 @@
-name: Release Package
+name: Release Beta
 
 on:
   workflow_dispatch:
@@ -16,6 +16,7 @@ on:
           - minor
           - patch
 
+
 env:
   VERSION_FILE_PATH: nest/__init__.py
   CHANGELOG_FILE_PATH: CHANGELOG.md
@@ -24,7 +25,7 @@ jobs:
   run-tests:
     uses: ./.github/workflows/tests.yaml
 
-  release-package:
+  release-beta:
     runs-on: ubuntu-latest
     needs: run-tests
     permissions:
@@ -39,11 +40,11 @@ jobs:
       - name: Set version
         run: |
           VERSION_REGEX='^(__version__ = \")(([[:digit:]]+\.)*[[:digit:]]+)((a|b|rc)[[:digit:]]+)?(\.post[[:digit:]]+)?(.dev[[:digit:]]+)?(\")$'
-          
+
           # get current version from version file
           CURRENT_VERSION=`sed -n -E "s/$VERSION_REGEX/\2/p" $VERSION_FILE_PATH`
           echo "Current version: $CURRENT_VERSION"
-          
+
           # switch case for incrementing_version based on input
           case ${{ inputs.increment_version }} in
             major)
@@ -62,9 +63,10 @@ jobs:
           esac
           echo "New version: $NEW_VERSION"
           echo "RELEASE_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-          
+
           # update version file
           sed -i -E "s/$VERSION_REGEX/\1$NEW_VERSION\8/" $VERSION_FILE_PATH
+
 
       - name: Install python
         uses: actions/setup-python@v4
@@ -78,6 +80,7 @@ jobs:
 
       - name: Update CHANGELOG.md
         run: git-changelog . -o $CHANGELOG_FILE_PATH
+
 
       - name: Build package
         run: python -m build
@@ -93,28 +96,6 @@ jobs:
           # import to check if package is installed correctly
           python -c "import nest"
 
-      - name: Commit and push changes
+      - name: Copy pip url
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github@actions.com"
-          git add $CHANGELOG_FILE_PATH $VERSION_FILE_PATH
-          git commit -m "Increment version to $NEW_VERSION"
-          git push
-
-      - name: Publish a Python distribution to PyPI
-        run: |
-          python -m twine upload -u ${{ secrets.PYPI_API_USER }} -p ${{ secrets.PYPI_API_TOKEN }} dist/*
-
-      - name: Release New Version
-        uses: softprops/action-gh-release@v1
-        with:
-          name: v${{ env.RELEASE_VERSION }}
-          tag_name: v${{ env.RELEASE_VERSION }}
-
-  deploy-docs:
-    needs: release-package
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    uses: ./.github/workflows/deploy_docs.yaml
+          echo "pip install --index-url https://test.pypi.org/simple/ --no-deps pynest-api"

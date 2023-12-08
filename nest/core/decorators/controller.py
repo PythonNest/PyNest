@@ -37,35 +37,35 @@ def Controller(tag: str = None, prefix: str = None):
                             method.__path__,
                             method,
                             methods=["GET"],
-                            **method.__kwargs__
+                            **method.__kwargs__,
                         )
                     elif method.method == "POST":
                         router.add_api_route(
                             method.__path__,
                             method,
                             methods=["POST"],
-                            **method.__kwargs__
+                            **method.__kwargs__,
                         )
                     elif method.method == "PUT":
                         router.add_api_route(
                             method.__path__,
                             method,
                             methods=["PUT"],
-                            **method.__kwargs__
+                            **method.__kwargs__,
                         )
                     elif method.method == "DELETE":
                         router.add_api_route(
                             method.__path__,
                             method,
                             methods=["DELETE"],
-                            **method.__kwargs__
+                            **method.__kwargs__,
                         )
                     elif method.method == "PATCH":
                         router.add_api_route(
                             method.__path__,
                             method,
                             methods=["PATCH"],
-                            **method.__kwargs__
+                            **method.__kwargs__,
                         )
                     else:
                         raise Exception("Invalid method")
