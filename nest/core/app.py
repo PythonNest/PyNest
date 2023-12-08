@@ -1,9 +1,9 @@
-from typing import List, Callable
+from typing import List
 from fastapi import FastAPI, APIRouter
 
 
 class App(FastAPI):
-    def __init__(self, description: str, modules: List):
+    def __init__(self, description: str, modules: List, *args, **kwargs):
         """
         Initializes the App instance.
 
@@ -12,14 +12,13 @@ class App(FastAPI):
             modules (List): A list of modules to register.
 
         """
-        super().__init__(description=description)
+        super().__init__(description=description, *args, **kwargs)
         self.modules = modules
         self._register_controllers()
 
     def _register_controllers(self):
         """
         Registers the controllers from the provided modules.
-
         """
         for module in self.modules:
             module_instance = module()

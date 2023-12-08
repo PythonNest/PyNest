@@ -1,4 +1,4 @@
-from nest.core.database.config import ConfigFactoryBase, BaseProvider
+from nest.core.database.base_config import ConfigFactoryBase, BaseProvider
 
 
 class MongoDBConfig(BaseProvider):

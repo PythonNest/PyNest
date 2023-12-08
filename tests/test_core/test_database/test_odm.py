@@ -6,12 +6,12 @@ from nest.core.database.odm_config import (
     MongoDBConfig,
 )
 
-from nest.core.database.base_odm import OdmService
+from nest.core.database.odm_provider import OdmProvider
 
 
 @pytest.fixture(scope="module")
 def odm_service():
-    return OdmService(
+    return OdmProvider(
         db_type="mongodb",
         config_params={
             "db_name": "db_name",
