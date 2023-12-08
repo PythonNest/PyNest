@@ -23,7 +23,7 @@ class BaseOrmProvider(ABC):
         db_type: str = "postgresql",
         config_params: dict = None,
         async_mode: bool = False,
-        **kwargs
+        **kwargs,
     ):
         """
         Initializes the BaseOrmProvider instance.

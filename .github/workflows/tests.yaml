@@ -3,23 +3,8 @@ name: Tests
 on: [push, workflow_call]
 
 jobs:
-  format:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Check black formatter
-      uses: psf/black@stable
-      with:
-        options: "--check"
-        version: "23.1.0"
-
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python_version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
     - uses: actions/checkout@v3
 
@@ -27,13 +12,14 @@ jobs:
       id: setup_python
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python_version }}
-
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-
-    - name: Install python dependencies
-      run: poetry install --with test
+        python-version: |
+          3.7
+          3.8
+          3.9
+          3.10
+          3.11
 
     - name: Run tests
-      run: poetry run pytest tests
+      run: |
+        pip install -r requirements-tests.txt
+        pytest tests

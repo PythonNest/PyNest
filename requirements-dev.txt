@@ -1,0 +1,6 @@
+fastapi==0.95.1
+black==21.12b0
+SQLAlchemy==2.0.19
+motor==3.2.0
+beanie==1.20.0
+click==8.1.6
