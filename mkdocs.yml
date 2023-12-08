@@ -22,8 +22,8 @@ nav:
   - Overview: index.md
   - Usage:
       - Blank Application: blank.md
-      - Sync Application: sync_orm.md
-      - Async Application: async_orm.md
+      - Sync ORM Application: sync_orm.md
+      - Async ORM Application: async_orm.md
       - MongoDB Application: mongodb.md
   - API Reference:
     - database: database.md
