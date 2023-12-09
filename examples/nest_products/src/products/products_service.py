@@ -1,6 +1,6 @@
-from examples.nest_products.src.products.products_model import Product
-from examples.nest_products.src.products.products_entity import Product as ProductEntity
-from examples.nest_products.orm_config import config
+from .products_model import Product
+from .products_entity import Product as ProductEntity
+from orm_config import config
 from nest.core.decorators import db_request_handler
 
 

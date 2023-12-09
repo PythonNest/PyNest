@@ -1,6 +1,6 @@
 from nest.core import Depends, Controller, Get, Post
-from examples.nest_products.src.products.products_service import ProductsService
-from examples.nest_products.src.products.products_model import Product
+from .products_service import ProductsService
+from .products_model import Product
 
 
 @Controller("products")

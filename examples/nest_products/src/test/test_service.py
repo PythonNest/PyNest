@@ -1,6 +1,6 @@
-from examples.nest_products.src.test.test_model import Test
-from examples.nest_products.src.test.test_entity import Test as TestEntity
-from examples.nest_products.orm_config import config
+from .test_model import Test
+from .test_entity import Test as TestEntity
+from orm_config import config
 from nest.core.decorators import db_request_handler
 
 

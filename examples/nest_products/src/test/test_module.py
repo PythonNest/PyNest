@@ -1,5 +1,5 @@
-from examples.nest_products.src.test.test_service import TestService
-from examples.nest_products.src.test.test_controller import TestController
+from .test_service import TestService
+from .test_controller import TestController
 
 
 class TestModule:

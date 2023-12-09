@@ -1,5 +1,5 @@
-from examples.nest_products.src.users.users_controller import UsersController
-from examples.nest_products.src.users.users_service import UsersService
+from .users_controller import UsersController
+from .users_service import UsersService
 
 
 class UsersModule:

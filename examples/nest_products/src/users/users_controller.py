@@ -1,7 +1,7 @@
 from nest.core import Controller, Get, Post, Depends
 
-from examples.nest_products.src.users.users_service import UsersService
-from examples.nest_products.src.users.users_model import User
+from .users_service import UsersService
+from .users_model import User
 
 
 @Controller("users")
