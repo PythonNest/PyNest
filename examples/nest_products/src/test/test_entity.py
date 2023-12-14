@@ -1,4 +1,4 @@
-from examples.nest_products.orm_config import config
+from orm_config import config
 from sqlalchemy import Column, Integer, String
 
 

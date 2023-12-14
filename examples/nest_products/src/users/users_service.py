@@ -1,6 +1,6 @@
-from examples.nest_products.src.users.users_model import User
-from examples.nest_products.src.users.users_entity import User as UserEntity
-from examples.nest_products.orm_config import config
+from .users_model import User
+from .users_entity import User as UserEntity
+from orm_config import config
 from nest.core.decorators import db_request_handler
 
 

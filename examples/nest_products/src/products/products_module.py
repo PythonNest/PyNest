@@ -1,5 +1,5 @@
-from examples.nest_products.src.products.products_controller import ProductsController
-from examples.nest_products.src.products.products_service import ProductsService
+from .products_controller import ProductsController
+from .products_service import ProductsService
 
 
 class ProductsModule:

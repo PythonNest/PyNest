@@ -1,7 +1,7 @@
 from nest.core import Controller, Get, Post, Depends
 
-from examples.nest_products.src.test.test_service import TestService
-from examples.nest_products.src.test.test_model import Test
+from .test_service import TestService
+from .test_model import Test
 
 
 @Controller("test")
