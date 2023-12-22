@@ -1,4 +1,4 @@
-from nest.core import Controller, Get, Post, Depends
+from nest.core import Controller, Get, Post, Depends, Delete
 
 from nest.plugins.modules.redis.redis_service import RedisService
 from nest.plugins.modules.redis.redis_model import RedisInput
@@ -8,18 +8,18 @@ from nest.plugins.modules.redis.redis_model import RedisInput
 class RedisController:
     redis_service: RedisService = Depends(RedisService)
 
-    @Get("get/{key}")
+    @Get("/{key}")
     def get(self, key: str):
         return self.redis_service.get(key)
 
-    @Post("set")
+    @Post("/")
     def set(self, redis_input: RedisInput):
         return self.redis_service.set(redis_input)
 
-    @Post("delete/{key}")
+    @Delete("/{key}")
     def delete(self, key: str):
         return self.redis_service.delete(key)
 
-    @Get("exists/{key}")
+    @Get("/exists/{key}")
     def exists(self, key: str):
         return self.redis_service.exists(key)

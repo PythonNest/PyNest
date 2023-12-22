@@ -49,7 +49,7 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── orm_config.py
+├── config.py
 ├── main.py
 ├── src
 │    ├── __init__.py
@@ -64,7 +64,7 @@ this command will create a new project with the following structure:
 
 once you have created your app, this is the code that support the mongo integration:
 
-`orm_config.py`
+`config.py`
 
 ```python
 from nest.core.database.odm_provider import OdmProvider
@@ -92,7 +92,7 @@ Now we need to declare the App object and register the module in
 `app.py`
 
 ```python
-from orm_config import config
+from config import config
 from nest.core.app import App
 from src.examples.examples_module import ExamplesModule
 

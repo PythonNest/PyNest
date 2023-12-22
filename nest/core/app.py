@@ -12,7 +12,9 @@ class App(FastAPI):
             modules (List): A list of modules to register.
 
         """
-        super().__init__(description=description, *args, **kwargs)
+        super().__init__(
+            description=description, title="PyNest Application", *args, **kwargs
+        )
         self.modules = modules
         self._register_controllers()
 

@@ -34,7 +34,7 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── orm_config.py
+├── config.py
 ├── main.py
 ├── src
 │    ├── __init__.py
@@ -49,7 +49,7 @@ this command will create a new project with the following structure:
 
 once you have created your app, this is the code that support the asynchronous feature:
 
-`orm_config.py`
+`config.py`
 
 ```python
 from nest.core.database.orm_provider import AsyncOrmProvider
@@ -77,7 +77,7 @@ Now we need to declare the App object and register the module in
 `app.py`
 
 ```python
-from orm_config import config
+from config import config
 from nest.core.app import App
 from src.examples.examples_module import ExamplesModule
 
@@ -118,7 +118,7 @@ an async environment.
 Define your models using SQLAlchemy's declarative base. For example, the Examples model:
 
 ```python
-from orm_config import config
+from config import config
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -170,7 +170,7 @@ class ExamplesService:
 ```python
 from src.examples.examples_model import Examples
 from src.examples.examples_entity import Examples as ExamplesEntity
-from orm_config import config
+from config import config
 from nest.core.decorators.database import async_db_request_handler
 from functools import lru_cache
 from sqlalchemy import select, text
@@ -206,14 +206,14 @@ logic.
 
 Here we have also two ways of creating the controller.
 
-1. In that way, the controller's functions are getting the async session from the orm_config
+1. In that way, the controller's functions are getting the async session from the config
 
 ```python
 from nest.core import Controller, Get, Post, Depends
 
 from src.examples.examples_service import ExamplesService
 from src.examples.examples_model import Examples
-from orm_config import config
+from config import config
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

@@ -44,7 +44,7 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── orm_config.py
+├── config.py
 ├── main.py
 ├── src
 │    ├── __init__.py
@@ -56,7 +56,7 @@ this command will create a new project with the following structure:
 │    ├──  ├── examples_entity.py
 │    ├──  ├── examples_module.py
 ```
-
+[
 once you have created your app, get into the folder and run the following command:
 
 ```bash
@@ -66,17 +66,17 @@ cd my_app_name
 run the server with the following command:
 
 ```bash
-uvicorn "app:app" --host "0.0.0.0" --port "80" --reload
+uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
 ```
 
-Now you can visit [OpenAPI](http://localhost:80/docs) in your browser to see the default API documentation.
+Now you can visit [OpenAPI](http://localhost:8000/docs) in your browser to see the default API documentation.
 
 ### Adding modules
 
 To add a new module to your application, you can use the pynest generate module command:
-
+]()
 ```bash
-pynest generate-module -n users
+pynest g module -n users
 ```
 
 This will create a new module called ```users``` in your application with the following structure:

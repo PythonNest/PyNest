@@ -32,7 +32,7 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── orm_config.py
+├── config.py
 ├── main.py
 ├── src
 │    ├── __init__.py
@@ -47,7 +47,7 @@ this command will create a new project with the following structure:
 
 once you have created your app, this is the code that support the asynchronous feature:
 
-`orm_config.py`
+`config.py`
 
 ```python
 from nest.core.database.orm_provider import OrmProvider
@@ -76,7 +76,7 @@ Define your models using SQLAlchemy's declarative base. For example, the Example
 `examples_entity.py`
 
 ```python
-from orm_config import config
+from config import config
 from sqlalchemy import Column, Integer, String
 
 class Examples(config.Base):
@@ -92,7 +92,7 @@ Implement services to handle business logic.
 `examples_service.py`
 
 ```python
-from orm_config import config
+from config import config
 from src.examples.examples_model import Examples
 from src.examples.examples_entity import Examples as ExamplesEntity
 from nest.core.decorators.database import db_request_handler

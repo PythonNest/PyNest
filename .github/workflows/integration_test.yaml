@@ -25,14 +25,13 @@ jobs:
 
     - name: Start the application
       run: |
-        pynest create-nest-app -n NestApp -db sqlite
+        pynest create-nest-app -n NestApp
         cd NestApp
         pynest generate-module -n user
-        sudo python main.py &
-        sleep 10  # Wait for the server to start
+        uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
 
     - name: Test the application
       run: |
         curl http://localhost:8000/docs
-        curl get http://localhost:8000/get_user
-        curl post http://localhost:8000/add_user -d '{"name": "test"}'
+        curl get http://localhost:8000/user/
+        curl post http://localhost:8000/user/ -d '{"name": "test"}'
