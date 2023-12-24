@@ -5,8 +5,8 @@ from nest.common.templates.templates_factory import TemplateFactory
 
 
 def get_metadata():
-    setting_path = Path(__file__).parent.parent / "settings.yml"
-    assert setting_path.exists(), "settings.yml file not found"
+    setting_path = Path(__file__).parent.parent / "settings.yaml"
+    assert setting_path.exists(), "settings.yaml file not found"
     with open(setting_path, "r") as file:
         file = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -44,6 +44,8 @@ def create_nest_app(app_name: str = ".", db_type: str = None, is_async: bool = F
         .....................
 
     │    ├── another module
+
+    in addition to those files, a setting.yaml file will be created in the package level that will help managed configurations
     """
     template_factory = TemplateFactory()
     template = template_factory.get_template(
