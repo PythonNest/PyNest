@@ -3,7 +3,13 @@ from fastapi import FastAPI, APIRouter
 
 
 class App(FastAPI):
-    def __init__(self, description: str, modules: List, *args, **kwargs):
+    def __init__(
+            self,
+            description: str,
+            modules: List,
+            title: str = "PyNest Service",
+            **kwargs
+    ):
         """
         Initializes the App instance.
 
@@ -13,7 +19,7 @@ class App(FastAPI):
 
         """
         super().__init__(
-            description=description, title="PyNest Application", *args, **kwargs
+            description=description, title=title, **kwargs
         )
         self.modules = modules
         self._register_controllers()
