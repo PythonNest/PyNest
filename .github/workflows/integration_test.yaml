@@ -1,10 +1,7 @@
 name: Integration Test
 
-on:
-  workflow_dispatch:
-    permissions:
-    users:
-      - ItayTheDar
+on: [ push, workflow_call ]
+
 jobs:
   test:
     runs-on: ubuntu-latest
