@@ -28,10 +28,18 @@ jobs:
         pynest create-nest-app -n NestApp
         cd NestApp
         pynest g module -n user
-        uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
+        uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload &
+
+    - name: Wait for the server to start
+      run: |
+        sleep 10  # Wait for 10 seconds to ensure the server is up
 
     - name: Test the application
       run: |
         curl http://localhost:8000/docs
-        curl get http://localhost:8000/user/
-        curl post http://localhost:8000/user/ -d '{"name": "test"}'
+        curl http://localhost:8000/user/
+        curl -X POST http://localhost:8000/user/ -d '{"name": "test"}'
+
+    - name: Kill the server
+      run: |
+        kill $(jobs -p) || true
