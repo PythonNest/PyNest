@@ -23,7 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
 
-      - name: Start the application
+      - name: Start Blank Application
         run: |
           pynest create-nest-app -n NestApp
           cd NestApp
@@ -47,3 +47,31 @@ jobs:
       - name: Kill the server
         run: |
           kill $(jobs -p) || true
+
+
+      - name: Wait fot the server to die
+        run: |
+          sleep 10  # Wait for 10 seconds to ensure the server is down
+
+
+      - name: Start Sync ORM Application
+        run: |
+          pynest create-nest-app -n ORMNestApp --db sqlite
+          cd ORMNestApp
+          pynest g module -n user
+          uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload &
+
+      - name: Wait for the server to start
+        run: |
+          sleep 10  # Wait for 10 seconds to ensure the server is up
+
+      - name: Test the application
+        run: |
+          curl -f http://localhost:8000/docs
+          curl -f -X 'POST' \
+            'http://0.0.0.0:8000/user/' \
+            -H 'accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -d '{"name": "Example Name"}'
+          curl -f http://localhost:8000/user/
+
