@@ -56,7 +56,7 @@ jobs:
 
       - name: Start Sync ORM Application
         run: |
-          pynest create-nest-app -n ORMNestApp --db sqlite
+          pynest create-nest-app -n ORMNestApp -db sqlite
           cd ORMNestApp
           pynest g module -n user
           uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload &
