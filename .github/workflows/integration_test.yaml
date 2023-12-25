@@ -38,12 +38,10 @@ jobs:
         run: |
           curl -f http://localhost:8000/docs
           curl -f -X 'POST' \
-            'http://0.0.0.0:8000/examples/ \
+            'http://0.0.0.0:8000/user/' \
             -H 'accept: application/json' \
             -H 'Content-Type: application/json' \
-            -d '{
-            "name": "Example Name"
-            }'
+            -d '{"name": "Example Name"}'
           curl -f http://localhost:8000/user/
 
       - name: Kill the server
