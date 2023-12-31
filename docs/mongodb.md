@@ -49,7 +49,7 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── orm_config.py
+├── config.py
 ├── main.py
 ├── src
 │    ├── __init__.py
@@ -64,7 +64,7 @@ this command will create a new project with the following structure:
 
 once you have created your app, this is the code that support the mongo integration:
 
-`orm_config.py`
+`config.py`
 
 ```python
 from nest.core.database.odm_provider import OdmProvider
@@ -92,7 +92,7 @@ Now we need to declare the App object and register the module in
 `app.py`
 
 ```python
-from orm_config import config
+from config import config
 from nest.core.app import App
 from src.examples.examples_module import ExamplesModule
 
@@ -145,8 +145,8 @@ class Examples(BaseModel):
 Implement services to handle business logic.
 
 ```python
-from src.examples.examples_model import Examples
-from src.examples.examples_entity import Examples as ExamplesEntity
+from .examples_model import Examples
+from .examples_entity import Examples as ExamplesEntity
 from nest.core.decorators import db_request_handler
 from functools import lru_cache
 
@@ -173,11 +173,11 @@ logic.
 ```python
 from nest.core import Controller, Get, Post, Depends
 
-from src.examples.examples_service import ExamplesService
-from src.examples.examples_model import Examples
+from .examples_service import ExamplesService
+from .examples_model import Examples
 
 
-@Controller("examples", prefix="/examples")
+@Controller("examples")
 class ExamplesController:
 
     service: ExamplesService = Depends(ExamplesService)
@@ -196,8 +196,8 @@ class ExamplesController:
 Create a module to register the controller and service.
 
 ```python
-from src.examples.examples_controller import ExamplesController
-from src.examples.examples_service import ExamplesService
+from .examples_controller import ExamplesController
+from .examples_service import ExamplesService
 
 
 class ExamplesModule:

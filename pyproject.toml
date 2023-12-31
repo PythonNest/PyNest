@@ -27,6 +27,9 @@ dependencies = [
     "python-dotenv==1.0.0",
     "SQLAlchemy==2.0.19",
     "uvicorn==0.23.1",
+    "PyYAML==6.0.1",
+    "astor==0.8.1",
+    "black==23.11.0"
 ]
 
 [tool.setuptools.dynamic]

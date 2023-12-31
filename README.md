@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/imgs/pynest_new_logo_opt-removebg-preview.jpeg" title="pynest logo" width="300">
+  <img src="docs/imgs/pynest-logo.png" title="pynest logo" width="300">
 </p>
 <p align="center">
     <em>PyNest is a Python framework built on top of FastAPI that follows the modular architecture of NestJS</em>
@@ -26,7 +26,7 @@ PyNest is designed to help structure your APIs in an intuitive, easy to understa
 
 With PyNest, you can build scalable and maintainable APIs with ease. The framework supports dependency injection, type annotations, decorators, and code generation, making it easy to write clean and testable code.
 
-This framework is not a direct port of NestJS to Python but rather a re-imagining of the framework specifically for Python developers, including data scientists, data analysts, and data engineers. It aims to assist them in building better and faster APIs for their data applications.
+This framework is not a direct port of NestJS to Python but rather a re-imagining of the framework specifically for Python developers, including backend engineers and ML engineers. It aims to assist them in building better and faster APIs for their data applications.
 
 ## Getting Started
 To get started with PyNest, you'll need to install it using pip:
@@ -44,17 +44,12 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── orm_config.py
 ├── main.py
+├── requirements.txt
+├── .gitignore
+├── README.md
 ├── src
 │    ├── __init__.py
-│    ├── examples
-│    │    ├── __init__.py
-│    │    ├── examples_controller.py
-│    │    ├── examples_service.py
-│    │    ├── examples_model.py
-│    ├──  ├── examples_entity.py
-│    ├──  ├── examples_module.py
 ```
 
 once you have created your app, get into the folder and run the following command:
@@ -66,20 +61,20 @@ cd my_app_name
 run the server with the following command:
 
 ```bash
-uvicorn "app:app" --host "0.0.0.0" --port "80" --reload
+uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
 ```
 
-Now you can visit [OpenAPI](http://localhost:80/docs) in your browser to see the default API documentation.
+Now you can visit [OpenAPI](http://localhost:8000/docs) in your browser to see the default API documentation.
 
 ### Adding modules
 
 To add a new module to your application, you can use the pynest generate module command:
-
+]()
 ```bash
-pynest generate-module -n users
+pynest g module -n users
 ```
 
-This will create a new module called ```users``` in your application with the following structure:
+This will create a new module called ```users``` in your application with the following structure under the ```src``` folder:
 
 ```text
 ├── users
@@ -96,6 +91,42 @@ The users module will immediately register itself with the application and will 
 You can then start defining routes and other application components using decorators and other PyNest constructs.
 
 For more information on how to use PyNest, check out the official documentation at https://pythonnest.github.io/PyNest/.
+
+## PyNest CLI Usage Guide
+
+This document provides a guide on how to use the PyNest Command Line Interface (CLI). Below are the available commands and their descriptions:
+
+### `pynest` Command
+
+- **Description**: The main command group for PyNest CLI.
+
+#### `create-nest-app` Subcommand
+
+- **Description**: Create a new nest app.
+- **Options**:
+  - `--app-name`/`-n`: The name of the nest app (required).
+  - `--db-type`/`-db`: The type of the database (optional). You can specify PostgreSQL, MySQL, SQLite, or MongoDB.
+  - `--is-async`: Whether the project should be asynchronous (optional, default is False).
+
+### `g` command group
+
+- **Description**: Group command for generating boilerplate code.
+
+#### `module` Subcommand
+
+- **Description**: Generate a new module (controller, service, entity, model, module).
+- **Options**:
+  - `--name`/`-n`: The name of the module (required).
+
+
+#### CLI Examples
+* create a blank nest application - 
+`pynest create-nest-app -n my_app_name`
+* create a nest application with postgres database and async connection - 
+<br>
+`pynest create-nest-app -n my_app_name -db postgresql --is-async`
+* create new module - 
+`pynest g module -n users`
 
 
 ## Key Features

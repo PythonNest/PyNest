@@ -32,7 +32,7 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── orm_config.py
+├── config.py
 ├── main.py
 ├── src
 │    ├── __init__.py
@@ -45,9 +45,9 @@ this command will create a new project with the following structure:
 │    ├──  ├── examples_module.py
 ```
 
-once you have created your app, this is the code that support the asynchronous feature:
+once you have created your app, this should be the code that supports the database connection:
 
-`orm_config.py`
+`config.py`
 
 ```python
 from nest.core.database.orm_provider import OrmProvider
@@ -76,7 +76,7 @@ Define your models using SQLAlchemy's declarative base. For example, the Example
 `examples_entity.py`
 
 ```python
-from orm_config import config
+from config import config
 from sqlalchemy import Column, Integer, String
 
 class Examples(config.Base):
@@ -92,9 +92,9 @@ Implement services to handle business logic.
 `examples_service.py`
 
 ```python
-from orm_config import config
-from src.examples.examples_model import Examples
-from src.examples.examples_entity import Examples as ExamplesEntity
+from config import config
+from .examples_model import Examples
+from .examples_entity import Examples as ExamplesEntity
 from nest.core.decorators.database import db_request_handler
 from functools import lru_cache
 
@@ -128,11 +128,11 @@ Finally, create a controller to handle the requests and responses. The controlle
 ```python
 from nest.core import Controller, Get, Post, Depends
 
-from src.examples.examples_service import ExamplesService
-from src.examples.examples_model import Examples
+from .examples_service import ExamplesService
+from .examples_model import Examples
 
 
-@Controller("examples", prefix="examples")
+@Controller("examples")
 class ExamplesController:
 
     service: ExamplesService = Depends(ExamplesService)
@@ -144,6 +144,22 @@ class ExamplesController:
     @Post("/")
     def add_examples(self, examples: Examples):
         return self.service.add_examples(examples)
+```
+
+## Creating Module
+
+create the module file to register the controller and the service
+
+`examples_module.py`
+
+```python
+from .examples_controller import ExamplesController
+from .examples_service import ExamplesService
+
+
+class ExamplesModule:
+    controllers = [ExamplesController]
+    services = [ExamplesService]
 ```
 
 

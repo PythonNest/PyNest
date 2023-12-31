@@ -79,7 +79,7 @@ Implement services to handle business logic.
 `examples_service.py`
 
 ```python
-from src.examples.examples_model import Examples
+from .examples_model import Examples
 from functools import lru_cache
 
 
@@ -105,11 +105,11 @@ logic.
 ```python
 from nest.core import Controller, Get, Post, Depends
 
-from src.examples.examples_service import ExamplesService
-from src.examples.examples_model import Examples
+from .examples_service import ExamplesService
+from .examples_model import Examples
 
 
-@Controller("examples", prefix="examples")
+@Controller("examples")
 class ExamplesController:
     service: ExamplesService = Depends(ExamplesService)
 
@@ -120,4 +120,20 @@ class ExamplesController:
     @Post("/")
     async def add_examples(self, examples: Examples):
         return await self.service.add_examples(examples)
+```
+
+## Creating Module
+
+create the module file to register the controller and the service
+
+`examples_module.py`
+
+```python
+from .examples_controller import ExamplesController
+from .examples_service import ExamplesService
+
+
+class ExamplesModule:
+    controllers = [ExamplesController]
+    services = [ExamplesService]
 ```

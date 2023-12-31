@@ -14,11 +14,14 @@ def Controller(tag: str = None, prefix: str = None):
         class: The decorated class.
 
     """
-    if prefix:
-        if not prefix.startswith("/"):
-            prefix = "/" + prefix
-        if prefix.endswith("/"):
-            prefix = prefix[:-1]
+    # Use tag as default prefix if prefix is None
+    if prefix is None:
+        prefix = tag
+
+    if not prefix.startswith("/"):
+        prefix = "/" + prefix
+    if prefix.endswith("/"):
+        prefix = prefix[:-1]
 
     def wrapper(cls) -> ClassBasedView:
         router = APIRouter(tags=[tag] if tag else None)

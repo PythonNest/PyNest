@@ -39,6 +39,7 @@ def app():
 
 @pytest.mark.parametrize("route", ["/get", "/post", "/put", "/delete", "/patch"])
 def test_get(app, route):
+    route = "/test" + route # if prefix is not defined in the controller, then the given tag will be used as prefix
     route_exist = False
     for app_route in app.routes:
         if isinstance(app_route, APIRoute):
