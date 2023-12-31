@@ -44,19 +44,14 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── config.py
 ├── main.py
+├── requirements.txt
+├── .gitignore
+├── README.md
 ├── src
 │    ├── __init__.py
-│    ├── examples
-│    │    ├── __init__.py
-│    │    ├── examples_controller.py
-│    │    ├── examples_service.py
-│    │    ├── examples_model.py
-│    ├──  ├── examples_entity.py
-│    ├──  ├── examples_module.py
 ```
-[
+
 once you have created your app, get into the folder and run the following command:
 
 ```bash
@@ -79,7 +74,7 @@ To add a new module to your application, you can use the pynest generate module 
 pynest g module -n users
 ```
 
-This will create a new module called ```users``` in your application with the following structure:
+This will create a new module called ```users``` in your application with the following structure under the ```src``` folder:
 
 ```text
 ├── users
