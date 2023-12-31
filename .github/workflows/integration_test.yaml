@@ -28,15 +28,12 @@ jobs:
         run: |
           if [ "${{ matrix.app_type }}" == "Blank" ]; then
             app_name="NestApp"
-            port="8000"
             is_async=""
           elif [ "${{ matrix.app_type }}" == "SyncORM" ]; then
             app_name="ORMNestApp"
-            port="8080"
             is_async=""
           elif [ "${{ matrix.app_type }}" == "AsyncORM" ]; then
             app_name="AsyncORMNestApp"
-            port="8088"
             is_async="--is-async"
           fi
 
