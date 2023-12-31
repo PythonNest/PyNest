@@ -26,7 +26,7 @@ PyNest is designed to help structure your APIs in an intuitive, easy to understa
 
 With PyNest, you can build scalable and maintainable APIs with ease. The framework supports dependency injection, type annotations, decorators, and code generation, making it easy to write clean and testable code.
 
-This framework is not a direct port of NestJS to Python but rather a re-imagining of the framework specifically for Python developers, including data scientists, data analysts, and data engineers. It aims to assist them in building better and faster APIs for their data applications.
+This framework is not a direct port of NestJS to Python but rather a re-imagining of the framework specifically for Python developers, including backend engineers and ML engineers. It aims to assist them in building better and faster APIs for their data applications.
 
 ## Getting Started
 To get started with PyNest, you'll need to install it using pip:
@@ -119,10 +119,11 @@ This document provides a guide on how to use the PyNest Command Line Interface (
   - `--name`/`-n`: The name of the module (required).
 
 
-## CLI Examples
+#### CLI Examples
 * create a blank nest application - 
 `pynest create-nest-app -n my_app_name`
 * create a nest application with postgres database and async connection - 
+<br>
 `pynest create-nest-app -n my_app_name -db postgresql --is-async`
 * create new module - 
 `pynest g module -n users`
