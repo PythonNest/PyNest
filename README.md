@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/imgs/pynest_new_logo_opt-removebg-preview.jpeg" title="pynest logo" width="300">
+  <img src="docs/imgs/pynest_new_logo_opt-removebg-preview-removebg-preview.png" title="pynest logo" width="300">
 </p>
 <p align="center">
     <em>PyNest is a Python framework built on top of FastAPI that follows the modular architecture of NestJS</em>
