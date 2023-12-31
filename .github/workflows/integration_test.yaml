@@ -56,13 +56,13 @@ jobs:
 
       - name: Test the application
         run: |
-          curl -f http://0.0.0.0:"$port"/docs
+          curl -f http://localhost:"$port"/docs
           curl -f -X 'POST' \
-            "http://0.0.0.0:$port/user/" \
+            "http://localhost:$port/user/" \
             -H 'accept: application/json' \
             -H 'Content-Type: application/json' \
             -d '{"name": "Example Name"}'
-          curl -f http://0.0.0.0:"$port"/user/
+          curl -f http://localhost:"$port"/user/
 
       - name: Kill the server
         run: kill $(jobs -p) || true
