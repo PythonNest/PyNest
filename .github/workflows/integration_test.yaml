@@ -37,7 +37,7 @@ jobs:
           elif [ "${{ matrix.app_type }}" == "AsyncORM" ]; then
             app_name="AsyncORMNestApp"
             port="8088"
-            is_async="--is_async"
+            is_async="--is-async"
           fi
 
           if [ "${{ matrix.app_type }}" == "Blank" ]; then
