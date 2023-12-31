@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        app_type: ["Blank", "SyncORM"]
+        app_type: ["Blank", "SyncORM", "AsyncORM"]
 
     steps:
       - name: Check out repository code
@@ -44,6 +44,7 @@ jobs:
             pynest create-nest-app -n "$app_name"
           else
             pynest create-nest-app -n "$app_name" -db sqlite $is_async
+            pip install aiosqlite
           fi
 
           cd "$app_name"
@@ -57,7 +58,7 @@ jobs:
         run: |
           curl -f http://0.0.0.0:"$port"/docs
           curl -f -X 'POST' \
-            "http://0.0.0.0:"$port"/user/" \
+            "http://0.0.0.0:$port/user/" \
             -H 'accept: application/json' \
             -H 'Content-Type: application/json' \
             -d '{"name": "Example Name"}'
