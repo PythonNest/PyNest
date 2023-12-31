@@ -1,6 +1,6 @@
 name: Integration Test
 
-on: [push, workflow_call]
+on: [ push, workflow_call ]
 
 jobs:
   test:
@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        app_type: ["Blank", "SyncORM", "AsyncORM"]
+        app_type: [ "Blank", "SyncORM", "AsyncORM" ]
 
     steps:
       - name: Check out repository code
@@ -50,18 +50,18 @@ jobs:
           pynest g module -n user
           uvicorn "app:app" --host "0.0.0.0" --port "$port" --reload &
 
-      - name: Wait for the server to start
-        run: sleep 10
+  - name: Wait for the server to start
+    run: sleep 10
 
-      - name: Test the application
-        run: |
-          curl -f http://0.0.0.0:"$port"/docs
-          curl -f -X 'POST' \
-            "http://0.0.0.0:"$port"/user/" \
-            -H 'accept: application/json' \
-            -H 'Content-Type: application/json' \
-            -d '{"name": "Example Name"}'
-          curl -f http://0.0.0.0:"$port"/user/
-
-      - name: Kill the server
-        run: kill $(jobs -p) || true
+  - name: Test the application
+    run: |
+      curl -f http://localhost:"$port"/docs
+      curl -f -X 'POST' \
+        "http://localhost:"$port"/user/" \
+        -H 'accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d '{"name": "Example Name"}'
+      curl -f http://localhost:"$port"/user/
+      
+        - name: Kill the server
+          run: kill $(jobs -p) || true
