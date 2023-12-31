@@ -113,7 +113,7 @@ This document provides a guide on how to use the PyNest Command Line Interface (
   - `--db-type`/`-db`: The type of the database (optional). You can specify PostgreSQL, MySQL, SQLite, or MongoDB.
   - `--is-async`: Whether the project should be asynchronous (optional, default is False).
 
-### `g` Command
+### `g` command group
 
 - **Description**: Group command for generating boilerplate code.
 
@@ -122,6 +122,16 @@ This document provides a guide on how to use the PyNest Command Line Interface (
 - **Description**: Generate a new module (controller, service, entity, model, module).
 - **Options**:
   - `--name`/`-n`: The name of the module (required).
+
+
+## CLI Examples
+* create a blank nest application - 
+`pynest create-nest-app -n my_app_name`
+* create a nest application with postgres database and async connection - 
+`pynest create-nest-app -n my_app_name -db postgresql --is-async`
+* create new module - 
+`pynest g module -n users`
+
 
 ## Key Features
 ### Modular Architecture

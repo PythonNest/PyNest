@@ -145,8 +145,8 @@ class Examples(BaseModel):
 Implement services to handle business logic.
 
 ```python
-from src.examples.examples_model import Examples
-from src.examples.examples_entity import Examples as ExamplesEntity
+from .examples_model import Examples
+from .examples_entity import Examples as ExamplesEntity
 from nest.core.decorators import db_request_handler
 from functools import lru_cache
 
@@ -173,11 +173,11 @@ logic.
 ```python
 from nest.core import Controller, Get, Post, Depends
 
-from src.examples.examples_service import ExamplesService
-from src.examples.examples_model import Examples
+from .examples_service import ExamplesService
+from .examples_model import Examples
 
 
-@Controller("examples", prefix="/examples")
+@Controller("examples")
 class ExamplesController:
 
     service: ExamplesService = Depends(ExamplesService)
@@ -196,8 +196,8 @@ class ExamplesController:
 Create a module to register the controller and service.
 
 ```python
-from src.examples.examples_controller import ExamplesController
-from src.examples.examples_service import ExamplesService
+from .examples_controller import ExamplesController
+from .examples_service import ExamplesService
 
 
 class ExamplesModule:

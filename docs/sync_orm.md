@@ -45,7 +45,7 @@ this command will create a new project with the following structure:
 │    ├──  ├── examples_module.py
 ```
 
-once you have created your app, this is the code that support the asynchronous feature:
+once you have created your app, this should be the code that supports the database connection:
 
 `config.py`
 
@@ -93,8 +93,8 @@ Implement services to handle business logic.
 
 ```python
 from config import config
-from src.examples.examples_model import Examples
-from src.examples.examples_entity import Examples as ExamplesEntity
+from .examples_model import Examples
+from .examples_entity import Examples as ExamplesEntity
 from nest.core.decorators.database import db_request_handler
 from functools import lru_cache
 
@@ -128,11 +128,11 @@ Finally, create a controller to handle the requests and responses. The controlle
 ```python
 from nest.core import Controller, Get, Post, Depends
 
-from src.examples.examples_service import ExamplesService
-from src.examples.examples_model import Examples
+from .examples_service import ExamplesService
+from .examples_model import Examples
 
 
-@Controller("examples", prefix="examples")
+@Controller("examples")
 class ExamplesController:
 
     service: ExamplesService = Depends(ExamplesService)
@@ -144,6 +144,22 @@ class ExamplesController:
     @Post("/")
     def add_examples(self, examples: Examples):
         return self.service.add_examples(examples)
+```
+
+## Creating Module
+
+create the module file to register the controller and the service
+
+`examples_module.py`
+
+```python
+from .examples_controller import ExamplesController
+from .examples_service import ExamplesService
+
+
+class ExamplesModule:
+    controllers = [ExamplesController]
+    services = [ExamplesService]
 ```
 
 

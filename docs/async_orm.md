@@ -10,7 +10,8 @@ environment.
 
 - Python 3.9+
 - PyNest (latest version)
-- SQLAlchemy 2.0
+- SQLAlchemy < 2.0
+- async driver for your database (e.g. asyncpg for PostgreSQL, aiomysql for MySQL, or aiosqlite for SQLite)
 
 ## Setting Up
 
@@ -27,7 +28,13 @@ pip install pynest-api
 #### Create a new project
 
 ```bash
-pynest create-nest-app -n my_app_name -db postgresql --async
+pynest create-nest-app -n my_app_name -db postgresql --is-async
+```
+
+Note: you need to install the async driver for your database, for example, if you are using PostgreSQL, you need to install asyncpg:
+
+```bash
+pip install asyncpg
 ```
 
 this command will create a new project with the following structure:
@@ -79,7 +86,7 @@ Now we need to declare the App object and register the module in
 ```python
 from config import config
 from nest.core.app import App
-from src.examples.examples_module import ExamplesModule
+from .examples_module import ExamplesModule
 
 app = App(
     description="PyNest service",
@@ -102,18 +109,8 @@ AsyncOrmProvider is a key component in managing asynchronous database connection
 AsyncSession from sqlalchemy.ext.asyncio is used for executing asynchronous database operations. It is essential for leveraging the full capabilities of SQLAlchemy 2.0 in an async environment.
 
 ## Implementing Async Features
-### Creating Models
-Define your models using SQLAlchemy's declarative base. For example, the Examples model:
 
-### AsyncSession
-
-AsyncSession, from sqlalchemy.ext.asyncio is used
-for executing asynchronous database operations.It is essential for leveraging the full capabilities of SQLAlchemy 2.0 in
-an async environment.
-
-## Implementing Async Features
-
-### Creating Models
+### Creating Entities
 
 Define your models using SQLAlchemy's declarative base. For example, the Examples model:
 
@@ -136,11 +133,11 @@ Implement services to handle business logic.
 There are two ways of creating service.
 
 1. In that way, the service does not init any parameter, and that each function that depends on the database is getting
-   the async session fron the controller
+   the async session from the controller
 
 ```python
-from src.examples.examples_model import Examples
-from src.examples.examples_entity import Examples as ExamplesEntity
+from .examples_model import Examples
+from .examples_entity import Examples as ExamplesEntity
 from nest.core.decorators.database import async_db_request_handler
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -168,8 +165,8 @@ class ExamplesService:
    using the session that was init in the constructor
 
 ```python
-from src.examples.examples_model import Examples
-from src.examples.examples_entity import Examples as ExamplesEntity
+from .examples_model import Examples
+from .examples_entity import Examples as ExamplesEntity
 from config import config
 from nest.core.decorators.database import async_db_request_handler
 from functools import lru_cache
@@ -181,7 +178,7 @@ class ExamplesService:
 
     def __init__(self):
         self.orm_config = config
-        self.session = self.orm_config.get_self_db
+        self.session = self.orm_config.session
 
     @async_db_request_handler
     async def add_examples(self, examples: Examples):
@@ -211,13 +208,13 @@ Here we have also two ways of creating the controller.
 ```python
 from nest.core import Controller, Get, Post, Depends
 
-from src.examples.examples_service import ExamplesService
-from src.examples.examples_model import Examples
+from .examples_service import ExamplesService
+from .examples_model import Examples
 from config import config
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-@Controller("examples", prefix="examples")
+@Controller("examples")
 class ExamplesController:
     service: ExamplesService = Depends(ExamplesService)
 
@@ -236,11 +233,11 @@ class ExamplesController:
 ```python
 from nest.core import Controller, Get, Post, Depends
 
-from src.examples.examples_service import ExamplesService
-from src.examples.examples_model import Examples
+from .examples_service import ExamplesService
+from .examples_model import Examples
 
 
-@Controller("examples", prefix="examples")
+@Controller("examples")
 class ExamplesController:
     service: ExamplesService = Depends(ExamplesService)
 
@@ -255,6 +252,22 @@ class ExamplesController:
 
 > **Hint:** Keep in mind that there are no difference between the two methods, the only difference is the way of getting
 > the async session object, and how to use it. Choose you favorite syntax and use it.
+
+### Creating Module
+
+Create a module to register the controller and the service.
+
+```python
+from .examples_controller import ExamplesController
+from .examples_service import ExamplesService
+
+
+class ExamplesModule:
+    controllers = [ExamplesController]
+    services = [ExamplesService]
+```
+
+
 
 ## async_db_request_handler decorator
 
