@@ -1,10 +1,14 @@
 name: Integration Test
 
-on: [ push, workflow_call ]
+on: [push, workflow_call]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        app_type: ["Blank", "SyncORM", "AsyncORM"]
 
     steps:
       - name: Check out repository code
@@ -13,65 +17,51 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'  # or any version you need
+          python-version: '3.8'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install .
 
-      - name: Start Blank Application
+      - name: Start Application
         run: |
-          pynest create-nest-app -n NestApp
-          cd NestApp
+          if [ "${{ matrix.app_type }}" == "Blank" ]; then
+            app_name="NestApp"
+            port="8000"
+            is_async=""
+          elif [ "${{ matrix.app_type }}" == "SyncORM" ]; then
+            app_name="ORMNestApp"
+            port="8080"
+            is_async=""
+          elif [ "${{ matrix.app_type }}" == "AsyncORM" ]; then
+            app_name="AsyncORMNestApp"
+            port="8088"
+            is_async="--is_async"
+          fi
+
+          if [ "${{ matrix.app_type }}" == "Blank" ]; then
+            pynest create-nest-app -n "$app_name"
+          else
+            pynest create-nest-app -n "$app_name" -db sqlite $is_async
+          fi
+
+          cd "$app_name"
           pynest g module -n user
-          uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload &
+          uvicorn "app:app" --host "0.0.0.0" --port "$port" --reload &
 
       - name: Wait for the server to start
-        run: |
-          sleep 10  # Wait for 10 seconds to ensure the server is up
+        run: sleep 10
 
       - name: Test the application
         run: |
-          curl -f http://localhost:8000/docs
+          curl -f http://localhost:"$port"/docs
           curl -f -X 'POST' \
-            'http://0.0.0.0:8000/user/' \
+            "http://0.0.0.0:$port/user/" \
             -H 'accept: application/json' \
             -H 'Content-Type: application/json' \
             -d '{"name": "Example Name"}'
-          curl -f http://localhost:8000/user/
+          curl -f http://localhost:"$port"/user/
 
       - name: Kill the server
-        run: |
-          kill $(jobs -p) || true
-
-
-      - name: Wait fot the server to die
-        run: |
-          sleep 10  # Wait for 10 seconds to ensure the server is down
-
-
-      - name: Start Sync ORM Application
-        run: |
-          pynest create-nest-app -n ORMNestApp -db sqlite
-          cd ORMNestApp
-          pynest g module -n user
-          uvicorn "app:app" --host "0.0.0.0" --port "8080" --reload &
-
-      - name: Wait for the server to start
-        run: |
-          sleep 10  # Wait for 10 seconds to ensure the server is up
-
-      - name: Test the application
-        run: |
-          curl -f http://localhost:8000/docs
-          curl -f -X 'POST' \
-            'http://0.0.0.0:8080/user/' \
-            -H 'accept: application/json' \
-            -H 'Content-Type: application/json' \
-            -d '{"name": "Example Name"}'
-          curl -f http://localhost:8080/user/
-
-      - name: Kill the server
-        run: |
-          kill $(jobs -p) || true
+        run: kill $(jobs -p) || true

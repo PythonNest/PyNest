@@ -32,8 +32,7 @@ IS_ASYNC = click.option(
     "--is-async",  # Changed the underscore to a hyphen for consistency
     help="Whether the project should be async or not (only for relational databases).",
     required=False,
-    default=False,
-    type=bool,
+    is_flag=True,  # Set is_flag=True to make it a flag option
 )
 
 

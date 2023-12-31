@@ -97,6 +97,31 @@ You can then start defining routes and other application components using decora
 
 For more information on how to use PyNest, check out the official documentation at https://pythonnest.github.io/PyNest/.
 
+## PyNest CLI Usage Guide
+
+This document provides a guide on how to use the PyNest Command Line Interface (CLI). Below are the available commands and their descriptions:
+
+### `pynest` Command
+
+- **Description**: The main command group for PyNest CLI.
+
+#### `create-nest-app` Subcommand
+
+- **Description**: Create a new nest app.
+- **Options**:
+  - `--app-name`/`-n`: The name of the nest app (required).
+  - `--db-type`/`-db`: The type of the database (optional). You can specify PostgreSQL, MySQL, SQLite, or MongoDB.
+  - `--is-async`: Whether the project should be asynchronous (optional, default is False).
+
+### `g` Command
+
+- **Description**: Group command for generating boilerplate code.
+
+#### `module` Subcommand
+
+- **Description**: Generate a new module (controller, service, entity, model, module).
+- **Options**:
+  - `--name`/`-n`: The name of the module (required).
 
 ## Key Features
 ### Modular Architecture
