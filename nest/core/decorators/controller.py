@@ -1,5 +1,3 @@
-import http
-
 from fastapi.routing import APIRouter
 from nest.core.decorators.helpers import class_based_view as ClassBasedView
 
@@ -28,12 +26,14 @@ def Controller(tag: str = None, prefix: str = None):
     def wrapper(cls) -> ClassBasedView:
         router = APIRouter(tags=[tag] if tag else None)
 
-        http_method_names = ('GET', 'POST', 'PUT', 'DELETE', 'PATCH')
+        http_method_names = ("GET", "POST", "PUT", "DELETE", "PATCH")
 
         for name, method in cls.__dict__.items():
             if callable(method) and hasattr(method, "method"):
                 # Check if method is decorated with an HTTP method decorator
-                assert hasattr(method, "__path__") and method.__path__, f"Missing path for method {name}"
+                assert (
+                    hasattr(method, "__path__") and method.__path__
+                ), f"Missing path for method {name}"
 
                 http_method = method.method
                 # Ensure that the method is a valid HTTP method
@@ -42,8 +42,9 @@ def Controller(tag: str = None, prefix: str = None):
                     method.__path__ = prefix + method.__path__
                 if not method.__path__.startswith("/"):
                     method.__path__ = "/" + method.__path__
-                router.add_api_route(method.__path__, method, methods=[http_method], **method.__kwargs__)
-
+                router.add_api_route(
+                    method.__path__, method, methods=[http_method], **method.__kwargs__
+                )
 
         def get_router() -> APIRouter:
             """
