@@ -17,12 +17,16 @@ class ModulesContainer(dict):
         return self._application_id
 
     def get_by_id(self, module_id):
-        return next((module for module in self.values() if module.id == module_id), None)
-    
-    def has(self, token: str): 
-        return  True if self.get(token) is not None else False
+        return next(
+            (module for module in self.values() if module.id == module_id), None
+        )
+
+    def has(self, token: str):
+        return True if self.get(token) is not None else False
+
 
 import uuid
+
 
 class Module:
     def __init__(self, metatype, container):
@@ -54,7 +58,6 @@ class Module:
     @property
     def name(self):
         return self._metatype.__name__
-
 
     @property
     def providers(self):
@@ -102,23 +105,21 @@ class Module:
     @distance.setter
     def distance(self, value):
         self._distance = value
-    
-    def add_import(self, moduleRef): 
-        self._imports.add(moduleRef);
-    
+
+    def add_import(self, moduleRef):
+        self._imports.add(moduleRef)
+
     def add_imports(self, module_ref: List[Any]):
-          for module in module_ref:
-              self.add_import(module)
-        
-        
-    def add_provider(self, provider) -> str: 
-         self._providers[provider.__name__] = provider;
-         return provider.__name__;
-    
-    def add_controller(self, controller) -> str: 
-         self._controllers[controller.__name__] = controller
-         return controller.__name__
-  
+        for module in module_ref:
+            self.add_import(module)
+
+    def add_provider(self, provider) -> str:
+        self._providers[provider.__name__] = provider
+        return provider.__name__
+
+    def add_controller(self, controller) -> str:
+        self._controllers[controller.__name__] = controller
+        return controller.__name__
 
     def add_exported_provider(self, provider):
         def add_exported_unit(token):
@@ -134,10 +135,6 @@ class Module:
         add_exported_unit(provider)
 
 
-    
-
- 
-
 class ModuleTokenFactory:
     def __init__(self):
         self.module_token_cache = {}
@@ -147,7 +144,9 @@ class ModuleTokenFactory:
         module_id = self.get_module_id(metatype)
 
         if dynamic_module_metadata is None:
-            return self.get_static_module_token(module_id, self.get_module_name(metatype))
+            return self.get_static_module_token(
+                module_id, self.get_module_name(metatype)
+            )
 
         opaque_token = {
             "id": module_id,
@@ -168,7 +167,7 @@ class ModuleTokenFactory:
         return hash_value
 
     def stringify_opaque_token(self, opaque_token):
-        return str(opaque_token)  
+        return str(opaque_token)
 
     def get_module_id(self, metatype):
         if metatype in self.module_ids_cache:
@@ -182,11 +181,10 @@ class ModuleTokenFactory:
         return metatype.__name__
 
     def random_string_generator(self, length=10):
-        return ''.join(random.choice(string.ascii_letters) for _ in range(length))
+        return "".join(random.choice(string.ascii_letters) for _ in range(length))
 
     def hash_string(self, value):
         return hashlib.sha256(value.encode()).hexdigest()
-
 
 
 class ModuleFactory:
@@ -194,6 +192,7 @@ class ModuleFactory:
         self.type = type
         self.token = token
         self.dynamic_metadata = dynamic_metadata
+
 
 class ModuleCompiler:
     def __init__(self, module_token_factory: ModuleTokenFactory = ModuleTokenFactory()):
@@ -207,19 +206,19 @@ class ModuleCompiler:
         return ModuleFactory(module_type, token, dynamic_metadata)
 
     def extract_metadata(self, metatype) -> dict:
-       metadata = {}
-       metadata["type"] = metatype
-       metadata["dynamic_metadata"] = {}
-       
-       if not self.has_module_metadata(metatype): 
+        metadata = {}
+        metadata["type"] = metatype
+        metadata["dynamic_metadata"] = {}
+
+        if not self.has_module_metadata(metatype):
             raise Exception(f"{metatype.__name__} as no metadata found")
-       for props in  ["imports", 'providers', "controllers"]: 
-          metadata["dynamic_metadata"][props]  = getattr(metatype, props, [])
-       return metadata
-    
+        for props in ["imports", "providers", "controllers"]:
+            metadata["dynamic_metadata"][props] = getattr(metatype, props, [])
+        return metadata
+
     def has_module_metadata(self, metatype):
-       for props in  ["imports", 'providers', "controllers"]: 
-           if  hasattr(metatype, props):
-                return True 
-       else : 
-           return False 
+        for props in ["imports", "providers", "controllers"]:
+            if hasattr(metatype, props):
+                return True
+        else:
+            return False

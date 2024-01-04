@@ -14,61 +14,37 @@ def Controller(tag: str = None, prefix: str = None):
         class: The decorated class.
 
     """
-    if prefix:
-        if not prefix.startswith("/"):
-            prefix = "/" + prefix
-        if prefix.endswith("/"):
-            prefix = prefix[:-1]
+    # Use tag as default prefix if prefix is None
+    if prefix is None:
+        prefix = tag
+
+    if not prefix.startswith("/"):
+        prefix = "/" + prefix
+    if prefix.endswith("/"):
+        prefix = prefix[:-1]
 
     def wrapper(cls) -> ClassBasedView:
         router = APIRouter(tags=[tag] if tag else None)
 
+        http_method_names = ("GET", "POST", "PUT", "DELETE", "PATCH")
+
         for name, method in cls.__dict__.items():
             if callable(method) and hasattr(method, "method"):
-                if not method.__path__:
-                    raise Exception("Missing path")
-                else:
-                    if prefix:
-                        method.__path__ = prefix + method.__path__
-                    if not method.__path__.startswith("/"):
-                        method.__path__ = "/" + method.__path__
-                    if method.method == "GET":
-                        router.add_api_route(
-                            method.__path__,
-                            method,
-                            methods=["GET"],
-                            **method.__kwargs__
-                        )
-                    elif method.method == "POST":
-                        router.add_api_route(
-                            method.__path__,
-                            method,
-                            methods=["POST"],
-                            **method.__kwargs__
-                        )
-                    elif method.method == "PUT":
-                        router.add_api_route(
-                            method.__path__,
-                            method,
-                            methods=["PUT"],
-                            **method.__kwargs__
-                        )
-                    elif method.method == "DELETE":
-                        router.add_api_route(
-                            method.__path__,
-                            method,
-                            methods=["DELETE"],
-                            **method.__kwargs__
-                        )
-                    elif method.method == "PATCH":
-                        router.add_api_route(
-                            method.__path__,
-                            method,
-                            methods=["PATCH"],
-                            **method.__kwargs__
-                        )
-                    else:
-                        raise Exception("Invalid method")
+                # Check if method is decorated with an HTTP method decorator
+                assert (
+                    hasattr(method, "__path__") and method.__path__
+                ), f"Missing path for method {name}"
+
+                http_method = method.method
+                # Ensure that the method is a valid HTTP method
+                assert http_method in http_method_names, f"Invalid method {http_method}"
+                if prefix:
+                    method.__path__ = prefix + method.__path__
+                if not method.__path__.startswith("/"):
+                    method.__path__ = "/" + method.__path__
+                router.add_api_route(
+                    method.__path__, method, methods=[http_method], **method.__kwargs__
+                )
 
         def get_router() -> APIRouter:
             """
@@ -80,4 +56,5 @@ def Controller(tag: str = None, prefix: str = None):
         cls.get_router = get_router
 
         return ClassBasedView(router=router, cls=cls)
+
     return wrapper

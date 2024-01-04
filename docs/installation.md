@@ -124,8 +124,7 @@ app = App(
     description="Your app description",
     modules=[
         ProductsModule
-    ],
-    init_db=config.create_all
+    ]
 )
 ```
 

@@ -1,36 +1,32 @@
-from fastapi import FastAPI 
+from fastapi import FastAPI
 from pynest_app_context import PyNestApplicationContext
 from typing import Any, Dict, List, Union
 from pynest_container import PyNestContainer
 from nest.common.route_resolver import RoutesResolver
 
+
 class PyNestApp(PyNestApplicationContext):
     _is_listening = False
-    
+
     @property
     def is_listening(self):
-        self._is_listening 
-        
-    def __init__(self,
-                 container: PyNestContainer,
-                 http_server: FastAPI
-                 ):
+        self._is_listening
+
+    def __init__(self, container: PyNestContainer, http_server: FastAPI):
         self.container = container
         self.http_server = http_server
         super().__init__(self.container)
         self.routes_resolver = RoutesResolver(self.container, self.http_server)
         self.select_context_module()
-        
+
         self.register_routes()
-             
-        
-    def use (self, middleware: type, **options: Any) -> None: 
+
+    def use(self, middleware: type, **options: Any) -> None:
         self.http_server.add_middleware(middleware, **options)
-        return self 
-    
-    def get_server(self): 
+        return self
+
+    def get_server(self):
         return self.http_server
-    
 
     def enable_cors(self, options: Dict[str, Union[str, bool, List[str]]]):
         """
@@ -53,7 +49,12 @@ class PyNestApp(PyNestApplicationContext):
         from fastapi.middleware.cors import CORSMiddleware
 
         # Define the expected keys
-        expected_keys = ["allow_origins", "allow_credentials", "allow_methods", "allow_headers"]
+        expected_keys = [
+            "allow_origins",
+            "allow_credentials",
+            "allow_methods",
+            "allow_headers",
+        ]
 
         # Check for unexpected keys
         unexpected_keys = [key for key in options if key not in expected_keys]
@@ -77,9 +78,5 @@ class PyNestApp(PyNestApplicationContext):
         # Add the CORS middleware to the HTTP server
         self.http_server.add_middleware(cors_middleware)
 
-        
     def register_routes(self):
-          self.routes_resolver.register_routes()
-        
-    
-        
+        self.routes_resolver.register_routes()

@@ -1,4 +1,3 @@
-
 def Get(path: str, **kwargs):
     """
     Decorator that defines a GET route for the controller.
