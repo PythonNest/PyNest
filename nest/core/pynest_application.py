@@ -69,6 +69,7 @@ class PyNestApp(PyNestApplicationContext):
 
         # Configure CORS using CORSMiddleware
         cors_middleware = CORSMiddleware(
+            self.http_server,
             allow_origins=allow_origins,
             allow_credentials=allow_credentials,
             allow_methods=allow_methods,
