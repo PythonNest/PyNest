@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from pynest_app_context import PyNestApplicationContext
+from nest.core.pynest_app_context import PyNestApplicationContext
 from typing import Any, Dict, List, Union
-from pynest_container import PyNestContainer
+from nest.core.pynest_container import PyNestContainer
 from nest.common.route_resolver import RoutesResolver
 
 
@@ -10,7 +10,7 @@ class PyNestApp(PyNestApplicationContext):
 
     @property
     def is_listening(self):
-        self._is_listening
+        return self._is_listening
 
     def __init__(self, container: PyNestContainer, http_server: FastAPI):
         self.container = container

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from pynest_application import PyNestApp
+from nest.core.pynest_application import PyNestApp
 from typing import TypeVar, Union
-from pynest_container import PyNestContainer
+from nest.core.pynest_container import PyNestContainer
 
 T = TypeVar("T")
 

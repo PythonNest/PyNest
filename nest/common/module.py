@@ -1,10 +1,10 @@
 import hashlib
 import random
-import string
+import uuid
 import string
 from typing import List
 from uuid import uuid4
-from typing import Any, Type, Union
+from typing import Any, Type
 
 
 class ModulesContainer(dict):
@@ -23,9 +23,6 @@ class ModulesContainer(dict):
 
     def has(self, token: str):
         return True if self.get(token) is not None else False
-
-
-import uuid
 
 
 class Module:
@@ -166,7 +163,8 @@ class ModuleTokenFactory:
         self.module_token_cache[key] = hash_value
         return hash_value
 
-    def stringify_opaque_token(self, opaque_token):
+    @staticmethod
+    def stringify_opaque_token(opaque_token):
         return str(opaque_token)
 
     def get_module_id(self, metatype):
@@ -177,13 +175,16 @@ class ModuleTokenFactory:
         self.module_ids_cache[metatype] = module_id
         return module_id
 
-    def get_module_name(self, metatype):
+    @staticmethod
+    def get_module_name(metatype):
         return metatype.__name__
 
-    def random_string_generator(self, length=10):
+    @staticmethod
+    def random_string_generator(length=10):
         return "".join(random.choice(string.ascii_letters) for _ in range(length))
 
-    def hash_string(self, value):
+    @staticmethod
+    def hash_string(value):
         return hashlib.sha256(value.encode()).hexdigest()
 
 
@@ -206,9 +207,7 @@ class ModuleCompiler:
         return ModuleFactory(module_type, token, dynamic_metadata)
 
     def extract_metadata(self, metatype) -> dict:
-        metadata = {}
-        metadata["type"] = metatype
-        metadata["dynamic_metadata"] = {}
+        metadata = {"type": metatype, "dynamic_metadata": {}}
 
         if not self.has_module_metadata(metatype):
             raise Exception(f"{metatype.__name__} as no metadata found")
@@ -216,7 +215,8 @@ class ModuleCompiler:
             metadata["dynamic_metadata"][props] = getattr(metatype, props, [])
         return metadata
 
-    def has_module_metadata(self, metatype):
+    @staticmethod
+    def has_module_metadata(metatype):
         for props in ["imports", "providers", "controllers"]:
             if hasattr(metatype, props):
                 return True

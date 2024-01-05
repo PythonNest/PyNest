@@ -1,6 +1,6 @@
 from nest.common.module import ModuleCompiler, Module
 from typing import Union
-from pynest_container import PyNestContainer
+from nest.core.pynest_container import PyNestContainer
 from nest.common.exceptions import UnknownModuleException
 import logging
 
