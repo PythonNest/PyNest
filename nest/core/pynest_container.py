@@ -63,8 +63,8 @@ class PyNestContainer:
         if not self.modules.has(token):
             return
         module_ref = self.modules.get(token)
-        related_mod = self.module_compiler.compile(related_module)
-        related = self.modules.get(related_mod.token)
+        compile_related_module = self.module_compiler.compile(related_module)
+        related = self.modules.get(compile_related_mod.token)
         module_ref.add_import(related)
 
     def _get_controllers(self, token: str):
