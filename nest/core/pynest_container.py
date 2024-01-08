@@ -135,11 +135,10 @@ class PyNestContainer:
             raise UnknownModuleException()
         if not hasattr(provider, INJECTABLE_TOKEN):
             error_message = f"""
-               {click.style(provider.__name__, fg='red')} is not injectable. 
-
-               To make {provider.__name__} injectable, apply the {click.style("@Injectable decorator", fg='green')} to the class definition. 
-               or remove {click.style(provider.__name__, fg='red')} from the provider array of the Module class. 
-               Please check your code and ensure that the decorator is correctly applied to the class.
+            {click.style(provider.__name__, fg='red')} is not injectable. 
+     To make {provider.__name__} injectable, apply the {click.style("@Injectable decorator", fg='green')} to the class definition. 
+    or remove {click.style(provider.__name__, fg='red')} from the provider array of the Module class. 
+    Please check your code and ensure that the decorator is correctly applied to the class.
           """
             raise NoneInjectableException(error_message)
 

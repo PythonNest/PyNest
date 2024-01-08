@@ -1,6 +1,6 @@
 from fastapi.routing import APIRouter
 from nest.core.decorators.helpers import class_based_view as ClassBasedView
-
+from nest.common.constants import  STATUS_CODE_TOKEN
 
 def Controller(tag: str = None, prefix: str = None):
     """
@@ -42,6 +42,8 @@ def Controller(tag: str = None, prefix: str = None):
                     method.__path__ = prefix + method.__path__
                 if not method.__path__.startswith("/"):
                     method.__path__ = "/" + method.__path__
+                if hasattr(method, STATUS_CODE_TOKEN) and method.__kwargs__.get(STATUS_CODE_TOKEN) is None: 
+                    method.__kwargs__[STATUS_CODE_TOKEN] = method.__dict__[STATUS_CODE_TOKEN]
                 router.add_api_route(
                     method.__path__, method, methods=[http_method], **method.__kwargs__
                 )

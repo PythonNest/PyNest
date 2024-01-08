@@ -8,3 +8,4 @@ class ModuleMetadata(Enum):
 
 
 INJECTABLE_TOKEN = "__injectable__"
+STATUS_CODE_TOKEN = "status_code"

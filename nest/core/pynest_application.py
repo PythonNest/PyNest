@@ -78,6 +78,7 @@ class PyNestApp(PyNestApplicationContext):
 
         # Add the CORS middleware to the HTTP server
         self.http_server.add_middleware(cors_middleware)
+        
 
     def register_routes(self):
         self.routes_resolver.register_routes()
