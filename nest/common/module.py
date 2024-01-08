@@ -6,7 +6,6 @@ from typing import List
 from uuid import uuid4
 from typing import Any, Type
 
-from nest.core.pynest_container import PyNestContainer 
 
 class ModulesContainer(dict):
     def __init__(self):
@@ -27,7 +26,7 @@ class ModulesContainer(dict):
 
 
 class Module:
-    def __init__(self, metatype: Type[object], container: PyNestContainer):
+    def __init__(self, metatype: Type[object], container):
         self._id = str(uuid.uuid4())
         self._metatype = metatype
         self.container = container
