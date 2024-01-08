@@ -83,9 +83,9 @@ class PyNestContainer:
 
     def add_controllers(self, controllers: List[Any], module_token: str):
         for controller in controllers:
-            self.add_controller(module_token, controller)
+            self._add_controller(module_token, controller)
 
-    def add_controller(self, token: str, controller):
+    def _add_controller(self, token: str, controller):
         if not self.modules.has(token):
             raise UnknownModuleException()
         module_ref: Module = self.modules[token]
@@ -136,9 +136,9 @@ class PyNestContainer:
         if not hasattr(provider, INJECTABLE_TOKEN):
             error_message = f"""
             {click.style(provider.__name__, fg='red')} is not injectable. 
-     To make {provider.__name__} injectable, apply the {click.style("@Injectable decorator", fg='green')} to the class definition. 
-    or remove {click.style(provider.__name__, fg='red')} from the provider array of the Module class. 
-    Please check your code and ensure that the decorator is correctly applied to the class.
+      To make {provider.__name__} injectable, apply the {click.style("@Injectable decorator", fg='green')} to the class definition. 
+     or remove {click.style(provider.__name__, fg='red')} from the provider array of the Module class. 
+     Please check your code and ensure that the decorator is correctly applied to the class.
           """
             raise NoneInjectableException(error_message)
 

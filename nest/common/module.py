@@ -6,6 +6,7 @@ from typing import List
 from uuid import uuid4
 from typing import Any, Type
 
+from nest.core.pynest_container import PyNestContainer 
 
 class ModulesContainer(dict):
     def __init__(self):
@@ -26,7 +27,7 @@ class ModulesContainer(dict):
 
 
 class Module:
-    def __init__(self, metatype, container):
+    def __init__(self, metatype: Type[object], container: PyNestContainer):
         self._id = str(uuid.uuid4())
         self._metatype = metatype
         self.container = container
@@ -35,7 +36,7 @@ class Module:
         self._injectables = {}
         self._middlewares = {}
         self._controllers = {}
-        self._entryProviderKeys = set()
+        self._entry_provider_keys = set()
         self._exports = set()
         self._distance = 0
         self._token = None
@@ -49,7 +50,7 @@ class Module:
         return self._token
 
     @token.setter
-    def token(self, token):
+    def token(self, token: str):
         self._token = token
 
     @property
@@ -77,7 +78,7 @@ class Module:
         return self._controllers
 
     @property
-    def entryProviders(self):
+    def entry_providers(self):
         return [self._providers[token] for token in self._entryProviderKeys]
 
     @property
