@@ -1,4 +1,4 @@
-
+from nest.common.constants import STATUS_CODE_TOKEN
 def HttpCode(status_code: int):
     """
     Decorator that sets the HTTP status code for a route.

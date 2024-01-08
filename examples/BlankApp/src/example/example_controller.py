@@ -1,5 +1,5 @@
 from nest.core import Controller, Get, Post, Depends
-from nest.common import HttpCode
+from nest.core import HttpCode
 from .example_service import ExampleService
 from .example_model import Example
 
@@ -9,11 +9,11 @@ class ExampleController:
 
     service: ExampleService = Depends(ExampleService)
     
-    @Get("/")
+    @Get()
     def get_example(self):
         return self.service.get_example()
         
-    @Post("/")
+    @Post()
     @HttpCode(201)
     def add_example(self, example: Example):
         return self.service.add_example(example)
