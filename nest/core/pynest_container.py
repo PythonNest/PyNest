@@ -64,7 +64,7 @@ class PyNestContainer:
             return
         module_ref = self.modules.get(token)
         compile_related_module = self.module_compiler.compile(related_module)
-        related = self.modules.get(compile_related_mod.token)
+        related = self.modules.get(compile_related_module.token)
         module_ref.add_import(related)
 
     def _get_controllers(self, token: str):
