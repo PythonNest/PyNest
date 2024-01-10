@@ -66,6 +66,14 @@ jobs:
             echo "Directory $app_name does not exist."
             exit 1
           fi
+          
+          if [ -d "$app_name/src/user" ]; then
+            echo "Directory $app_name/src/user exists."
+          else
+            echo "Directory $app_name does not exist."
+            exit 1
+          fi
+
 
           # List of expected files
           declare -a files=("main.py" "app.py" "requirements.txt" "README.md")
