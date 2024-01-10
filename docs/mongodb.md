@@ -53,16 +53,28 @@ this command will create a new project with the following structure:
 ├── main.py
 ├── src
 │    ├── __init__.py
-│    ├── examples
-│    │    ├── __init__.py
-│    │    ├── examples_controller.py
-│    │    ├── examples_service.py
-│    │    ├── examples_model.py
-│    ├──  ├── examples_entity.py
-│    ├──  ├── examples_module.py
 ```
 
-once you have created your app, this is the code that support the mongo integration:
+once you have created your app, you can create a new module:
+
+```bash
+pynest g module -n examples
+```
+
+This will create a new module called examples in your application with the following structure under the src folder:
+
+```text
+├── examples
+│    ├── __init__.py
+│    ├── examples_controller.py
+│    ├── examples_service.py
+│    ├── examples_model.py
+│    ├── examples_entity.py
+│    ├── examples_module.py
+```
+
+
+Let's go over the boilerplate code that support the mongo integration:
 
 `config.py`
 
@@ -75,12 +87,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 config = OdmProvider(
-    db_type="mongodb",
-    config_params={
-        "db_name": os.getenv("DB_NAME"),
-        "host": os.getenv("DB_HOST"),
-        "port": os.getenv("DB_PORT"),
-    },
+    config_params={{
+        "db_name": os.getenv("DB_NAME", "default_nest_db"),
+        "host": os.getenv("DB_HOST", "localhost"),
+        "user": os.getenv("DB_USER", "root"),
+        "password": os.getenv("DB_PASSWORD", "root"),
+        "port": os.getenv("DB_PORT", 27017),
+    }},
     document_models=[Examples]
 )       
 ```
@@ -205,5 +218,11 @@ class ExamplesModule:
     def __init__(self):
         self.providers = [ExamplesService]
         self.controllers = [ExamplesController]
+```
+
+## Run the app
+
+```bash
+uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
 ```
 

@@ -307,15 +307,3 @@ class ExampleModule:
         ├── module_name_module.py
         """
         raise NotImplementedError
-
-
-if __name__ == "__main__":
-    base_template = BaseTemplate(
-        module_name="example",
-    )
-    base_template.append_module_to_app(
-        path_to_app_py="/Users/itayd/PycharmProjects/PyNestRepo/examples/MyApp/app.py"
-    )
-    base_template.append_module_to_app(
-        path_to_app_py="/Users/itayd/PycharmProjects/PyNestRepo/examples/MyApp/app.py"
-    )

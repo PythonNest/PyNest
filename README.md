@@ -69,7 +69,7 @@ Now you can visit [OpenAPI](http://localhost:8000/docs) in your browser to see t
 ### Adding modules
 
 To add a new module to your application, you can use the pynest generate module command:
-]()
+
 ```bash
 pynest g module -n users
 ```
@@ -122,9 +122,10 @@ This document provides a guide on how to use the PyNest Command Line Interface (
 #### CLI Examples
 * create a blank nest application - 
 `pynest create-nest-app -n my_app_name`
-* create a nest application with postgres database and async connection - 
-<br>
+
+* create a nest application with postgres database and async connection -
 `pynest create-nest-app -n my_app_name -db postgresql --is-async`
+
 * create new module - 
 `pynest g module -n users`
 

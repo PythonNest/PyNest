@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from nest.common.templates.base_template import BaseTemplate, get_module_strings
+from nest.common.templates.base_template import BaseTemplate
 from abc import ABC
 
 
