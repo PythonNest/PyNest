@@ -23,6 +23,13 @@ Ensure you have the latest version of PyNest and SQLAlchemy 2.0 installed. You c
 pip install pynest-api
 ```
 
+Note: you need to install the async driver for your database, for example, if you are using PostgreSQL, you need to
+install asyncpg:
+
+```bash
+pip install asyncpg
+```
+
 ## Start with cli
 
 #### Create a new project
@@ -31,27 +38,34 @@ pip install pynest-api
 pynest create-nest-app -n my_app_name -db postgresql --is-async
 ```
 
-Note: you need to install the async driver for your database, for example, if you are using PostgreSQL, you need to install asyncpg:
-
-```bash
-pip install asyncpg
-```
-
 this command will create a new project with the following structure:
 
 ```text
 ├── app.py
 ├── config.py
 ├── main.py
+|── requirements.txt
+|── README.md
 ├── src
 │    ├── __init__.py
-│    ├── examples
-│    │    ├── __init__.py
-│    │    ├── examples_controller.py
-│    │    ├── examples_service.py
-│    │    ├── examples_model.py
-│    ├──  ├── examples_entity.py
-│    ├──  ├── examples_module.py
+```
+
+After creating the project, let's create a new module:
+
+```bash
+pynest g module -n examples
+```
+
+This will create a new module called examples in your application with the following structure under the src folder:
+
+```text
+├── users
+│    ├── __init__.py
+│    ├── users_controller.py
+│    ├── users_service.py
+│    ├── users_model.py
+│    ├── users_entity.py
+│    ├── users_module.py
 ```
 
 once you have created your app, this is the code that support the asynchronous feature:
@@ -68,12 +82,12 @@ load_dotenv()
 config = AsyncOrmProvider(
     db_type="postgresql",
     config_params=dict(
-        host=os.getenv("POSTGRESQL_HOST"),
-        db_name=os.getenv("POSTGRESQL_DB_NAME"),
-        user=os.getenv("POSTGRESQL_USER"),
-        password=os.getenv("POSTGRESQL_PASSWORD"),
-        port=int(os.getenv("POSTGRESQL_PORT")),
-    ),
+        host=os.getenv("POSTGRESQL_HOST", "localhost"),
+        db_name=os.getenv("POSTGRESQL_DB_NAME", "default_nest_db"),
+        user=os.getenv("POSTGRESQL_USER", "postgres"),
+        password=os.getenv("POSTGRESQL_PASSWORD", "postgres"),
+        port=int(os.getenv("POSTGRESQL_PORT", 5432)),
+    )
 )
 ```
 
@@ -102,11 +116,16 @@ async def startup():
 ```
 
 ## Core Concepts
+
 ### AsyncOrmProvider
-AsyncOrmProvider is a key component in managing asynchronous database connections. It configures the connection pool and other parameters for efficient database access.
+
+AsyncOrmProvider is a key component in managing asynchronous database connections. It configures the connection pool and
+other parameters for efficient database access.
 
 ### AsyncSession
-AsyncSession from sqlalchemy.ext.asyncio is used for executing asynchronous database operations. It is essential for leveraging the full capabilities of SQLAlchemy 2.0 in an async environment.
+
+AsyncSession from sqlalchemy.ext.asyncio is used for executing asynchronous database operations. It is essential for
+leveraging the full capabilities of SQLAlchemy 2.0 in an async environment.
 
 ## Implementing Async Features
 
@@ -126,6 +145,11 @@ class Examples(config.Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(1000), nullable=False)
 ```
+
+We are using the config object (which is the AsyncOrmProvider object) to initialize and create the tables. sqlalchemy
+2.0 requires a bit different syntax to use the async session object. you can notice the "mapped_columns" function and
+the "Mapped" object that leverage the typing system of Python. rather than that, the syntax remains the same as older
+sync versions of sqlalchemy.
 
 ### Creating Service
 
@@ -267,7 +291,11 @@ class ExamplesModule:
     services = [ExamplesService]
 ```
 
+## Run the application
 
+```shell
+uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
+```
 
 ## async_db_request_handler decorator
 
