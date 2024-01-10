@@ -59,13 +59,13 @@ pynest g module -n examples
 This will create a new module called examples in your application with the following structure under the src folder:
 
 ```text
-├── users
+├── examples
 │    ├── __init__.py
-│    ├── users_controller.py
-│    ├── users_service.py
-│    ├── users_model.py
-│    ├── users_entity.py
-│    ├── users_module.py
+│    ├── examples_controller.py
+│    ├── examples_service.py
+│    ├── examples_model.py
+│    ├── examples_entity.py
+│    ├── examples_module.py
 ```
 
 once you have created your app, this is the code that support the asynchronous feature:
