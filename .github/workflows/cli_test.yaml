@@ -55,6 +55,7 @@ jobs:
           esac
           
           pynest g module -n user
+          cd ..
 
       - name: Verify Boilerplate
         run: |
