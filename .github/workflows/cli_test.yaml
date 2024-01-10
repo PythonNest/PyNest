@@ -26,35 +26,35 @@ jobs:
 
       - name: Test CLI Commands
         run: |
+          app_name="${{ matrix.app_type }}App"
           case "${{ matrix.app_type }}" in
             "Blank")
-              pynest create-nest-app -n "BlankApp"
+              pynest create-nest-app -n "$app_name"
               ;;
             "SyncORM")
-              pynest create-nest-app -n "ORMSyncApp" -db sqlite
+              pynest create-nest-app -n "$app_name" -db sqlite
               ;;
             "AsyncORM")
-              pynest create-nest-app -n "ORMAsyncApp" -db sqlite --is-async
+              pynest create-nest-app -n "$app_name" -db sqlite --is-async
               ;;
             "MongoDB")
-              pynest create-nest-app -n "MongoApp" -db mongodb
+              pynest create-nest-app -n "$app_name" -db mongodb
               ;;
             "PostgresSync")
-              pynest create-nest-app -n "PostgresSyncApp" -db postgresql
+              pynest create-nest-app -n "$app_name" -db postgresql
               ;;
             "PostgresAsync")
-              pynest create-nest-app -n "PostgresAsyncApp" -db postgresql --is-async
+              pynest create-nest-app -n "$app_name" -db postgresql --is-async
               ;;
             "MySQLSync")
-              pynest create-nest-app -n "MySQLSyncApp" -db mysql
+              pynest create-nest-app -n "$app_name" -db mysql
               ;;
             "MySQLAsync")
-              pynest create-nest-app -n "MySQLAsyncApp" -db mysql --is-async
+              pynest create-nest-app -n "$app_name" -db mysql --is-async
               ;;
           esac
           
           pynest g module -n user
-          cd ..
 
       - name: Verify Boilerplate
         run: |
