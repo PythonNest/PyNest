@@ -1,0 +1,93 @@
+name: CLI Test
+
+on: [ push, workflow_call ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        app_type: [ "Blank", "SyncORM", "AsyncORM", "MongoDB", "PostgresSync", "PostgresAsync", "MySQLSync", "MySQLAsync" ]
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+
+      - name: Test CLI Commands
+        run: |
+          case "${{ matrix.app_type }}" in
+            "Blank")
+              pynest create-nest-app -n "BlankApp"
+              ;;
+            "SyncORM")
+              pynest create-nest-app -n "ORMSyncApp" -db sqlite
+              ;;
+            "AsyncORM")
+              pynest create-nest-app -n "ORMAsyncApp" -db sqlite --is-async
+              ;;
+            "MongoDB")
+              pynest create-nest-app -n "MongoApp" -db mongodb
+              ;;
+            "PostgresSync")
+              pynest create-nest-app -n "PostgresSyncApp" -db postgresql
+              ;;
+            "PostgresAsync")
+              pynest create-nest-app -n "PostgresAsyncApp" -db postgresql --is-async
+              ;;
+            "MySQLSync")
+              pynest create-nest-app -n "MySQLSyncApp" -db mysql
+              ;;
+            "MySQLAsync")
+              pynest create-nest-app -n "MySQLAsyncApp" -db mysql --is-async
+              ;;
+          esac
+          
+          pynest g module -n user
+          cd ..
+
+      - name: Verify Boilerplate
+        run: |
+          app_name="${{ matrix.app_type }}App"
+          if [ -d "$app_name" ]; then
+            echo "Directory $app_name exists."
+          else
+            echo "Directory $app_name does not exist."
+            exit 1
+          fi
+
+          # List of expected files
+          declare -a files=("main.py" "app.py" "requirements.txt" "README.md")
+          declare -a module_files=("user_controller", "user_service", "user_module", "user_model")
+
+          # Check each file in the list of files
+          for file in "${files[@]}"; do
+            if [ -f "$app_name/$file" ]; then
+              echo "$file exists in $app_name."
+            else
+              echo "$file does not exist in $app_name."
+              exit 1
+            fi
+          done
+          
+          # Check each file in the list of module_files
+          for file in "${files[@]}"; do
+            if [ -f "$app_name/src/user/$file" ]; then
+              echo "$file exists in $app_name."
+            else
+              echo "$file does not exist in $app_name."
+              exit 1
+            fi
+          done
+
+          echo "Boilerplate for ${{ matrix.app_type }} generated successfully."
