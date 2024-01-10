@@ -91,6 +91,7 @@ jobs:
           
           # Check each file in the list of module_files
           for file in "${module_files[@]}"; do
+            echo "$file"
             if [ -f "$app_name/src/user/$file" ]; then
               echo "$file exists in $app_name."
             else
