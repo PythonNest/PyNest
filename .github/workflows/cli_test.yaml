@@ -69,7 +69,7 @@ jobs:
 
           # List of expected files
           declare -a files=("main.py" "app.py" "requirements.txt" "README.md")
-          declare -a module_files=("user_controller", "user_service", "user_module", "user_model")
+          declare -a module_files=("user_controller.py", "user_service.py", "user_module.py", "user_model.py")
 
           # Check each file in the list of files
           for file in "${files[@]}"; do
