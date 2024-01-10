@@ -54,8 +54,8 @@ jobs:
               ;;
           esac
           
+          cd "$app_name"
           pynest g module -n user
-          cd ..
 
       - name: Verify Boilerplate
         run: |
