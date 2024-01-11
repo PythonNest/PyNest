@@ -82,17 +82,6 @@ jobs:
       - name: Build package
         run: python -m build
 
-      - name: Publish package to TestPyPI
-        run: |
-          python -m twine upload dist/* -r testpypi -u ${{ secrets.TEST_PYPI_API_USER }} -p ${{ secrets.TEST_PYPI_API_TOKEN }}
-
-      - name: Install test package
-        run: |
-          pip install --index-url https://test.pypi.org/simple/ --no-deps pynest-api
-          
-          # import to check if package is installed correctly
-          python -c "import nest"
-
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions"
