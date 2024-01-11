@@ -92,7 +92,7 @@ jobs:
 
       - name: Publish a Python distribution to PyPI
         run: |
-          python -m twine upload -u ${{ secrets.PYPI_API_USER }} -p ${{ secrets.PYPI_API_TOKEN }} dist/*
+          python -m twine upload dist/* -u ${{ secrets.PYPI_API_USER }} -p ${{ secrets.PYPI_API_TOKEN }} 
 
       - name: Release New Version
         uses: softprops/action-gh-release@v1
