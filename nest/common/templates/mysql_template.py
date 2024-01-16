@@ -34,14 +34,6 @@ config = OrmProvider(
 mysql-connector-python==8.2.0
 """
 
-    def docker_file(self):
-        pass
-
-    def dockerignore_file(self):
-        pass
-
-    def gitignore_file(self):
-        pass
 
 
 class AsyncMySQLTemplate(AsyncORMTemplate, ABC):
@@ -73,12 +65,3 @@ config = AsyncOrmProvider(
         return f"""pynest-api=={self.version}
 aiomysql==0.2.0
 """
-
-    def docker_file(self):
-        pass
-
-    def dockerignore_file(self):
-        pass
-
-    def gitignore_file(self):
-        pass
