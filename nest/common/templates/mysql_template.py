@@ -35,7 +35,6 @@ mysql-connector-python==8.2.0
 """
 
 
-
 class AsyncMySQLTemplate(AsyncORMTemplate, ABC):
     def __init__(self, module_name: str):
         super().__init__(

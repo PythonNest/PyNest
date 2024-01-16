@@ -17,6 +17,7 @@ class ProductController:
         return await self.service.get_product(session)
 
     @Post("/")
-    async def add_product(self, product: Product, session: AsyncSession = Depends(config.get_db)):
+    async def add_product(
+        self, product: Product, session: AsyncSession = Depends(config.get_db)
+    ):
         return await self.service.add_product(product, session)
- 

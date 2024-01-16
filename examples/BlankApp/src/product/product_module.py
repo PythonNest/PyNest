@@ -3,10 +3,6 @@ from .product_service import ProductService
 from nest.core import Module
 
 
-@Module(
-    controllers=[ProductController],
-    providers=[ProductService],
-    imports=[]
-)
+@Module(controllers=[ProductController], providers=[ProductService], imports=[])
 class ProductModule:
     pass

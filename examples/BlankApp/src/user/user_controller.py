@@ -7,12 +7,11 @@ from .user_model import User
 class UserController:
 
     service: UserService = Depends(UserService)
-    
+
     @Get("/")
     def get_user(self):
         return self.service.get_user()
-        
+
     @Post("/")
     def add_user(self, user: User):
         return self.service.add_user(user)
-

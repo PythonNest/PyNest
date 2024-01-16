@@ -11,4 +11,5 @@ class Module:
         setattr(cls, ModuleMetadata.CONTROLLERS.value, self.controllers)
         setattr(cls, ModuleMetadata.PROVIDER.value, self.providers)
         setattr(cls, ModuleMetadata.IMPORT.value, self.imports)
+
         return cls

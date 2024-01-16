@@ -7,12 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UserService:
-
     @async_db_request_handler
     async def add_user(self, user: User, session: AsyncSession):
-        new_user = UserEntity(
-            **user.dict()
-        )
+        new_user = UserEntity(**user.dict())
         session.add(new_user)
         await session.commit()
         return new_user.id

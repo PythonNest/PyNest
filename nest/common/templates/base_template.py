@@ -103,10 +103,15 @@ Go to the fastapi docs and use your api endpoints - http://127.0.0.1/docs
 
     @abstractmethod
     def module_file(self):
-        return """
+        return """from nest.core import Module
+        
+@Module(
+    imports=[],
+    controllers=[],
+    providers=[]
+)
 class ExampleModule:
-    self.controllers = []
-    self.providers = []
+    pass
     
 """
 

@@ -6,12 +6,9 @@ from functools import lru_cache
 
 @lru_cache()
 class ExampleService:
-
     @db_request_handler
     async def add_example(self, example: Example):
-        new_example = ExampleEntity(
-            **example.dict()
-        )
+        new_example = ExampleEntity(**example.dict())
         await new_example.save()
         return new_example.id
 

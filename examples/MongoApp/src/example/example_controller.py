@@ -16,4 +16,3 @@ class ExampleController:
     @Post("/")
     async def add_example(self, example: Example):
         return await self.service.add_example(example)
- 

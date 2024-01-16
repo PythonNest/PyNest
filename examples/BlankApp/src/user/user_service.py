@@ -6,7 +6,6 @@ from nest.core.decorators import Injectable
 @lru_cache()
 @Injectable
 class UserService:
-
     def __init__(self):
         self.database = []
 

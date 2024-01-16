@@ -3,7 +3,7 @@ import pytest
 from nest.core.decorators import Controller, Get, Post, Delete, Put, Patch
 
 
-@Controller(tag="test", prefix="/api/v1")
+@Controller(prefix="/api/v1")
 class TestController:
     @Get("/get")
     def get_endpoint(self):

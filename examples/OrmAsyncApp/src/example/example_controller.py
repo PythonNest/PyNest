@@ -17,6 +17,7 @@ class ExampleController:
         return await self.service.get_example(session)
 
     @Post("/")
-    async def add_example(self, example: Example, session: AsyncSession = Depends(config.get_db)):
+    async def add_example(
+        self, example: Example, session: AsyncSession = Depends(config.get_db)
+    ):
         return await self.service.add_example(example, session)
- 

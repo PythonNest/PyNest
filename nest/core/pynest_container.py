@@ -11,9 +11,13 @@ from nest.common.exceptions import (
     NoneInjectableException,
 )
 from nest.common.constants import INJECTABLE_TOKEN
-from typing import List, Any
+from typing import List, Any, NoReturn
 import logging
 import click
+
+
+TController = type("TController", (), {})
+TProvider = type("TProvider", (), {})
 
 
 class PyNestContainer:
@@ -81,11 +85,11 @@ class PyNestContainer:
         for provider in providers:
             self.add_provider(module_token, provider)
 
-    def add_controllers(self, controllers: List[Any], module_token: str):
+    def add_controllers(self, controllers: List[Any], module_token: str) -> NoReturn:
         for controller in controllers:
             self._add_controller(module_token, controller)
 
-    def _add_controller(self, token: str, controller):
+    def _add_controller(self, token: str, controller: TController) -> NoReturn:
         if not self.modules.has(token):
             raise UnknownModuleException()
         module_ref: Module = self.modules[token]
@@ -94,14 +98,19 @@ class PyNestContainer:
     def set_module(self, module_factory: ModuleFactory) -> Module:
         module_ref = Module(module_factory.type, self)
         module_ref.token = module_factory.token
-        module_token = module_factory.token
         self._modules[module_factory.token] = module_ref
-        self.add_metadata(module_token, module_factory.dynamic_metadata)
-        self.add_import(module_token)
-        self.add_controllers(self._get_controllers(module_token), module_token)
-        self.add_providers(self._get_providers(module_token), module_token)
+
+        self.add_metadata(module_factory.token, module_factory.dynamic_metadata)
+        self.add_import(module_factory.token)
+        self.add_controllers(
+            self._get_controllers(module_factory.token), module_factory.token
+        )
+        self.add_providers(
+            self._get_providers(module_factory.token), module_factory.token
+        )
+
         self.logger.info(
-            f"{click.style(module_factory.type.__name__ + ' Detected ', fg='green')}",
+            f"{click.style(module_factory.type.__name__ + ' Detected ', fg='green')}"
         )
 
         return module_ref

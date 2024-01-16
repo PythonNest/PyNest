@@ -16,4 +16,3 @@ class ProductController:
     @Post("/")
     async def add_product(self, product: Product):
         return await self.service.add_product(product)
- 

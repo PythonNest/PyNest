@@ -3,7 +3,6 @@ from .product_controller import ProductController
 
 
 class ProductModule:
-
     def __init__(self):
         self.providers = [ProductService]
         self.controllers = [ProductController]

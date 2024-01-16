@@ -5,9 +5,7 @@ from src.product.product_module import ProductModule
 from fastapi import FastAPI
 
 
-@Module(
-    imports=[ExampleModule, UserModule, ProductModule]
-)
+@Module(imports=[ExampleModule, UserModule, ProductModule])
 class AppModule:
     pass
 

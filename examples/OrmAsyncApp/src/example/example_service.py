@@ -7,12 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class ExampleService:
-
     @async_db_request_handler
     async def add_example(self, example: Example, session: AsyncSession):
-        new_example = ExampleEntity(
-            **example.dict()
-        )
+        new_example = ExampleEntity(**example.dict())
         session.add(new_example)
         await session.commit()
         return new_example.id
