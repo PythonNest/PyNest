@@ -20,7 +20,7 @@ def Controller(tag: str = None, prefix: str = None):
 
     # Ensure prefix has correct formatting
     if prefix:
-        prefix = "/" + prefix.rstrip("/")
+        prefix = "/" + prefix.rstrip("/") if not prefix.startswith("/") else prefix.rstrip("/")
 
     def wrapper(cls) -> ClassBasedView:
         router = APIRouter(tags=[tag] if tag else None)
@@ -38,15 +38,14 @@ def Controller(tag: str = None, prefix: str = None):
 
                 # Process single path or list of paths
                 paths = method.__path__ if isinstance(method.__path__, list) else [method.__path__]
-
                 for path in paths:
                     if prefix and isinstance(path, str):
-                        path = f"{prefix.rstrip('/')}/{path.lstrip('/')}" if path else prefix.rstrip('/')
-                        
-                        # Set default status code if  provided in @HttpCode decorator
+                        method.__path__ = f"{prefix.rstrip('/')}/{path.lstrip('/')}" if path else prefix.rstrip('/')
+                    
+                    # Set default status code if  provided in @HttpCode decorator
                     if  hasattr(method, STATUS_CODE_TOKEN) and method.__kwargs__.get(STATUS_CODE_TOKEN) is None:
                         method.__kwargs__[STATUS_CODE_TOKEN] = method.__dict__[STATUS_CODE_TOKEN]
-                    router.add_api_route(path, method, methods=[http_method], **method.__kwargs__)
+                    router.add_api_route(method.__path__, method, methods=[http_method], **method.__kwargs__)
 
                     
         def get_router() -> APIRouter:
