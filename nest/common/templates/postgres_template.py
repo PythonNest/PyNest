@@ -34,15 +34,6 @@ config = OrmProvider(
 psycopg2==2.9.6
 """
 
-    def docker_file(self):
-        pass
-
-    def dockerignore_file(self):
-        pass
-
-    def gitignore_file(self):
-        pass
-
 
 class AsyncPostgresqlTemplate(AsyncORMTemplate, ABC):
     def __init__(self, module_name: str):
@@ -73,12 +64,3 @@ config = AsyncOrmProvider(
         return f"""pynest-api=={self.version}
 asyncpg==0.29.0
 """
-
-    def docker_file(self):
-        pass
-
-    def dockerignore_file(self):
-        pass
-
-    def gitignore_file(self):
-        pass

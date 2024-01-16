@@ -32,17 +32,6 @@ def create_nest_app(app_name: str = ".", db_type: str = None, is_async: bool = F
     ├── .gitignore
     ├── src
     │    ├── __init__.py
-    │    ├── examples
-    │    │    ├── __init__.py
-    │    │    ├── examples_controller.py
-    │    │    ├── examples_service.py
-    │    │    ├── examples_model.py
-    │    ├──  ├── examples_entity.py (only for databases)
-    │    ├──  ├── examples_module.py
-
-        .....................
-
-    │    ├── another module
 
     in addition to those files, a setting.yaml file will be created in the package level that will help managed configurations
     """
@@ -60,13 +49,16 @@ def create_nest_module(name: str):
     :param name: The name of the module
 
     The files structure are:
-
-    ├── __init__.py
-    ├── module_name_controller.py
-    ├── module_name_service.py
-    ├── module_name_model.py
-    ├── module_name_entity.py (only for databases)
-    ├── module_name_module.py
+    ├── ...
+    ├── src
+    │    ├── __init__.py
+    │    ├── module_name
+            ├── __init__.py
+            ├── module_name_controller.py
+            ├── module_name_service.py
+            ├── module_name_model.py
+            ├── module_name_entity.py (only for databases)
+            ├── module_name_module.py
     """
     db_type, is_async = get_metadata()
     template_factory = TemplateFactory()

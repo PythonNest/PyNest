@@ -33,9 +33,8 @@ def startup():
     def requirements_file(self):
         raise NotImplementedError
 
-    @abstractmethod
     def docker_file(self):
-        raise NotImplementedError
+        return ""
 
     def dockerignore_file(self):
         return """__pycache__
@@ -224,9 +223,6 @@ async def startup():
     def requirements_file(self):
         pass
 
-    @abstractmethod
-    def docker_file(self):
-        pass
 
     def entity_file(self):
         return f"""from config import config
