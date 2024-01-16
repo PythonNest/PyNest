@@ -5,14 +5,15 @@ from .product_model import Product
 
 @Controller("product")
 class ProductController:
+     
 
     service: ProductService = Depends(ProductService)
     
-    @Get("/")
+    @Get(["/" , '/single'])
     def get_product(self):
         return self.service.get_product()
         
-    @Post("/")
+    @Post(["/single" , "/multiple"])
     def add_product(self, product: Product):
         return self.service.add_product(product)
 
