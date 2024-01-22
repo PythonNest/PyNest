@@ -240,7 +240,7 @@ class {self.capitalized_module_name}Module:
         return ast.parse(source)
 
     def append_import(
-            self, file_path: str, module_path: str, class_name: str, import_exception: str
+        self, file_path: str, module_path: str, class_name: str, import_exception: str
     ) -> ast.Module:
         tree = self.get_ast_tree(file_path)
         import_node = ast.ImportFrom(
@@ -274,9 +274,9 @@ class {self.capitalized_module_name}Module:
             if isinstance(node, ast.ClassDef):
                 for decorator in node.decorator_list:
                     if (
-                            isinstance(decorator, ast.Call)
-                            and hasattr(decorator.func, "id")
-                            and decorator.func.id == "Module"
+                        isinstance(decorator, ast.Call)
+                        and hasattr(decorator.func, "id")
+                        and decorator.func.id == "Module"
                     ):
                         for keyword in decorator.keywords:
                             if keyword.arg == "imports":
