@@ -5,6 +5,7 @@ from functools import lru_cache
 
 
 @lru_cache()
+@Injectable
 class ExampleService:
     def __init__(self):
         self.database = []

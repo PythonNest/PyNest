@@ -89,11 +89,12 @@ class {self.capitalized_module_name}(config.Base):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
 from config import config
-from nest.core.decorators import db_request_handler
+from nest.core.decorators import db_request_handler, Injectable
 from functools import lru_cache
 
 
 @lru_cache()
+@Injectable
 class {self.capitalized_module_name}Service:
 
     def __init__(self):
@@ -247,12 +248,12 @@ class {self.capitalized_module_name}(config.Base):
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
-from nest.core.decorators import async_db_request_handler
+from nest.core.decorators import async_db_request_handler, Injectable
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
+@Injectable
 class {self.capitalized_module_name}Service:
 
     @async_db_request_handler

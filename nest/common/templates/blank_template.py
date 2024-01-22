@@ -53,9 +53,11 @@ class {self.capitalized_module_name}(BaseModel):
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from functools import lru_cache
+from nest.core import Injectable
 
 
 @lru_cache()
+@Injectable
 class {self.capitalized_module_name}Service:
 
     def __init__(self):
