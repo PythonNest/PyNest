@@ -3,9 +3,9 @@ from pathlib import Path
 import os
 from typing import List, Tuple, Union, Callable
 from nest import __version__
-import subprocess
 import ast
 import astor
+import black
 
 
 def get_module_strings(module_name: str) -> Tuple[List[str], str]:
@@ -213,11 +213,22 @@ class {self.capitalized_module_name}Module:
         return None
 
     @staticmethod
-    def format_with_black(file_path):
-        subprocess.run(["black", file_path], check=True)
+    def read_file(file_path: str) -> str:
+        with open(file_path, "r") as file:
+            return file.read()
 
     @staticmethod
-    def save_file_with_astor(file_path, tree):
+    def write_file(file_path: str, content: str) -> None:
+        with open(file_path, "w") as file:
+            file.write(content)
+
+    def format_with_black(self, file_path: str) -> None:
+        file_content = self.read_file(file_path)
+        formatted_content = black.format_str(file_content, mode=black.FileMode())
+        self.write_file(file_path, formatted_content)
+
+    @staticmethod
+    def save_file_with_astor(file_path: str, tree: ast.Module) -> None:
         with open(file_path, "w") as file:
             file.write(astor.to_source(tree))
 
@@ -229,7 +240,7 @@ class {self.capitalized_module_name}Module:
         return ast.parse(source)
 
     def append_import(
-        self, file_path: str, module_path: str, class_name: str, import_exception: str
+            self, file_path: str, module_path: str, class_name: str, import_exception: str
     ) -> ast.Module:
         tree = self.get_ast_tree(file_path)
         import_node = ast.ImportFrom(
@@ -259,29 +270,23 @@ class {self.capitalized_module_name}Module:
         modified = False
 
         for node in ast.walk(tree):
-            if (
-                isinstance(node, ast.Call)
-                and hasattr(node.func, "id")
-                and node.func.id == "App"
-            ):
-                for keyword in node.keywords:
-                    if keyword.arg == "modules":
-                        if (
-                            isinstance(keyword.value, ast.List)
-                            and len(keyword.value.elts) > 0
-                        ):
-                            # Append to existing list
-                            keyword.value.elts.append(
-                                ast.Name(id=self.class_name, ctx=ast.Load())
-                            )
-                        else:
-                            # Create a new list with the module
-                            keyword.value = ast.List(
-                                elts=[ast.Name(id=self.class_name, ctx=ast.Load())],
-                                ctx=ast.Load(),
-                            )
-                        modified = True
-                        break
+            # Check if the node is a ClassDef with a decorator named 'Module'
+            if isinstance(node, ast.ClassDef):
+                for decorator in node.decorator_list:
+                    if (
+                            isinstance(decorator, ast.Call)
+                            and hasattr(decorator.func, "id")
+                            and decorator.func.id == "Module"
+                    ):
+                        for keyword in decorator.keywords:
+                            if keyword.arg == "imports":
+                                # Append to existing imports list
+                                if isinstance(keyword.value, ast.List):
+                                    keyword.value.elts.append(
+                                        ast.Name(id=self.class_name, ctx=ast.Load())
+                                    )
+                                    modified = True
+                                break
 
         if modified:
             with open(path_to_app_py, "w") as file:

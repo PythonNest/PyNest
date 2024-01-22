@@ -29,7 +29,7 @@ app = PyNestFactory.create(
 
 http_server = app.get_server()
 
-@app.on_event("startup")
+@http_server.on_event("startup")
 def startup():
     config.create_all()
 """
@@ -216,7 +216,7 @@ app = PyNestFactory.create(
 
 http_server = app.get_server()
 
-@app.on_event("startup")
+@http_server.on_event("startup")
 async def startup():
     await config.create_all()
     
