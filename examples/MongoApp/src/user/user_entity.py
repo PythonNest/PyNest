@@ -2,7 +2,7 @@ from beanie import Document
 
 
 class User(Document):
-    title: str
+    name: str
 
     class Config:
-        schema_extra = {"example": {"title": "Example Title",}}
+        schema_extra = {"example": {"name": "Example Name",}}

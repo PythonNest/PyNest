@@ -42,12 +42,12 @@ beanie==1.20.0"""
         
         
 class {self.capitalized_module_name}(Document):
-    title: str
+    name: str
     
     class Config:
         schema_extra = {{
             "example": {{
-                "title": "Example Title",
+                "name": "Example Name",
             }}
         }}
 """

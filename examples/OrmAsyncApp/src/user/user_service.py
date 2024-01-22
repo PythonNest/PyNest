@@ -1,11 +1,12 @@
 from .user_model import User
 from .user_entity import User as UserEntity
-from nest.core.decorators import async_db_request_handler
+from nest.core.decorators import async_db_request_handler, Injectable
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
+@Injectable
 class UserService:
     @async_db_request_handler
     async def add_user(self, user: User, session: AsyncSession):

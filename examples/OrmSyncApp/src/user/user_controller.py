@@ -9,8 +9,8 @@ class UserController:
     service: UserService = Depends(UserService)
 
     @Get("/")
-    def get_user(self):
-        return self.service.get_user()
+    def get_users(self):
+        return self.service.get_users()
 
     @Post("/")
     def add_user(self, user: User):

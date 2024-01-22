@@ -1,8 +1,8 @@
+from nest.core import Module
 from .product_service import ProductService
 from .product_controller import ProductController
 
 
+@Module(controllers=[ProductController], providers=[ProductService], imports=[])
 class ProductModule:
-    def __init__(self):
-        self.providers = [ProductService]
-        self.controllers = [ProductController]
+    pass

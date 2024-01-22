@@ -9,8 +9,8 @@ class ProductController:
     service: ProductService = Depends(ProductService)
 
     @Get("/")
-    def get_product(self):
-        return self.service.get_product()
+    def get_products(self):
+        return self.service.get_products()
 
     @Post("/")
     def add_product(self, product: Product):

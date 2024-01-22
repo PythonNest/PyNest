@@ -3,25 +3,25 @@ import pytest
 from nest.core.decorators import Controller, Get, Post, Delete, Put, Patch
 
 
-@Controller(prefix="/api/v1")
+@Controller(prefix="/api/v1/test")
 class TestController:
-    @Get("/get")
+    @Get("/")
     def get_endpoint(self):
         return {"message": "GET endpoint"}
 
-    @Post("/post")
+    @Post("/")
     def post_endpoint(self):
         return {"message": "POST endpoint"}
 
-    @Delete("/delete")
+    @Delete("/")
     def delete_endpoint(self):
         return {"message": "DELETE endpoint"}
 
-    @Put("/put")
+    @Put("/")
     def put_endpoint(self):
         return {"message": "PUT endpoint"}
 
-    @Patch("/patch")
+    @Patch("/")
     def patch_endpoint(self):
         return {"message": "PATCH endpoint"}
 

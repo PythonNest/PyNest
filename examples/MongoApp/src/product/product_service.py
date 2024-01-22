@@ -1,10 +1,9 @@
 from .product_model import Product
 from .product_entity import Product as ProductEntity
-from nest.core.decorators import db_request_handler
-from functools import lru_cache
+from nest.core.decorators import db_request_handler, Injectable
 
 
-@lru_cache()
+@Injectable
 class ProductService:
     @db_request_handler
     async def add_product(self, product: Product):

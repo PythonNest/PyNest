@@ -3,9 +3,11 @@ from .example_entity import Example as ExampleEntity
 from config import config
 from nest.core.decorators import db_request_handler
 from functools import lru_cache
+from nest.core.decorators import Injectable
 
 
 @lru_cache()
+@Injectable
 class ExampleService:
     def __init__(self):
         self.config = config

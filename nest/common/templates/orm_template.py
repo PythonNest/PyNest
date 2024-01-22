@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from nest.common.templates.base_template import BaseTemplate, get_module_strings
+from nest.common.templates.base_template import BaseTemplate
 from nest.common.templates import Database
 
 
@@ -11,14 +11,23 @@ class ORMTemplate(BaseTemplate, ABC):
         self.db_type = db_type
 
     def app_file(self):
-        return f"""from config import config
-from nest.core.app import App
+        return f"""from nest.core import PyNestFactory, Module
 
-app = App(
-    description="PyNest service",
-    modules=[]
+
+@Module(imports=[], controllers=[], providers=[])
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my PyNest app.",
+    title="PyNest Application",
+    version="1.0.0",
+    debug=True,
 )
 
+http_server = app.get_server()
 
 @app.on_event("startup")
 def startup():
@@ -52,18 +61,6 @@ def startup():
 *.pyd
 .DS_Store
 .env
-"""
-
-    def module_file(self):
-        return f"""from .{self.module_name}_service import {self.capitalized_module_name}Service
-from .{self.module_name}_controller import {self.capitalized_module_name}Controller
-
-
-class {self.capitalized_module_name}Module:
-
-    def __init__(self):
-        self.providers = [{self.capitalized_module_name}Service]
-        self.controllers = [{self.capitalized_module_name}Controller]
 """
 
     def model_file(self):
@@ -201,18 +198,28 @@ config:
 
 class AsyncORMTemplate(ORMTemplate, ABC):
     def app_file(self):
-        return f"""from config import config
-from nest.core.app import App
+        return f"""from nest.core import PyNestFactory, Module
 
-app = App(
-    description="PyNest service",
-    modules=[]
+
+@Module(imports=[], controllers=[], providers=[])
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my Async PyNest app.",
+    title="PyNest Application",
+    version="1.0.0",
+    debug=True,
 )
 
+http_server = app.get_server()
 
 @app.on_event("startup")
 async def startup():
     await config.create_all()
+    
 """
 
     @abstractmethod

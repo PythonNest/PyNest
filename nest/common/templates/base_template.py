@@ -31,11 +31,12 @@ class BaseTemplate(ABC):
 
 if __name__ == '__main__':
     uvicorn.run(
-        'app:app',
+        'app:http_server',
         host="0.0.0.0",
         port=8000,
         reload=True
     )
+    
 """
 
     @abstractmethod
@@ -101,19 +102,21 @@ uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
 Go to the fastapi docs and use your api endpoints - http://127.0.0.1/docs
 """
 
-    @abstractmethod
     def module_file(self):
-        return """from nest.core import Module
-        
+        return f"""from nest.core import Module
+from .{self.module_name}_controller import {self.capitalized_module_name}Controller
+from .{self.module_name}_service import {self.capitalized_module_name}Service
+
+
 @Module(
-    imports=[],
-    controllers=[],
-    providers=[]
-)
-class ExampleModule:
+    controllers=[{self.capitalized_module_name}Controller],
+    providers=[{self.capitalized_module_name}Service],
+    imports=[]
+)   
+class {self.capitalized_module_name}Module:
     pass
-    
-"""
+
+    """
 
     @abstractmethod
     def model_file(self):
@@ -312,13 +315,3 @@ class ExampleModule:
         ├── module_name_module.py
         """
         raise NotImplementedError
-
-
-if __name__ == "__main__":
-    base_template = BaseTemplate(module_name="example",)
-    base_template.append_module_to_app(
-        path_to_app_py="/Users/itayd/PycharmProjects/PyNestRepo/examples/MyApp/app.py"
-    )
-    base_template.append_module_to_app(
-        path_to_app_py="/Users/itayd/PycharmProjects/PyNestRepo/examples/MyApp/app.py"
-    )

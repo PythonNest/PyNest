@@ -1,11 +1,12 @@
 from .example_model import Example
 from .example_entity import Example as ExampleEntity
-from nest.core.decorators import async_db_request_handler
+from nest.core.decorators import async_db_request_handler, Injectable
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
+@Injectable
 class ExampleService:
     @async_db_request_handler
     async def add_example(self, example: Example, session: AsyncSession):

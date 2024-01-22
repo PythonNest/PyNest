@@ -1,8 +1,8 @@
+from nest.core import Module
 from .user_controller import UserController
 from .user_service import UserService
 
 
+@Module(controllers=[UserController], providers=[UserService], imports=[])
 class UserModule:
-    def __init__(self):
-        self.controllers = [UserController]
-        self.providers = [UserService]
+    pass
