@@ -3,9 +3,11 @@ import redis
 from functools import lru_cache
 from fastapi import HTTPException
 from nest.plugins.modules.redis.redis_model import RedisInput, RedisConfig
+from nest.core import Injectable
 
 
-@lru_cache(maxsize=1)
+@lru_cache()
+@Injectable
 class RedisService:
     def __init__(self):
         self.redis_config = RedisConfig()
