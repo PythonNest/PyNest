@@ -1,6 +1,6 @@
 import pytest
 
-from nest.core.decorators.controller import Controller, Get, Post, Delete, Put, Patch
+from nest.core.decorators.controller import Controller, Get, Post, Delete, Put, Patch, Any
 
 
 @Controller(tag="test", prefix="/api/v1")
@@ -24,7 +24,10 @@ class TestController:
     @Patch("/patch")
     def patch_endpoint(self):
         return {"message": "PATCH endpoint"}
-
+    
+    @Any("/any")
+    def any_endpoint(self):
+        return {"message": "Any endpoint"}
 
 @pytest.fixture
 def test_controller():
