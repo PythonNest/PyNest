@@ -17,6 +17,7 @@ class UserController:
         return await self.service.get_user(session)
 
     @Post("/")
-    async def add_user(self, user: User, session: AsyncSession = Depends(config.get_db)):
+    async def add_user(
+        self, user: User, session: AsyncSession = Depends(config.get_db)
+    ):
         return await self.service.add_user(user, session)
- 

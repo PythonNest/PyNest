@@ -99,21 +99,41 @@ Now we need to declare the App object and register the module in
 
 ```python
 from config import config
-from nest.core.app import App
-from .examples_module import ExamplesModule
+from nest.core import PyNestFactory, Module
+from src.example.example_module import ExampleModule
+from fastapi import FastAPI
 
-app = App(
-    description="PyNest service",
-    modules=[
-        ExamplesModule,
-    ]
+@Module(
+    imports=[ExampleModule], controllers=[], providers=[]
+)
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my FastAPI app drive by Async ORM Engine",
+    title="My App",
+    version="1.0.0",
+    debug=True,
 )
 
+http_server: FastAPI = app.get_server()
 
-@app.on_event("startup")
+
+@http_server.on_event("startup")
 async def startup():
     await config.create_all()
 ```
+
+`@Module(...)`: This is a decorator that defines a module. In PyNest, a module is a class annotated with a `@Module()` decorator.
+The imports array includes the modules required by this module. In this case, ExampleModule is imported. The controllers and providers arrays are empty here, indicating this module doesn't directly provide any controllers or services.
+
+`PyNestFactory.create()` is a command to create an instance of the application.
+The AppModule is passed as an argument, which acts as the root module of the application.
+Additional metadata like description, title, version, and debug flag are also provided
+
+`http_server: FastAPI = app.get_server()`: Retrieves the HTTP server instance from the application.
 
 ## Core Concepts
 
@@ -162,11 +182,11 @@ There are two ways of creating service.
 ```python
 from .examples_model import Examples
 from .examples_entity import Examples as ExamplesEntity
-from nest.core.decorators.database import async_db_request_handler
+from nest.core.decorators import async_db_request_handler, Injectable
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
+@Injectable
 class ExamplesService:
 
     @async_db_request_handler
@@ -282,19 +302,21 @@ class ExamplesController:
 Create a module to register the controller and the service.
 
 ```python
-from .examples_controller import ExamplesController
-from .examples_service import ExamplesService
+from nest.core import Module
+from .example_service import ExampleService
+from .example_controller import ExampleController
 
 
-class ExamplesModule:
-    controllers = [ExamplesController]
-    services = [ExamplesService]
+@Module(controllers=[ExampleController], providers=[ExampleService], imports=[])
+class ExampleModule:
+    pass
+
 ```
 
 ## Run the application
 
 ```shell
-uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
+uvicorn "app:http_server" --host "0.0.0.0" --port "8000" --reload
 ```
 
 ## async_db_request_handler decorator

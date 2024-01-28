@@ -9,13 +9,24 @@ class BlankTemplate(BaseTemplate, ABC):
         super().__init__(module_name)
 
     def app_file(self):
-        return f"""from nest.core.app import App
+        return f"""from nest.core import PyNestFactory, Module
 
 
-app = App(
-    description="PyNest service",
-    modules=[]
+@Module(imports=[], controllers=[], providers=[])
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my PyNest app.",
+    title="PyNest Application",
+    version="1.0.0",
+    debug=True,
 )
+
+http_server = app.get_server()
+
                 """
 
     def config_file(self):
@@ -30,19 +41,6 @@ app = App(
     def gitignore_file(self):
         pass
 
-    def module_file(self):
-        return f"""from .{self.module_name}_controller import {self.capitalized_module_name}Controller
-from .{self.module_name}_service import {self.capitalized_module_name}Service
-
-
-class {self.capitalized_module_name}Module:
-
-    def __init__(self):
-        self.controllers = [{self.capitalized_module_name}Controller]
-        self.providers = [{self.capitalized_module_name}Service]
-
-"""
-
     def model_file(self):
         return f"""from pydantic import BaseModel
 
@@ -55,9 +53,11 @@ class {self.capitalized_module_name}(BaseModel):
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from functools import lru_cache
+from nest.core import Injectable
 
 
 @lru_cache()
+@Injectable
 class {self.capitalized_module_name}Service:
 
     def __init__(self):

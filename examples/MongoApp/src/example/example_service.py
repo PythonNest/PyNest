@@ -1,17 +1,13 @@
 from .example_model import Example
 from .example_entity import Example as ExampleEntity
-from nest.core.decorators import db_request_handler
-from functools import lru_cache
+from nest.core.decorators import db_request_handler, Injectable
 
 
-@lru_cache()
+@Injectable
 class ExampleService:
-
     @db_request_handler
     async def add_example(self, example: Example):
-        new_example = ExampleEntity(
-            **example.dict()
-        )
+        new_example = ExampleEntity(**example.dict())
         await new_example.save()
         return new_example.id
 

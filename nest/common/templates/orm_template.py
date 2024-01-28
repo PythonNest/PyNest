@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from nest.common.templates.base_template import BaseTemplate, get_module_strings
+from nest.common.templates.base_template import BaseTemplate
 from nest.common.templates import Database
 
 
@@ -13,16 +13,26 @@ class ORMTemplate(BaseTemplate, ABC):
         self.db_type = db_type
 
     def app_file(self):
-        return f"""from config import config
-from nest.core.app import App
+        return f"""from nest.core import PyNestFactory, Module
+from config import config
 
-app = App(
-    description="PyNest service",
-    modules=[]
+
+@Module(imports=[], controllers=[], providers=[])
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my PyNest app.",
+    title="PyNest Application",
+    version="1.0.0",
+    debug=True,
 )
 
+http_server = app.get_server()
 
-@app.on_event("startup")
+@http_server.on_event("startup")
 def startup():
     config.create_all()
 """
@@ -56,18 +66,6 @@ def startup():
 .env
 """
 
-    def module_file(self):
-        return f"""from .{self.module_name}_service import {self.capitalized_module_name}Service
-from .{self.module_name}_controller import {self.capitalized_module_name}Controller
-
-
-class {self.capitalized_module_name}Module:
-
-    def __init__(self):
-        self.providers = [{self.capitalized_module_name}Service]
-        self.controllers = [{self.capitalized_module_name}Controller]
-"""
-
     def model_file(self):
         return f"""from pydantic import BaseModel
 
@@ -94,11 +92,12 @@ class {self.capitalized_module_name}(config.Base):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
 from config import config
-from nest.core.decorators import db_request_handler
+from nest.core.decorators import db_request_handler, Injectable
 from functools import lru_cache
 
 
 @lru_cache()
+@Injectable
 class {self.capitalized_module_name}Service:
 
     def __init__(self):
@@ -203,18 +202,29 @@ config:
 
 class AsyncORMTemplate(ORMTemplate, ABC):
     def app_file(self):
-        return f"""from config import config
-from nest.core.app import App
+        return f"""from nest.core import PyNestFactory, Module
+from config import config
 
-app = App(
-    description="PyNest service",
-    modules=[]
+
+@Module(imports=[], controllers=[], providers=[])
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my Async PyNest app.",
+    title="PyNest Application",
+    version="1.0.0",
+    debug=True,
 )
 
+http_server = app.get_server()
 
-@app.on_event("startup")
+@http_server.on_event("startup")
 async def startup():
     await config.create_all()
+    
 """
 
     @abstractmethod
@@ -224,7 +234,6 @@ async def startup():
     @abstractmethod
     def requirements_file(self):
         pass
-
 
     def entity_file(self):
         return f"""from config import config
@@ -243,12 +252,12 @@ class {self.capitalized_module_name}(config.Base):
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
-from nest.core.decorators import async_db_request_handler
+from nest.core.decorators import async_db_request_handler, Injectable
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
+@Injectable
 class {self.capitalized_module_name}Service:
 
     @async_db_request_handler

@@ -106,21 +106,41 @@ Now we need to declare the App object and register the module in
 
 ```python
 from config import config
-from nest.core.app import App
-from src.examples.examples_module import ExamplesModule
+from nest.core import PyNestFactory, Module
+from src.example.example_module import ExampleModule
+from fastapi import FastAPI
 
-app = App(
-    description="PyNest service",
-    modules=[
-        ExamplesModule,
-    ]
+@Module(
+    imports=[ExampleModule], controllers=[], providers=[]
+)
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my FastAPI app drive by Mongo Engine",
+    title="My App",
+    version="1.0.0",
+    debug=True,
 )
 
+http_server: FastAPI = app.get_server()
 
-@app.on_event("startup")
+
+@http_server.on_event("startup")
 async def startup():
     await config.create_all()
 ```
+
+`@Module(...)`: This is a decorator that defines a module. In PyNest, a module is a class annotated with a `@Module()` decorator.
+The imports array includes the modules required by this module. In this case, ExampleModule is imported. The controllers and providers arrays are empty here, indicating this module doesn't directly provide any controllers or services.
+
+`PyNestFactory.create()` is a command to create an instance of the application.
+The AppModule is passed as an argument, which acts as the root module of the application.
+Additional metadata like description, title, version, and debug flag are also provided
+
+`http_server: FastAPI = app.get_server()`: Retrieves the HTTP server instance from the application.
 
 ### Creating Entity
 
@@ -160,11 +180,12 @@ Implement services to handle business logic.
 ```python
 from .examples_model import Examples
 from .examples_entity import Examples as ExamplesEntity
-from nest.core.decorators import db_request_handler
+from nest.core.decorators import db_request_handler, Injectable
 from functools import lru_cache
 
 
 @lru_cache()
+@Injectable
 class ExamplesService:
 
     @db_request_handler
@@ -209,20 +230,21 @@ class ExamplesController:
 Create a module to register the controller and service.
 
 ```python
+from nest.core import Module
 from .examples_controller import ExamplesController
 from .examples_service import ExamplesService
 
-
+@Module(
+    controllers=[ExamplesController],
+    providers=[ExamplesService]
+)
 class ExamplesModule:
-
-    def __init__(self):
-        self.providers = [ExamplesService]
-        self.controllers = [ExamplesController]
+    pass
 ```
 
 ## Run the app
 
 ```bash
-uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
+uvicorn "app:http_server" --host "0.0.0.0" --port "8000" --reload
 ```
 

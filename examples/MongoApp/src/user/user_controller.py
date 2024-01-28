@@ -16,4 +16,3 @@ class UserController:
     @Post("/")
     async def add_user(self, user: User):
         return await self.service.add_user(user)
- 

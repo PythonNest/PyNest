@@ -21,11 +21,7 @@ DB_TYPE = click.option(
 )
 
 MODULE_NAME = click.option(
-    "--name",
-    "-n",
-    help="The name of the module.",
-    required=False,
-    type=str,
+    "--name", "-n", help="The name of the module.", required=False, type=str,
 )
 
 IS_ASYNC = click.option(
@@ -42,8 +38,7 @@ def nest_cli() -> None:
 
 
 @nest_cli.command(
-    name="create-nest-app",
-    help="Create a new nest app.",
+    name="create-nest-app", help="Create a new nest app.",
 )
 @APP_NAME
 @DB_TYPE
