@@ -7,7 +7,9 @@ from nest.common.templates import Database
 
 class ORMTemplate(BaseTemplate, ABC):
     def __init__(self, module_name: str, db_type: Database):
-        super().__init__(module_name=module_name,)
+        super().__init__(
+            module_name=module_name,
+        )
         self.db_type = db_type
 
     def app_file(self):

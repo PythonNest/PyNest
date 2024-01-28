@@ -7,7 +7,8 @@ from nest.common.templates import Database
 class MySQLTemplate(ORMTemplate, ABC):
     def __init__(self, module_name: str):
         super().__init__(
-            module_name=module_name, db_type=Database.MYSQL,
+            module_name=module_name,
+            db_type=Database.MYSQL,
         )
 
     def config_file(self):
@@ -38,7 +39,8 @@ mysql-connector-python==8.2.0
 class AsyncMySQLTemplate(AsyncORMTemplate, ABC):
     def __init__(self, module_name: str):
         super().__init__(
-            module_name=module_name, db_type=Database.MYSQL,
+            module_name=module_name,
+            db_type=Database.MYSQL,
         )
 
     def config_file(self):

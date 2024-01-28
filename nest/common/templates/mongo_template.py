@@ -8,7 +8,8 @@ from nest.common.templates import Database
 class MongoTemplate(AsyncORMTemplate, ABC):
     def __init__(self, module_name: str):
         super().__init__(
-            module_name=module_name, db_type=Database.MONGODB,
+            module_name=module_name,
+            db_type=Database.MONGODB,
         )
 
     def config_file(self):
@@ -131,6 +132,7 @@ class {self.capitalized_module_name}Service:
         src_path = self.validate_new_module(module_name)
         config_file = self.validate_config_file(src_path)
         self.create_module(
-            src_path=src_path, module_name=module_name,
+            src_path=src_path,
+            module_name=module_name,
         )
         self.add_document_to_odm_config(config_file)

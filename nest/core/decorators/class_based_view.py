@@ -3,7 +3,6 @@ Credit: FastAPI-Utils
 Source: https://github.com/dmontagu/fastapi-utils/blob/master/fastapi_utils/cbv.py
 """
 
-
 import inspect
 from typing import Any, Callable, List, Type, TypeVar, Union, get_type_hints
 

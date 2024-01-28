@@ -7,7 +7,8 @@ from nest.common.templates import Database
 class SQLiteTemplate(ORMTemplate, ABC):
     def __init__(self, module_name: str):
         super().__init__(
-            module_name=module_name, db_type=Database.SQLITE,
+            module_name=module_name,
+            db_type=Database.SQLITE,
         )
 
     def config_file(self):
@@ -39,7 +40,8 @@ COPY ./requirements.txt /app/requirements.txt
 class AsyncSQLiteTemplate(AsyncORMTemplate, ABC):
     def __init__(self, module_name: str):
         super().__init__(
-            module_name=module_name, db_type=Database.SQLITE,
+            module_name=module_name,
+            db_type=Database.SQLITE,
         )
 
     def config_file(self):

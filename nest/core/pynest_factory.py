@@ -9,7 +9,8 @@ T = TypeVar("T")
 class PyNestFactory:
     @staticmethod
     def _initialize(
-        module: T, container: PyNestContainer,
+        module: T,
+        container: PyNestContainer,
     ):
         container.add_module(module)
 

@@ -7,7 +7,8 @@ from nest.common.templates import Database
 class PostgresqlTemplate(ORMTemplate, ABC):
     def __init__(self, module_name: str):
         super().__init__(
-            module_name=module_name, db_type=Database.POSTGRESQL,
+            module_name=module_name,
+            db_type=Database.POSTGRESQL,
         )
 
     def config_file(self):
@@ -38,7 +39,8 @@ psycopg2==2.9.6
 class AsyncPostgresqlTemplate(AsyncORMTemplate, ABC):
     def __init__(self, module_name: str):
         super().__init__(
-            module_name=module_name, db_type=Database.POSTGRESQL,
+            module_name=module_name,
+            db_type=Database.POSTGRESQL,
         )
 
     def config_file(self):
