@@ -12,6 +12,8 @@ from pydantic.typing import is_classvar
 from starlette.routing import Route, WebSocketRoute
 
 T = TypeVar("T")
+K = TypeVar("K", bound=Callable[..., Any])
+
 
 CBV_CLASS_KEY = "__cbv_class__"
 
@@ -102,3 +104,11 @@ def _update_cbv_route_endpoint_signature(
     ]
     new_signature = old_signature.replace(parameters=new_parameters)
     setattr(route.endpoint, "__signature__", new_signature)
+
+def route_decorator(path:str,method:str, **kwargs: Any):
+    def decorator(func: K) -> K:
+        setattr(func, "method", method)
+        setattr(func, "__path__", path)
+        setattr(func, "__kwargs__", kwargs)
+        return func
+    return decorator

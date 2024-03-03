@@ -1,5 +1,6 @@
+from typing import Any
 from fastapi.routing import APIRouter
-from nest.core.decorators.helpers import class_based_view as ClassBasedView
+from nest.core.decorators.helpers import class_based_view as ClassBasedView, route_decorator
 
 
 def Controller(tag: str = None, prefix: str = None):
@@ -60,7 +61,7 @@ def Controller(tag: str = None, prefix: str = None):
     return wrapper
 
 
-def Get(path: str, **kwargs):
+def Get(path: str, **kwargs:Any):
     """
     Decorator that defines a GET route for the controller.
 
@@ -73,16 +74,10 @@ def Get(path: str, **kwargs):
 
     """
 
-    def decorator(func):
-        func.method = "GET"
-        func.__path__ = path
-        func.__kwargs__ = kwargs
-        return func
-
-    return decorator
+    return route_decorator(path,"PATCH",**kwargs)
 
 
-def Post(path: str, **kwargs):
+def Post(path: str, **kwargs:Any):
     """
     Decorator that defines a POST route for the controller.
 
@@ -95,16 +90,10 @@ def Post(path: str, **kwargs):
 
     """
 
-    def decorator(func):
-        func.method = "POST"
-        func.__path__ = path
-        func.__kwargs__ = kwargs
-        return func
-
-    return decorator
+    return route_decorator(path,"PATCH",**kwargs)
 
 
-def Delete(path: str, **kwargs):
+def Delete(path: str, **kwargs:Any):
     """
     Decorator that defines a DELETE route for the controller.
 
@@ -117,16 +106,10 @@ def Delete(path: str, **kwargs):
 
     """
 
-    def decorator(func):
-        func.method = "DELETE"
-        func.__path__ = path
-        func.__kwargs__ = kwargs
-        return func
-
-    return decorator
+    return route_decorator(path,"PATCH",**kwargs)
 
 
-def Put(path: str, **kwargs):
+def Put(path: str, **kwargs:Any):
     """
     Decorator that defines a PUT route for the controller.
 
@@ -139,16 +122,10 @@ def Put(path: str, **kwargs):
 
     """
 
-    def decorator(func):
-        func.method = "PUT"
-        func.__path__ = path
-        func.__kwargs__ = kwargs
-        return func
-
-    return decorator
+    return route_decorator(path,"PATCH",**kwargs)
 
 
-def Patch(path: str, **kwargs):
+def Patch(path: str, **kwargs:Any):
     """
     Decorator that defines a PATCH route for the controller.
 
@@ -161,10 +138,4 @@ def Patch(path: str, **kwargs):
 
     """
 
-    def decorator(func):
-        func.method = "PATCH"
-        func.__path__ = path
-        func.__kwargs__ = kwargs
-        return func
-
-    return decorator
+    return route_decorator(path,"PATCH",**kwargs)
