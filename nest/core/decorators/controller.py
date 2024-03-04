@@ -1,6 +1,9 @@
 from typing import Any
 from fastapi.routing import APIRouter
-from nest.core.decorators.helpers import class_based_view as ClassBasedView, route_decorator
+from nest.core.decorators.helpers import (
+    class_based_view as ClassBasedView,
+    route_decorator,
+)
 
 
 def Controller(tag: str = None, prefix: str = None):
@@ -61,7 +64,7 @@ def Controller(tag: str = None, prefix: str = None):
     return wrapper
 
 
-def Get(path: str, **kwargs:Any):
+def Get(path: str, **kwargs: Any):
     """
     Decorator that defines a GET route for the controller.
 
@@ -74,10 +77,10 @@ def Get(path: str, **kwargs:Any):
 
     """
 
-    return route_decorator(path,"PATCH",**kwargs)
+    return route_decorator(path, "PATCH", **kwargs)
 
 
-def Post(path: str, **kwargs:Any):
+def Post(path: str, **kwargs: Any):
     """
     Decorator that defines a POST route for the controller.
 
@@ -90,10 +93,10 @@ def Post(path: str, **kwargs:Any):
 
     """
 
-    return route_decorator(path,"PATCH",**kwargs)
+    return route_decorator(path, "PATCH", **kwargs)
 
 
-def Delete(path: str, **kwargs:Any):
+def Delete(path: str, **kwargs: Any):
     """
     Decorator that defines a DELETE route for the controller.
 
@@ -106,10 +109,10 @@ def Delete(path: str, **kwargs:Any):
 
     """
 
-    return route_decorator(path,"PATCH",**kwargs)
+    return route_decorator(path, "PATCH", **kwargs)
 
 
-def Put(path: str, **kwargs:Any):
+def Put(path: str, **kwargs: Any):
     """
     Decorator that defines a PUT route for the controller.
 
@@ -122,10 +125,10 @@ def Put(path: str, **kwargs:Any):
 
     """
 
-    return route_decorator(path,"PATCH",**kwargs)
+    return route_decorator(path, "PATCH", **kwargs)
 
 
-def Patch(path: str, **kwargs:Any):
+def Patch(path: str, **kwargs: Any):
     """
     Decorator that defines a PATCH route for the controller.
 
@@ -138,4 +141,4 @@ def Patch(path: str, **kwargs:Any):
 
     """
 
-    return route_decorator(path,"PATCH",**kwargs)
+    return route_decorator(path, "PATCH", **kwargs)

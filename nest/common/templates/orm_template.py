@@ -225,7 +225,6 @@ async def startup():
     def requirements_file(self):
         pass
 
-
     def entity_file(self):
         return f"""from config import config
 from sqlalchemy import Integer, String
