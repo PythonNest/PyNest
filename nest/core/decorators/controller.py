@@ -77,7 +77,7 @@ def Get(path: str, **kwargs: Any):
 
     """
 
-    return route_decorator(path, "PATCH", **kwargs)
+    return route_decorator(path, "GET", **kwargs)
 
 
 def Post(path: str, **kwargs: Any):
@@ -93,7 +93,7 @@ def Post(path: str, **kwargs: Any):
 
     """
 
-    return route_decorator(path, "PATCH", **kwargs)
+    return route_decorator(path, "POST", **kwargs)
 
 
 def Delete(path: str, **kwargs: Any):
@@ -109,7 +109,7 @@ def Delete(path: str, **kwargs: Any):
 
     """
 
-    return route_decorator(path, "PATCH", **kwargs)
+    return route_decorator(path, "DELETE", **kwargs)
 
 
 def Put(path: str, **kwargs: Any):
@@ -125,7 +125,7 @@ def Put(path: str, **kwargs: Any):
 
     """
 
-    return route_decorator(path, "PATCH", **kwargs)
+    return route_decorator(path, "PUT", **kwargs)
 
 
 def Patch(path: str, **kwargs: Any):
