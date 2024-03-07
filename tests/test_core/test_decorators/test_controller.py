@@ -1,6 +1,6 @@
 import pytest
 
-from nest.core.decorators.controller import Controller, Get, Post, Delete, Put, Patch
+from nest.core import Controller, Get, Post, Delete, Put, Patch
 
 
 @Controller(tag="test", prefix="/api/v1")
