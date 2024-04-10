@@ -1,5 +1,8 @@
+from typing import Optional
+
 import click
-from nest.cli.click_handlers import create_nest_app, create_nest_module
+
+from nest.cli.click_handlers import create_nest_app, create_nest_module, run_nest_app
 
 ### Options ###
 APP_NAME = click.option(
@@ -21,14 +24,18 @@ DB_TYPE = click.option(
 )
 
 MODULE_NAME = click.option(
-    "--name", "-n", help="The name of the module.", required=False, type=str,
+    "--name",
+    "-n",
+    help="The name of the module.",
+    required=False,
+    type=str,
 )
 
 IS_ASYNC = click.option(
     "--is-async",  # Changed the underscore to a hyphen for consistency
     help="Whether the project should be async or not (only for relational databases).",
     required=False,
-    is_flag=True,  # Set is_flag=True to make it a flag option
+    is_flag=True,
 )
 
 
@@ -38,7 +45,8 @@ def nest_cli() -> None:
 
 
 @nest_cli.command(
-    name="create-nest-app", help="Create a new nest app.",
+    name="create-nest-app",
+    help="Create a new nest app.",
 )
 @APP_NAME
 @DB_TYPE
@@ -63,7 +71,3 @@ def generate():
 @MODULE_NAME
 def generate_module(name: str):
     create_nest_module(name=name)
-
-
-if __name__ == "__main__":
-    nest_cli()

@@ -1,9 +1,10 @@
-import redis
-
 from functools import lru_cache
+
+import redis
 from fastapi import HTTPException
-from nest.plugins.modules.redis.redis_model import RedisInput, RedisConfig
+
 from nest.core import Injectable
+from nest.plugins.modules.redis.redis_model import RedisConfig, RedisInput
 
 
 @lru_cache()

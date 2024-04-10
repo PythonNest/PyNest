@@ -1,5 +1,7 @@
-import yaml
 from pathlib import Path
+
+import yaml
+
 from nest.common.templates.templates_factory import TemplateFactory
 
 
@@ -25,7 +27,7 @@ def create_nest_app(app_name: str = ".", db_type: str = None, is_async: bool = F
 
     The files structure are:
 
-    ├── app.py
+    ├── app_module.py
     ├── config.py (only for databases)
     ├── main.py
     ├── requirements.txt

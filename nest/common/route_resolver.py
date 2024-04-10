@@ -1,9 +1,8 @@
-from fastapi import FastAPI, APIRouter
-from nest.core.pynest_container import PyNestContainer
+from fastapi import APIRouter, FastAPI
 
 
 class RoutesResolver:
-    def __init__(self, container: PyNestContainer, app_ref: FastAPI):
+    def __init__(self, container, app_ref: FastAPI):
         self.container = container
         self.app_ref = app_ref
 

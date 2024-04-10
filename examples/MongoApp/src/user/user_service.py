@@ -1,10 +1,12 @@
-from .user_model import User
+from nest.core.decorators import Injectable, db_request_handler
+
 from .user_entity import User as UserEntity
-from nest.core.decorators import db_request_handler, Injectable
+from .user_model import User
 
 
 @Injectable
 class UserService:
+
     @db_request_handler
     async def add_user(self, user: User):
         new_user = UserEntity(**user.dict())

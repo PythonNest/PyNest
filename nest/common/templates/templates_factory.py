@@ -1,14 +1,15 @@
-from nest.common.templates.postgres_template import (
-    PostgresqlTemplate,
-    AsyncPostgresqlTemplate,
-)
-from nest.common.templates.sqlite_template import SQLiteTemplate, AsyncSQLiteTemplate
-from nest.common.templates.mysql_template import MySQLTemplate, AsyncMySQLTemplate
-from nest.common.templates.mongo_template import MongoTemplate
+from typing import Optional, Union
+
+from nest.common.templates import Database
 from nest.common.templates.base_template import BaseTemplate
 from nest.common.templates.blank_template import BlankTemplate
-from nest.common.templates import Database
-from typing import Union, Optional
+from nest.common.templates.mongo_template import MongoTemplate
+from nest.common.templates.mysql_template import AsyncMySQLTemplate, MySQLTemplate
+from nest.common.templates.postgres_template import (
+    AsyncPostgresqlTemplate,
+    PostgresqlTemplate,
+)
+from nest.common.templates.sqlite_template import AsyncSQLiteTemplate, SQLiteTemplate
 
 
 class TemplateFactory:

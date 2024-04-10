@@ -1,10 +1,13 @@
 import pytest
 
-from nest.core.decorators import Controller, Get, Post, Delete, Put, Patch
+from nest.core import Controller, Delete, Get, Patch, Post, Put, Injectable
 
 
 @Controller(prefix="api/v1/user", tag="test")
 class TestController:
+
+    def __init__(self): ...
+
     @Get("/get_all_users")
     def get_endpoint(self):
         return {"message": "GET endpoint"}

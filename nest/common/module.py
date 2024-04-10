@@ -1,10 +1,9 @@
 import hashlib
 import random
-import uuid
 import string
-from typing import List
+import uuid
+from typing import Any, List, Type
 from uuid import uuid4
-from typing import Any, Type
 
 from nest.core import Module
 
@@ -80,7 +79,7 @@ class Module:
 
     @property
     def entry_providers(self):
-        return [self._providers[token] for token in self._entryProviderKeys]
+        return [self._providers[token] for token in self._entry_provider_keys]
 
     @property
     def exports(self):
@@ -119,19 +118,6 @@ class Module:
     def add_controller(self, controller) -> str:
         self._controllers[controller.__name__] = controller
         return controller.__name__
-
-    def add_exported_provider(self, provider):
-        def add_exported_unit(token):
-            self._exports.add(self._validate_exported_provider(token))
-
-        if self._is_custom_provider(provider):
-            return self._add_custom_exported_provider(provider)
-        elif isinstance(provider, (str, type)):
-            return add_exported_unit(provider)
-        elif self._is_dynamic_module(provider):
-            module_class_ref = provider.module
-            return add_exported_unit(module_class_ref)
-        add_exported_unit(provider)
 
 
 class ModuleTokenFactory:
@@ -213,7 +199,7 @@ class ModuleCompiler:
 
         if not self.has_module_metadata(metatype):
             raise Exception(f"{metatype.__name__} as no metadata found")
-        for props in ["imports", "providers", "controllers"]:
+        for props in ["imports", "providers", "controllers", "exports"]:
             metadata["dynamic_metadata"][props] = getattr(metatype, props, [])
         return metadata
 

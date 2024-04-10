@@ -1,5 +1,6 @@
-from pydantic import BaseModel, BaseSettings
 from typing import Any
+
+from pydantic import BaseModel, BaseSettings
 
 
 class RedisInput(BaseModel):

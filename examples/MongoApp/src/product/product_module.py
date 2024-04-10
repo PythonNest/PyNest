@@ -1,6 +1,7 @@
 from nest.core import Module
-from .product_service import ProductService
+
 from .product_controller import ProductController
+from .product_service import ProductService
 
 
 @Module(controllers=[ProductController], providers=[ProductService], imports=[])

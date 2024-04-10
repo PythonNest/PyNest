@@ -1,13 +1,14 @@
-from nest.core import Controller, Get, Post, Depends
+from nest.core import Controller, Depends, Get, Post
 
-from .example_service import ExampleService
 from .example_model import Example
+from .example_service import ExampleService
 
 
 @Controller("example")
 class ExampleController:
 
-    service: ExampleService = Depends(ExampleService)
+    def __init__(self, service: ExampleService):
+        self.service = service
 
     @Get("/")
     def get_example(self):

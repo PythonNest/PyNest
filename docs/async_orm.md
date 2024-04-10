@@ -42,12 +42,15 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── config.py
 ├── main.py
 |── requirements.txt
 |── README.md
 ├── src
 │    ├── __init__.py
+│    ├── config.py
+│    ├── app_module.py
+├──  |── app_controller.py
+├──  |── app_service.py
 ```
 
 After creating the project, let's create a new module:
@@ -93,18 +96,57 @@ config = AsyncOrmProvider(
 
 Note: you can add any parameters that needed in order to configure the database connection.
 
+`app_service.py`
+```python
+from nest.core import Injectable
+
+
+@Injectable
+class AppService:
+    def __init__(self):
+        self.app_name = "MongoApp"
+        self.app_version = "1.0.0"
+
+    async def get_app_info(self):
+        return {"app_name": self.app_name, "app_version": self.app_version}
+```
+
+`app_controller.py`
+```python
+from nest.core import Controller, Get
+
+from .app_service import AppService
+
+
+@Controller("/")
+class AppController:
+
+    def __init__(self, service: AppService):
+        self.service = service
+
+    @Get("/")
+    async def get_app_info(self):
+        return await self.service.get_app_info()
+```
+
 Now we need to declare the App object and register the module in
 
-`app.py`
+`app_module.py`
 
 ```python
-from config import config
-from nest.core import PyNestFactory, Module
-from src.example.example_module import ExampleModule
-from fastapi import FastAPI
+from .config import config
+from .example.example_module import ExampleModule
+
+from .app_controller import AppController
+from .app_service import AppService
+
+from nest.core import Module, PyNestFactory
+
 
 @Module(
-    imports=[ExampleModule], controllers=[], providers=[]
+    imports=[ExampleModule],
+    controllers=[AppController],
+    providers=[AppService],
 )
 class AppModule:
     pass
@@ -118,7 +160,7 @@ app = PyNestFactory.create(
     debug=True,
 )
 
-http_server: FastAPI = app.get_server()
+http_server = app.get_server()
 
 
 @http_server.on_event("startup")
@@ -147,6 +189,8 @@ other parameters for efficient database access.
 AsyncSession from sqlalchemy.ext.asyncio is used for executing asynchronous database operations. It is essential for
 leveraging the full capabilities of SQLAlchemy 2.0 in an async environment.
 
+
+
 ## Implementing Async Features
 
 ### Creating Entities
@@ -154,16 +198,16 @@ leveraging the full capabilities of SQLAlchemy 2.0 in an async environment.
 Define your models using SQLAlchemy's declarative base. For example, the Examples model:
 
 ```python
-from config import config
+from src.config import config
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 
-class Examples(config.Base):
-    __tablename__ = "examples"
+class Example(config.Base):
+    __tablename__ = "example"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(1000), nullable=False)
+    name: Mapped[str] = mapped_column(String, unique=True)
 ```
 
 We are using the config object (which is the AsyncOrmProvider object) to initialize and create the tables. sqlalchemy
@@ -180,27 +224,28 @@ There are two ways of creating service.
    the async session from the controller
 
 ```python
-from .examples_model import Examples
-from .examples_entity import Examples as ExamplesEntity
-from nest.core.decorators import async_db_request_handler, Injectable
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from nest.core.decorators import async_db_request_handler
+from nest.core import Injectable
+
+from .example_entity import Example as ExampleEntity
+from .example_model import Example
+
+
 @Injectable
-class ExamplesService:
-
+class ExampleService:
     @async_db_request_handler
-    async def add_examples(self, examples: Examples, session: AsyncSession):
-        examples_entity = ExamplesEntity(
-            **examples.dict()
-        )
-        session.add(examples_entity)
+    async def add_example(self, example: Example, session: AsyncSession):
+        new_example = ExampleEntity(**example.dict())
+        session.add(new_example)
         await session.commit()
-        return examples_entity.id
+        return new_example.id
 
     @async_db_request_handler
-    async def get_examples(self, session: AsyncSession):
-        query = select(ExamplesEntity)
+    async def get_example(self, session: AsyncSession):
+        query = select(ExampleEntity)
         result = await session.execute(query)
         return result.scalars().all()
 ```
@@ -211,13 +256,13 @@ class ExamplesService:
 ```python
 from .examples_model import Examples
 from .examples_entity import Examples as ExamplesEntity
-from config import config
+from src.config import config
 from nest.core.decorators.database import async_db_request_handler
-from functools import lru_cache
-from sqlalchemy import select, text
+from nest.core import Injectable
+from sqlalchemy import select
 
 
-@lru_cache()
+@Injectable
 class ExamplesService:
 
     def __init__(self):
@@ -254,13 +299,15 @@ from nest.core import Controller, Get, Post, Depends
 
 from .examples_service import ExamplesService
 from .examples_model import Examples
-from config import config
+from src.config import config
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @Controller("examples")
 class ExamplesController:
-    service: ExamplesService = Depends(ExamplesService)
+    
+   def __init__(self, service: ExamplesService):
+        self.service = service
 
     @Get("/")
     async def get_examples(self, session: AsyncSession = Depends(config.get_db)):
@@ -275,7 +322,7 @@ class ExamplesController:
    in his constructor.
 
 ```python
-from nest.core import Controller, Get, Post, Depends
+from nest.core import Controller, Get, Post
 
 from .examples_service import ExamplesService
 from .examples_model import Examples
@@ -283,7 +330,9 @@ from .examples_model import Examples
 
 @Controller("examples")
 class ExamplesController:
-    service: ExamplesService = Depends(ExamplesService)
+   
+   def __init__(self, service: ExamplesService):
+        self.service = service
 
     @Get("/")
     async def get_examples(self):
@@ -316,57 +365,5 @@ class ExampleModule:
 ## Run the application
 
 ```shell
-uvicorn "app:http_server" --host "0.0.0.0" --port "8000" --reload
-```
-
-## async_db_request_handler decorator
-
-The async_db_request_handler decorator is used to handle the async session object. It is used in the service layer to
-handle exceptions and rollback the session if needed.
-
-Code:
-
-```python
-def async_db_request_handler(func):
-    """
-    Asynchronous decorator that handles database requests, including error handling,
-    session management, and logging for async functions.
-
-    Args:
-        func (function): The async function to be decorated.
-
-    Returns:
-        function: The decorated async function.
-    """
-
-    async def wrapper(*args, **kwargs):
-        try:
-            start_time = time.time()
-            result = await func(*args, **kwargs)  # Awaiting the async function
-            process_time = time.time() - start_time
-            logger.info(f"Async request finished after {process_time} seconds")
-            return result
-        except Exception as e:
-            self = args[0] if args else None
-            session = getattr(self, "session", None)
-            # If not found, check in function arguments
-            if session:
-                session_type = "class"
-            else:
-                session = [arg for arg in args if isinstance(arg, AsyncSession)][0]
-                if session:
-                    session_type = "function"
-                else:
-                    raise ValueError("AsyncSession not provided to the function")
-
-            logger.error(f"Error in async request: {e}")
-            # Rollback if session is in a transaction
-            if session and session_type == "function" and session.in_transaction():
-                await session.rollback()
-            elif session and session_type == "class":
-                async with session() as session:
-                    await session.rollback()
-            return HTTPException(status_code=500, detail=str(e))
-
-    return wrapper
+uvicorn "src.app_module:http_server" --host "0.0.0.0" --port "8000" --reload
 ```

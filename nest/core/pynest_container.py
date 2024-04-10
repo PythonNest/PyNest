@@ -1,20 +1,22 @@
-from nest.common.module import (
-    ModuleCompiler,
-    ModuleTokenFactory,
-    ModuleFactory,
-    Module,
-    ModulesContainer,
-)
+import logging
+from typing import Any, List, NoReturn, Optional, Union
+
+import click
+from injector import Injector, UnknownProvider, singleton
+
+from nest.common.constants import DEPENDENCIES, INJECTABLE_TOKEN
 from nest.common.exceptions import (
-    UnknownModuleException,
     CircularDependencyException,
     NoneInjectableException,
+    UnknownModuleException,
 )
-from nest.common.constants import INJECTABLE_TOKEN
-from typing import List, Any, NoReturn
-import logging
-import click
-
+from nest.common.module import (
+    Module,
+    ModuleCompiler,
+    ModuleFactory,
+    ModulesContainer,
+    ModuleTokenFactory,
+)
 
 TController = type("TController", (), {})
 TProvider = type("TProvider", (), {})
@@ -22,6 +24,7 @@ TProvider = type("TProvider", (), {})
 
 class PyNestContainer:
     _instance = None
+    _dependencies = None
 
     def __new__(cls):
         if cls._instance is None:
@@ -30,6 +33,7 @@ class PyNestContainer:
 
     def __init__(self):
         self.logger = logging.getLogger("pynest")
+        self._injector = Injector()
 
     _global_modules = set()
     _modules = ModulesContainer()
@@ -52,6 +56,21 @@ class PyNestContainer:
     @property
     def module_compiler(self):
         return self._module_compiler
+
+    def get_instance(
+        self,
+        dependency: TProvider,
+        provider: Optional[Union[TProvider, TController]] = None,
+    ):
+        try:
+            self._injector.binder.bind(dependency, scope=singleton)
+            instance = self._injector.get(dependency)
+            self.logger.info(
+                f"{click.style(dependency.__name__ + ' Detected ', fg='blue')}"
+            )
+        except UnknownProvider:
+            raise Exception(f"Unknown provider {provider}")
+        return instance
 
     def get_module_by_key(self, module_key: str) -> Module:
         return self._modules[module_key]
@@ -94,6 +113,12 @@ class PyNestContainer:
             raise UnknownModuleException()
         module_ref: Module = self.modules[token]
         module_ref.add_controller(controller)
+        if hasattr(controller, DEPENDENCIES):
+            for provider_name, provider_type in getattr(
+                controller, DEPENDENCIES
+            ).items():
+                instance = self.get_instance(provider_type, controller)
+                setattr(controller, provider_name, instance)
 
     def set_module(self, module_factory: ModuleFactory) -> Module:
         module_ref = Module(module_factory.type, self)
@@ -102,11 +127,11 @@ class PyNestContainer:
 
         self.add_metadata(module_factory.token, module_factory.dynamic_metadata)
         self.add_import(module_factory.token)
-        self.add_controllers(
-            self._get_controllers(module_factory.token), module_factory.token
-        )
         self.add_providers(
             self._get_providers(module_factory.token), module_factory.token
+        )
+        self.add_controllers(
+            self._get_controllers(module_factory.token), module_factory.token
         )
 
         self.logger.info(
@@ -150,6 +175,16 @@ class PyNestContainer:
      Please check your code and ensure that the decorator is correctly applied to the class.
           """
             raise NoneInjectableException(error_message)
+
+        for dependency_name, dependency_instance in getattr(
+            provider, DEPENDENCIES
+        ).items():
+            try:
+                instance = self.get_instance(dependency_instance, provider)
+                setattr(provider, dependency_name, instance)
+            except Exception as e:
+                self.logger.error(e)
+                raise e
 
         module_ref.add_provider(provider)
 

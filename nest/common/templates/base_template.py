@@ -1,11 +1,13 @@
+import ast
+import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-import os
-from typing import List, Tuple, Union, Callable
-from nest import __version__
-import ast
+from typing import Callable, List, Tuple, Union
+
 import astor
 import black
+
+from nest import __version__
 
 
 def get_module_strings(module_name: str) -> Tuple[List[str], str]:
@@ -31,7 +33,7 @@ class BaseTemplate(ABC):
 
 if __name__ == '__main__':
     uvicorn.run(
-        'app:http_server',
+        'src.app_module:http_server',
         host="0.0.0.0",
         port=8000,
         reload=True
@@ -117,6 +119,40 @@ class {self.capitalized_module_name}Module:
     pass
 
     """
+
+    @staticmethod
+    def app_controller_file():
+        return f"""from nest.core import Controller, Get, Post
+from .app_service import AppService
+
+
+@Controller("/")
+class AppController:
+
+    def __init__(self, service: AppService):
+        self.service = service
+
+    @Get("/")
+    def get_app_info(self):
+        return self.service.get_app_info()
+"""
+
+    @staticmethod
+    def app_service_file():
+        return """
+from nest.core import Injectable
+
+
+@Injectable
+class AppService:
+    def __init__(self):
+        self.app_name = "Pynest App"
+        self.app_version = "1.0.0"
+
+    def get_app_info(self):
+        return {"app_name": self.app_name, "app_version": self.app_version}
+
+"""
 
     @abstractmethod
     def model_file(self):

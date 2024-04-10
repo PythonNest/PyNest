@@ -1,8 +1,9 @@
 import ast
 from abc import ABC
 from pathlib import Path
-from nest.common.templates.orm_template import AsyncORMTemplate
+
 from nest.common.templates import Database
+from nest.common.templates.orm_template import AsyncORMTemplate
 
 
 class MongoTemplate(AsyncORMTemplate, ABC):
@@ -54,7 +55,7 @@ class {self.capitalized_module_name}(Document):
 """
 
     def controller_file(self):
-        return f"""from nest.core import Controller, Get, Post, Depends
+        return f"""from nest.core import Controller, Get, Post
 
 from .{self.module_name}_service import {self.capitalized_module_name}Service
 from .{self.module_name}_model import {self.capitalized_module_name}
@@ -63,7 +64,8 @@ from .{self.module_name}_model import {self.capitalized_module_name}
 @Controller("{self.module_name}")
 class {self.capitalized_module_name}Controller:
 
-    service: {self.capitalized_module_name}Service = Depends({self.capitalized_module_name}Service)
+    def __init__(self, service: {self.capitalized_module_name}Service):
+        self.service = service
 
     @Get("/")
     async def get_{self.module_name}(self):
@@ -78,10 +80,10 @@ class {self.capitalized_module_name}Controller:
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
 from nest.core.decorators import db_request_handler
-from functools import lru_cache
+from nest.core import Injectable
 
 
-@lru_cache()
+@Injectable
 class {self.capitalized_module_name}Service:
 
     @db_request_handler

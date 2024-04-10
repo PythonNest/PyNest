@@ -1,12 +1,14 @@
-from nest.core import Controller, Get, Post, Depends
-from .product_service import ProductService
+from nest.core import Controller, Depends, Get, Post
+
 from .product_model import Product
+from .product_service import ProductService
 
 
 @Controller("product")
 class ProductController:
 
-    service: ProductService = Depends(ProductService)
+    def __init__(self, service: ProductService):
+        self.service = service
 
     @Get("/")
     def get_products(self):

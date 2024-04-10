@@ -1,8 +1,11 @@
-from nest.common.module import ModuleCompiler, Module
-from typing import Union
-from nest.core.pynest_container import PyNestContainer
-from nest.common.exceptions import UnknownModuleException
 import logging
+from typing import TypeVar, Union
+
+from nest.common.exceptions import UnknownModuleException
+from nest.common.module import Module, ModuleCompiler
+from nest.core.pynest_container import PyNestContainer
+
+T = TypeVar("T")
 
 
 class PyNestApplicationContext:
@@ -11,7 +14,7 @@ class PyNestApplicationContext:
     This class is responsible for managing the application's lifecycle and modules.
 
     Attributes:
-        container (PyNestContainer): The container that holds the application's modules.
+        container (PyNestContainer): The container that holds the application's modules and manages the dependency injection.
         context_module (Module, optional): The module that represents the current context of the application.
         logger (Logger): Logger for the application context.
 
@@ -77,9 +80,9 @@ class PyNestApplicationContext:
         modules = self.container.modules.values()
         self.context_module = next(iter(modules), None)
 
-    def select(self, module):
+    def select(self, module: T) -> T:
         """
-        Selects a specific module as the current context module based on the provided module class.
+        Selects a specific module as the current context module based on the provided module class - The selected Module is the AppModule that contains all the application's graph.
 
         Args:
             module (Module): The module class to select.

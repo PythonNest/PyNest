@@ -1,11 +1,12 @@
-from .user_model import User
+from ..config import config
+
+from nest.core.decorators import db_request_handler
+from nest.core import Injectable
+
 from .user_entity import User as UserEntity
-from config import config
-from nest.core.decorators import db_request_handler, Injectable
-from functools import lru_cache
+from .user_model import User
 
 
-@lru_cache()
 @Injectable
 class UserService:
     def __init__(self):

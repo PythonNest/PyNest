@@ -1,6 +1,7 @@
 from fastapi.routing import APIRouter
+
 from nest.core.decorators.class_based_view import class_based_view as ClassBasedView
-from nest.common.constants import STATUS_CODE_TOKEN
+from nest.core.decorators.utils import get_instance_variables, parse_dependencies
 
 
 def Controller(tag: str = None, prefix: str = None):
@@ -26,6 +27,16 @@ def Controller(tag: str = None, prefix: str = None):
 
     def wrapper(cls) -> ClassBasedView:
         router = APIRouter(tags=[tag] if tag else None)
+
+        dependencies = parse_dependencies(cls)
+        setattr(cls, "__dependencies__", dependencies)
+        non_dep = get_instance_variables(cls)
+        for key, value in non_dep.items():
+            setattr(cls, key, value)
+        try:
+            delattr(cls, "__init__")
+        except AttributeError:
+            raise AttributeError("Class must have an __init__ method")
 
         http_method_names = ("GET", "POST", "PUT", "DELETE", "PATCH")
 

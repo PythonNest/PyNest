@@ -1,4 +1,4 @@
-from config import config
+from..config import config
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 

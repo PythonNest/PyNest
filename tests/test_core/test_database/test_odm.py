@@ -1,11 +1,8 @@
 import os
 
 import pytest
-from nest.core.database.odm_config import (
-    ConfigFactory,
-    MongoDBConfig,
-)
 
+from nest.core.database.odm_config import ConfigFactory, MongoDBConfig
 from nest.core.database.odm_provider import OdmProvider
 
 

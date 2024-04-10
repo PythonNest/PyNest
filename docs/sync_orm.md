@@ -32,12 +32,15 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── config.py
 ├── main.py
 |── requirements.txt
 |── README.md
 ├── src
 │    ├── __init__.py
+│    ├── config.py
+│    ├── app_module.py
+├──  |── app_controller.py
+├──  |── app_service.py
 ```
 
 After creating the project, let's create a new module:
@@ -83,7 +86,40 @@ config = OrmProvider(
 
 > **Note:** you can add any parameters that needed in order to configure the database connection.
 
-`app.py`
+`app_service.py`
+```python
+from nest.core import Injectable
+
+
+@Injectable
+class AppService:
+    def __init__(self):
+        self.app_name = "MongoApp"
+        self.app_version = "1.0.0"
+
+    async def get_app_info(self):
+        return {"app_name": self.app_name, "app_version": self.app_version}
+```
+
+`app_controller.py`
+```python
+from nest.core import Controller, Get
+
+from .app_service import AppService
+
+
+@Controller("/")
+class AppController:
+
+    def __init__(self, service: AppService):
+        self.service = service
+
+    @Get("/")
+    async def get_app_info(self):
+        return await self.service.get_app_info()
+```
+
+`app_module.py`
 
 ```python
 from config import config
@@ -227,57 +263,11 @@ class ExamplesModule:
     pass
 ```
 
+
 ## Run the application
 
 ```shell
-uvicorn "app:http_server" --host "0.0.0.0" --port "8000" --reload
+uvicorn "src.app_module:http_server" --host "0.0.0.0" --port "8000" --reload
 ```
 
-
-## db_request_handler decorator
-
-The db_request_handler decorator is used to handle the async session object. It is used in the service layer to handle
-exceptions and rollback the session if needed.
-
-Code:
-
-```python
-from fastapi.exceptions import HTTPException
-import logging
-import time
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-
-def db_request_handler(func):
-    """
-    Decorator that handles database requests, including error handling and session management.
-
-    Args:
-        func (function): The function to be decorated.
-
-    Returns:
-        function: The decorated function.
-    """
-
-    def wrapper(self, *args, **kwargs):
-        try:
-            s = time.time()
-            result = func(self, *args, **kwargs)
-            p_time = time.time() - s
-            logging.info(f"request finished after {p_time}")
-            if hasattr(self, "session"):
-                # Check if self is an instance of OrmService
-                self.session.close()
-            return result
-        except Exception as e:
-            logging.error(e)
-            if hasattr(self, "session"):
-                # Check if self is an instance of OrmService
-                self.session.rollback()
-                self.session.close()
-            return HTTPException(status_code=500, detail=str(e))
-
-    return wrapper
-```
+Now you can access the application at http://localhost:8000/docs and test the endpoints.

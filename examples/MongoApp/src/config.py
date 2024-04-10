@@ -1,9 +1,12 @@
 import os
+
 from dotenv import load_dotenv
+
 from nest.core.database.odm_provider import OdmProvider
-from src.user.user_entity import User
-from src.product.product_entity import Product
-from src.example.example_entity import Example
+
+from .example.example_entity import Example
+from .product.product_entity import Product
+from .user.user_entity import User
 
 load_dotenv()
 config = OdmProvider(

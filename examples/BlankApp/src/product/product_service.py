@@ -1,9 +1,8 @@
-from .product_model import Product
-from functools import lru_cache
 from nest.core.decorators import Injectable
 
+from .product_model import Product
 
-@lru_cache()
+
 @Injectable
 class ProductService:
     def __init__(self):

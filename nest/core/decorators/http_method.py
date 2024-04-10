@@ -1,4 +1,4 @@
-from typing import Callable, Any, Union, List
+from typing import Any, Callable, List, Union
 
 
 def route(method: str, path: Union[str, List[str]] = "/", **kwargs):

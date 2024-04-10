@@ -1,7 +1,7 @@
 from abc import ABC
 
-from nest.common.templates.orm_template import ORMTemplate, AsyncORMTemplate
 from nest.common.templates import Database
+from nest.common.templates.orm_template import AsyncORMTemplate, ORMTemplate
 
 
 class PostgresqlTemplate(ORMTemplate, ABC):

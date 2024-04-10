@@ -1,16 +1,17 @@
-from nest.core import Controller, Get, Post, Depends
+from ..config import config
 from sqlalchemy.ext.asyncio import AsyncSession
-from config import config
 
+from nest.core import Controller, Depends, Get, Post
 
-from .product_service import ProductService
 from .product_model import Product
+from .product_service import ProductService
 
 
 @Controller("product")
 class ProductController:
 
-    service: ProductService = Depends(ProductService)
+    def __init__(self, service: ProductService):
+        self.service = service
 
     @Get("/")
     async def get_product(self, session: AsyncSession = Depends(config.get_db)):

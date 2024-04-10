@@ -1,9 +1,11 @@
-from .example_model import Example
-from .example_entity import Example as ExampleEntity
-from nest.core.decorators import async_db_request_handler, Injectable
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from nest.core.decorators import async_db_request_handler
+from nest.core import Injectable
+
+from .example_entity import Example as ExampleEntity
+from .example_model import Example
 
 
 @Injectable

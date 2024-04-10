@@ -1,10 +1,12 @@
-from .product_model import Product
+from nest.core.decorators import Injectable, db_request_handler
+
 from .product_entity import Product as ProductEntity
-from nest.core.decorators import db_request_handler, Injectable
+from .product_model import Product
 
 
 @Injectable
 class ProductService:
+
     @db_request_handler
     async def add_product(self, product: Product):
         new_product = ProductEntity(**product.dict())

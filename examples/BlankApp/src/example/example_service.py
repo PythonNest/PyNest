@@ -1,15 +1,14 @@
-from .example_model import Example
 from nest.core.decorators import Injectable
-import time
-from functools import lru_cache
+
+from ..user.user_service import UserService
+from .example_model import Example
 
 
-@lru_cache()
 @Injectable
 class ExampleService:
-    def __init__(self):
+    def __init__(self, user_service: UserService):
         self.database = []
-        time.sleep(5)
+        self.user_service = user_service
 
     def get_example(self):
         return self.database

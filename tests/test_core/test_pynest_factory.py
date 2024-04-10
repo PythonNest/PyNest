@@ -1,23 +1,8 @@
-from nest.core import Module, Controller, Get
-from nest.core import PyNestContainer
-from nest.core import PyNestFactory  # Replace 'your_module' with the actual module name
-from fastapi import FastAPI
 import pytest
-from tests.test_core import (
-    test_module,
-    test_container,
-)
+from fastapi import FastAPI
 
-
-@pytest.fixture
-def test_server():
-    server = PyNestFactory._create_server(
-        title="Test Server",
-        description="This is a test server",
-        version="1.0.0",
-        debug=True,
-    )
-    return server
+from nest.core import PyNestFactory  # Replace 'your_module' with the actual module name
+from tests.test_core import test_container, test_module, test_server
 
 
 def test_create_server(test_server):

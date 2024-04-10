@@ -1,11 +1,11 @@
-from .product_model import Product
+from ..config import config
+
+from nest.core.decorators import db_request_handler
+from nest.core import Injectable
 from .product_entity import Product as ProductEntity
-from functools import lru_cache
-from config import config
-from nest.core.decorators import db_request_handler, Injectable
+from .product_model import Product
 
 
-@lru_cache()
 @Injectable
 class ProductService:
     def __init__(self):
