@@ -15,8 +15,8 @@ class ORMTemplate(BaseTemplate, ABC):
     def app_file(self):
         return f"""from nest.core import PyNestFactory, Module
 from .config import config
-from app_controller import AppController
-from app_service import AppService
+from .app_controller import AppController
+from .app_service import AppService
 
 
 @Module(imports=[], controllers=[AppController], providers=[AppService])
@@ -208,8 +208,8 @@ class AsyncORMTemplate(ORMTemplate, ABC):
     def app_file(self):
         return f"""from nest.core import PyNestFactory, Module
 from .config import config
-from app_controller import AppController
-from app_service import AppService
+from .app_controller import AppController
+from .app_service import AppService
 
 
 @Module(imports=[], controllers=[AppController], providers=[AppService])
