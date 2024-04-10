@@ -79,7 +79,7 @@ class {self.capitalized_module_name}Controller:
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
-from nest.core.decorators import db_request_handler
+from nest.core.decorators.database import db_request_handler
 from nest.core import Injectable
 
 

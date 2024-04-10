@@ -94,7 +94,7 @@ class {self.capitalized_module_name}(config.Base):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
 from src.config import config
-from nest.core.decorators import db_request_handler
+from nest.core.decorators.database import db_request_handler
 from nest.core import Injectable
 
 
@@ -258,7 +258,7 @@ class {self.capitalized_module_name}(config.Base):
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
-from nest.core.decorators import async_db_request_handler
+from nest.core.decorators.database import async_db_request_handler
 from nest.core import Injectable
 
 from sqlalchemy import select
