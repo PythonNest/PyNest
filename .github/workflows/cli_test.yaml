@@ -76,7 +76,8 @@ jobs:
 
 
           # List of expected files
-          declare -a files=("main.py" "app.py" "requirements.txt" "README.md")
+          declare -a files=("main.py" "requirements.txt" "README.md")
+          declare -s src_level_files=("app_module.py" "app_service.py" "app_controller.py")
           declare -a module_files=("user_controller.py" "user_service.py" "user_module.py" "user_model.py")
 
           # Check each file in the list of files
@@ -88,6 +89,17 @@ jobs:
               exit 1
             fi
           done
+          
+          # Check each file in the list of files
+          for file in "${src_level_files[@]}"; do
+            if [ -f "$app_name/src/$file" ]; then
+              echo "$file exists in $app_name."
+            else
+              echo "$file does not exist in $app_name."
+              exit 1
+            fi
+          done
+
           
           # Check each file in the list of module_files
           for file in "${module_files[@]}"; do
