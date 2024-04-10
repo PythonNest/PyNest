@@ -151,9 +151,9 @@ config:
 
     @staticmethod
     def validate_config_file(src_path: Path) -> Path:
-        config_file = src_path.parent / "config.py"
+        config_file = src_path / "config.py"
         if not config_file.exists():
-            raise Exception("orm_config.py file not found")
+            raise Exception("config.py file not found")
         return config_file
 
     def create_module(self, module_name: str, src_path: Path):
