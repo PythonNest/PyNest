@@ -122,7 +122,7 @@ class AppController:
 `app_module.py`
 
 ```python
-from config import config
+from src.config import config
 from nest.core import PyNestFactory, Module
 from src.example.example_module import ExampleModule
 from fastapi import FastAPI
@@ -169,7 +169,7 @@ Define your models using SQLAlchemy's declarative base. For example, the Example
 `examples_entity.py`
 
 ```python
-from config import config
+from src.config import config
 from sqlalchemy import Column, Integer, String
 
 
@@ -187,7 +187,7 @@ Implement services to handle business logic.
 `examples_service.py`
 
 ```python
-from config import config
+from src.config import config
 from .examples_model import Examples
 from .examples_entity import Examples as ExamplesEntity
 from nest.core.decorators import db_request_handler, Injectable
