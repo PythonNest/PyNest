@@ -2,7 +2,7 @@ from typing import Optional
 
 import click
 
-from nest.cli.click_handlers import create_nest_app, create_nest_module, run_nest_app
+from nest.cli.click_handlers import create_nest_app, create_nest_module
 
 ### Options ###
 APP_NAME = click.option(
