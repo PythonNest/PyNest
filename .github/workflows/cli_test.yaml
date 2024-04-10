@@ -77,7 +77,7 @@ jobs:
 
           # List of expected files
           declare -a files=("main.py" "requirements.txt" "README.md")
-          declare -s src_level_files=("app_module.py" "app_service.py" "app_controller.py")
+          declare -a src_level_files=("app_module.py" "app_service.py" "app_controller.py")
           declare -a module_files=("user_controller.py" "user_service.py" "user_module.py" "user_model.py")
 
           # Check each file in the list of files
