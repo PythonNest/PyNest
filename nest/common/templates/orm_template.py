@@ -173,7 +173,7 @@ config:
         self.create_template(
             module_path / f"{module_name}_entity.py", self.entity_file()
         )
-        self.append_module_to_app(src_path.parent / "app_module.py")
+        self.append_module_to_app(src_path / "app_module.py")
 
     def generate_module(self, module_name: str):
         src_path = self.validate_new_module(module_name)

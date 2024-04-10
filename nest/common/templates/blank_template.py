@@ -113,7 +113,7 @@ class {self.capitalized_module_name}Controller:
             module_path / f"{module_name}_service.py", self.service_file()
         )
         self.create_template(module_path / f"{module_name}_model.py", self.model_file())
-        self.append_module_to_app(path_to_app_py=src_path.parent / "app_module.py")
+        self.append_module_to_app(path_to_app_py=src_path / "app_module.py")
 
     def generate_module(self, module_name: str):
         src_path = self.validate_new_module(module_name)
