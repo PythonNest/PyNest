@@ -284,7 +284,7 @@ class {self.capitalized_module_name}Service:
 """
 
     def controller_file(self):
-        return f"""from nest.core import Controller, Get, Post
+        return f"""from nest.core import Controller, Get, Post, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.config import config
 
