@@ -2,8 +2,14 @@ import pytest
 from fastapi import FastAPI
 
 from nest.common.route_resolver import RoutesResolver
-from nest.core import Controller, Get, Module, PyNestContainer, PyNestFactory, Injectable
-
+from nest.core import (
+    Controller,
+    Get,
+    Injectable,
+    Module,
+    PyNestContainer,
+    PyNestFactory,
+)
 from nest.core.pynest_application import PyNestApp
 
 

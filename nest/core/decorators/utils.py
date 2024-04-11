@@ -1,7 +1,7 @@
 import ast
 import inspect
 
-from nest.common.constants import STATUS_CODE_TOKEN
+from nest.common.constants import INJECTABLE_TOKEN, STATUS_CODE_TOKEN
 
 
 def HttpCode(status_code: int):
@@ -78,6 +78,13 @@ def parse_dependencies(cls):
     signature = inspect.signature(cls.__init__)
     dependecies = {}
     for param in signature.parameters.values():
-        if param.annotation != param.empty and param.annotation.__injectable__:
-            dependecies[param.name] = param.annotation
+        try:
+            if (
+                param.annotation != param.empty
+                and hasattr(param.annotation, "__dict__")
+                and INJECTABLE_TOKEN in param.annotation.__dict__
+            ):
+                dependecies[param.name] = param.annotation
+        except Exception as e:
+            raise e
     return dependecies

@@ -64,16 +64,16 @@ from .{self.module_name}_model import {self.capitalized_module_name}
 @Controller("{self.module_name}")
 class {self.capitalized_module_name}Controller:
 
-    def __init__(self, service: {self.capitalized_module_name}Service):
+    def __init__(self, {self.module_name}_service: {self.capitalized_module_name}Service):
         self.service = service
 
     @Get("/")
     async def get_{self.module_name}(self):
-        return await self.service.get_{self.module_name}()
+        return await self.{self.module_name}_service.get_{self.module_name}()
 
     @Post("/")
     async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
-        return await self.service.add_{self.module_name}({self.module_name})
+        return await self.{self.module_name}_service.add_{self.module_name}({self.module_name})
  """
 
     def service_file(self):

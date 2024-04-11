@@ -84,15 +84,15 @@ from .{self.module_name}_model import {self.capitalized_module_name}
 class {self.capitalized_module_name}Controller:
 
     def __init__(self, {self.module_name}_service: {self.capitalized_module_name}Service):
-        self.service = {self.module_name}_service
+        self.{self.module_name}_service = {self.module_name}_service
     
     @Get("/")
     def get_{self.module_name}(self):
-        return self.service.get_{self.module_name}()
+        return self.{self.module_name}_service.get_{self.module_name}()
         
     @Post("/")
     def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
-        return self.service.add_{self.module_name}({self.module_name})
+        return self.{self.module_name}_service.add_{self.module_name}({self.module_name})
 
 """
 

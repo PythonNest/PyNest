@@ -1,6 +1,6 @@
 import pytest
 
-from nest.core import Controller, Delete, Get, Patch, Post, Put, Injectable
+from nest.core import Controller, Delete, Get, Injectable, Patch, Post, Put
 
 
 @Controller(prefix="api/v1/user", tag="test")

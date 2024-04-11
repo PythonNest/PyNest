@@ -1,8 +1,7 @@
-from ..config import config
-
-from nest.core.decorators import db_request_handler
 from nest.core import Injectable
+from nest.core.decorators import db_request_handler
 
+from ..config import config
 from .user_entity import User as UserEntity
 from .user_model import User
 

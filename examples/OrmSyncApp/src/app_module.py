@@ -1,12 +1,11 @@
+from nest.core import Module, PyNestFactory
+
+from .app_controller import AppController
+from .app_service import AppService
 from .config import config
 from .example.example_module import ExampleModule
 from .product.product_module import ProductModule
 from .user.user_module import UserModule
-
-from .app_controller import AppController
-from .app_service import AppService
-
-from nest.core import Module, PyNestFactory
 
 
 @Module(

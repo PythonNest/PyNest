@@ -1,4 +1,5 @@
-from nest.core.decorators import Injectable, db_request_handler
+from nest.core import Injectable
+from nest.core.decorators.database import db_request_handler
 
 from .user_entity import User as UserEntity
 from .user_model import User

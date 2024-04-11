@@ -1,8 +1,8 @@
-from ..config import config
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from nest.core import Controller, Depends, Get, Post
 
+from ..config import config
 from .example_model import Example
 from .example_service import ExampleService
 
