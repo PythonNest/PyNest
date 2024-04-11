@@ -22,14 +22,17 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
 ]
 dependencies = [
-    "click==8.1.6",
+    "click>=8.1.6",
     "fastapi==0.95.1",
-    "python-dotenv==1.0.0",
-    "SQLAlchemy==2.0.19",
-    "uvicorn==0.23.1",
-    "PyYAML==6.0.1",
-    "astor==0.8.1",
-    "black==23.11.0"
+    "python-dotenv>=1.0.0",
+    "uvicorn>=0.23.1",
+    "PyYAML>=6.0.1",
+    "astor>=0.8.1",
+    "black>=23.11.0",
+    "injector>=0.21.0",
+    "pydantic<2.0.0",
+    "sqlalchemy == 2.0.19",
+    "alembic == 1.7.4",
 ]
 
 [tool.setuptools.dynamic]
@@ -58,6 +61,11 @@ force-exclude = '''
 [project.optional-dependencies]
 test = [
     "pytest == 6.2.5",
+]
+
+orm = [
+    "sqlalchemy == 2.0.19",
+    "alembic == 1.7.4",
 ]
 mongo = [
     "pymongo == 3.12.0",

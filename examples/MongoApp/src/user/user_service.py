@@ -1,17 +1,16 @@
-from .user_model import User
+from nest.core import Injectable
+from nest.core.decorators.database import db_request_handler
+
 from .user_entity import User as UserEntity
-from nest.core.decorators import db_request_handler
-from functools import lru_cache
+from .user_model import User
 
 
-@lru_cache()
+@Injectable
 class UserService:
 
     @db_request_handler
     async def add_user(self, user: User):
-        new_user = UserEntity(
-            **user.dict()
-        )
+        new_user = UserEntity(**user.dict())
         await new_user.save()
         return new_user.id
 

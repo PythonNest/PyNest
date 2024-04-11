@@ -14,19 +14,23 @@ programming environment and leveraging the great capabilities of mongodb and it'
 - motor
 
 #### Beanie
+
 Beanie - is an asynchronous Python object-document mapper (ODM) for MongoDB. Data models are based on Pydantic.
 
-When using Beanie each database collection has a corresponding Document that is used to interact with that collection. In addition to retrieving data, Beanie allows you to add, update, or delete documents from the collection as well.
+When using Beanie each database collection has a corresponding Document that is used to interact with that collection.
+In addition to retrieving data, Beanie allows you to add, update, or delete documents from the collection as well.
 
 read more about beanie [here](https://roman-right.github.io/beanie/)
 
-
 #### Motor
-Motor presents a coroutine-based API for non-blocking access to MongoDB from Tornado or asyncio. 
+
+Motor presents a coroutine-based API for non-blocking access to MongoDB from Tornado or asyncio.
 The coroutine-based API simplifies asynchronous code, making it readable and maintainable.
-Motor also makes it easy to use MongoDB features that are unavailable in the MongoDB Python driver, like Aggregation Framework builders.
+Motor also makes it easy to use MongoDB features that are unavailable in the MongoDB Python driver, like Aggregation
+Framework builders.
 
 read more about motor [here](https://motor.readthedocs.io/en/stable/)
+
 ## Setting Up
 
 ### Installation and Setup
@@ -49,10 +53,15 @@ this command will create a new project with the following structure:
 
 ```text
 ├── app.py
-├── config.py
 ├── main.py
+|── requirements.txt
+|── README.md
 ├── src
 │    ├── __init__.py
+│    ├── config.py
+│    ├── app_module.py
+├──  |── app_controller.py
+├──  |── app_service.py
 ```
 
 once you have created your app, you can create a new module:
@@ -72,7 +81,6 @@ This will create a new module called examples in your application with the follo
 │    ├── examples_entity.py
 │    ├── examples_module.py
 ```
-
 
 Let's go over the boilerplate code that support the mongo integration:
 
@@ -100,27 +108,90 @@ config = OdmProvider(
 
 Note: you can add any parameters that needed in order to configure the database connection.
 
-Now we need to declare the App object and register the module in
-
-`app.py`
+`app_service.py`
 
 ```python
-from config import config
-from nest.core.app import App
+from nest.core import Injectable
+
+
+@Injectable
+class AppService:
+    def __init__(self):
+        self.app_name = "MongoApp"
+        self.app_version = "1.0.0"
+
+    async def get_app_info(self):
+        return {"app_name": self.app_name, "app_version": self.app_version}
+```
+
+`app_controller.py`
+
+```python
+from nest.core import Controller, Get
+
+from .app_service import AppService
+
+
+@Controller("/")
+class AppController:
+
+    def __init__(self, service: AppService):
+        self.service = service
+
+    @Get("/")
+    async def get_app_info(self):
+        return await self.service.get_app_info()
+```
+
+Now we need to declare the App object and register the module in
+
+`app_module.py`
+
+```python
+from .config import config
+
+from nest.core import Module, PyNestFactory
 from src.examples.examples_module import ExamplesModule
 
-app = App(
-    description="PyNest service",
-    modules=[
-        ExamplesModule,
-    ]
+from .app_controller import AppController
+from .app_service import AppService
+
+
+@Module(
+    imports=[ExamplesModule],
+    controllers=[AppController],
+    providers=[AppService],
+)
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my FastAPI app drive by MongoDB Engine",
+    title="My App",
+    version="1.0.0",
+    debug=True,
 )
 
+http_server = app.get_server()
 
-@app.on_event("startup")
+
+@http_server.on_event("startup")
 async def startup():
     await config.create_all()
 ```
+
+`@Module(...)`: This is a decorator that defines a module. In PyNest, a module is a class annotated with a `@Module()`
+decorator.
+The imports array includes the modules required by this module. In this case, ExampleModule is imported. The controllers
+and providers arrays are empty here, indicating this module doesn't directly provide any controllers or services.
+
+`PyNestFactory.create()` is a command to create an instance of the application.
+The AppModule is passed as an argument, which acts as the root module of the application.
+Additional metadata like description, title, version, and debug flag are also provided
+
+`http_server: FastAPI = app.get_server()`: Retrieves the HTTP server instance from the application.
 
 ### Creating Entity
 
@@ -161,10 +232,10 @@ Implement services to handle business logic.
 from .examples_model import Examples
 from .examples_entity import Examples as ExamplesEntity
 from nest.core.decorators import db_request_handler
-from functools import lru_cache
+from nest.core import Injectable
 
 
-@lru_cache()
+@Injectable
 class ExamplesService:
 
     @db_request_handler
@@ -184,7 +255,7 @@ create a controller to handle the requests and responses. The controller should 
 logic.
 
 ```python
-from nest.core import Controller, Get, Post, Depends
+from nest.core import Controller, Get, Post
 
 from .examples_service import ExamplesService
 from .examples_model import Examples
@@ -193,12 +264,13 @@ from .examples_model import Examples
 @Controller("examples")
 class ExamplesController:
 
-    service: ExamplesService = Depends(ExamplesService)
-    
+    def __init__(self, service: ExamplesService):
+        self.service = service
+
     @Get("/")
     async def get_examples(self):
         return await self.service.get_examples()
-                
+
     @Post("/")
     async def add_examples(self, examples: Examples):
         return await self.service.add_examples(examples)
@@ -209,20 +281,23 @@ class ExamplesController:
 Create a module to register the controller and service.
 
 ```python
+from nest.core import Module
 from .examples_controller import ExamplesController
 from .examples_service import ExamplesService
 
 
+@Module(
+    controllers=[ExamplesController],
+    providers=[ExamplesService]
+)
 class ExamplesModule:
-
-    def __init__(self):
-        self.providers = [ExamplesService]
-        self.controllers = [ExamplesController]
+    pass
 ```
 
-## Run the app
+## Run the application
 
-```bash
-uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
+```shell
+uvicorn "src.app_module:http_server" --host "0.0.0.0" --port "8000" --reload
 ```
 
+Now you can access the application at http://localhost:8000/docs and test the endpoints.

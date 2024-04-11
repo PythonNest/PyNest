@@ -1,27 +1,30 @@
 import pytest
 
-from nest.core import Controller, Get, Post, Delete, Put, Patch
+from nest.core import Controller, Delete, Get, Injectable, Patch, Post, Put
 
 
-@Controller(tag="test", prefix="/api/v1")
+@Controller(prefix="api/v1/user", tag="test")
 class TestController:
-    @Get("/get")
+
+    def __init__(self): ...
+
+    @Get("/get_all_users")
     def get_endpoint(self):
         return {"message": "GET endpoint"}
 
-    @Post("/post")
+    @Post("/create_user")
     def post_endpoint(self):
         return {"message": "POST endpoint"}
 
-    @Delete("/delete")
+    @Delete("/delete_user")
     def delete_endpoint(self):
         return {"message": "DELETE endpoint"}
 
-    @Put("/put")
+    @Put("/update_user")
     def put_endpoint(self):
         return {"message": "PUT endpoint"}
 
-    @Patch("/patch")
+    @Patch("/patch_user")
     def patch_endpoint(self):
         return {"message": "PATCH endpoint"}
 
@@ -34,16 +37,16 @@ def test_controller():
 @pytest.mark.parametrize(
     "function, endpoint, expected_message",
     [
-        ("get_endpoint", "/get", "GET endpoint"),
-        ("post_endpoint", "/post", "POST endpoint"),
-        ("delete_endpoint", "/delete", "DELETE endpoint"),
-        ("put_endpoint", "/put", "PUT endpoint"),
-        ("patch_endpoint", "/patch", "PATCH endpoint"),
+        ("get_endpoint", "get_all_users", "GET endpoint"),
+        ("post_endpoint", "create_user", "POST endpoint"),
+        ("delete_endpoint", "delete_user", "DELETE endpoint"),
+        ("put_endpoint", "update_user", "PUT endpoint"),
+        ("patch_endpoint", "patch_user", "PATCH endpoint"),
     ],
 )
 def test_endpoints(test_controller, function, endpoint, expected_message):
     attribute = getattr(test_controller, function)
-    assert attribute.__path__ == "/api/v1" + endpoint
+    assert attribute.__path__ == "/api/v1/user/" + endpoint
     assert attribute.__kwargs__ == {}
     assert attribute.method == function.split("_")[0].upper()
     assert attribute() == {"message": f"{function.split('_')[0].upper()} endpoint"}

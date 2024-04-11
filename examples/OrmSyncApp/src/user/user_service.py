@@ -1,17 +1,24 @@
+from nest.core import Injectable
+from nest.core.decorators import db_request_handler
+
+from ..config import config
+from .user_entity import User as UserEntity
 from .user_model import User
-from functools import lru_cache
 
 
-@lru_cache()
+@Injectable
 class UserService:
-
     def __init__(self):
-        self.database = []
-        
-    def get_user(self):
-        return self.database
-    
+        self.config = config
+        self.session = self.config.get_db()
+
+    @db_request_handler
     def add_user(self, user: User):
-        self.database.append(user)
-        return user
-        
+        new_user = UserEntity(**user.dict())
+        self.session.add(new_user)
+        self.session.commit()
+        return new_user.id
+
+    @db_request_handler
+    def get_users(self):
+        return self.session.query(UserEntity).all()

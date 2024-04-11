@@ -1,11 +1,13 @@
+import ast
+import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-import os
-from typing import List, Tuple, Union, Callable
-from nest import __version__
-import subprocess
-import ast
+from typing import Callable, List, Tuple, Union
+
 import astor
+import black
+
+from nest import __version__
 
 
 def get_module_strings(module_name: str) -> Tuple[List[str], str]:
@@ -31,11 +33,12 @@ class BaseTemplate(ABC):
 
 if __name__ == '__main__':
     uvicorn.run(
-        'app:app',
+        'src.app_module:http_server',
         host="0.0.0.0",
         port=8000,
         reload=True
     )
+    
 """
 
     @abstractmethod
@@ -101,13 +104,54 @@ uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
 Go to the fastapi docs and use your api endpoints - http://127.0.0.1/docs
 """
 
-    @abstractmethod
     def module_file(self):
+        return f"""from nest.core import Module
+from .{self.module_name}_controller import {self.capitalized_module_name}Controller
+from .{self.module_name}_service import {self.capitalized_module_name}Service
+
+
+@Module(
+    controllers=[{self.capitalized_module_name}Controller],
+    providers=[{self.capitalized_module_name}Service],
+    imports=[]
+)   
+class {self.capitalized_module_name}Module:
+    pass
+
+    """
+
+    @staticmethod
+    def app_controller_file():
+        return f"""from nest.core import Controller, Get, Post
+from .app_service import AppService
+
+
+@Controller("/")
+class AppController:
+
+    def __init__(self, service: AppService):
+        self.service = service
+
+    @Get("/")
+    def get_app_info(self):
+        return self.service.get_app_info()
+"""
+
+    @staticmethod
+    def app_service_file():
         return """
-class ExampleModule:
-    self.controllers = []
-    self.providers = []
-    
+from nest.core import Injectable
+
+
+@Injectable
+class AppService:
+    def __init__(self):
+        self.app_name = "Pynest App"
+        self.app_version = "1.0.0"
+
+    def get_app_info(self):
+        return {"app_name": self.app_name, "app_version": self.app_version}
+
 """
 
     @abstractmethod
@@ -205,11 +249,22 @@ class ExampleModule:
         return None
 
     @staticmethod
-    def format_with_black(file_path):
-        subprocess.run(["black", file_path], check=True)
+    def read_file(file_path: str) -> str:
+        with open(file_path, "r") as file:
+            return file.read()
 
     @staticmethod
-    def save_file_with_astor(file_path, tree):
+    def write_file(file_path: str, content: str) -> None:
+        with open(file_path, "w") as file:
+            file.write(content)
+
+    def format_with_black(self, file_path: str) -> None:
+        file_content = self.read_file(file_path)
+        formatted_content = black.format_str(file_content, mode=black.FileMode())
+        self.write_file(file_path, formatted_content)
+
+    @staticmethod
+    def save_file_with_astor(file_path: str, tree: ast.Module) -> None:
         with open(file_path, "w") as file:
             file.write(astor.to_source(tree))
 
@@ -251,29 +306,23 @@ class ExampleModule:
         modified = False
 
         for node in ast.walk(tree):
-            if (
-                isinstance(node, ast.Call)
-                and hasattr(node.func, "id")
-                and node.func.id == "App"
-            ):
-                for keyword in node.keywords:
-                    if keyword.arg == "modules":
-                        if (
-                            isinstance(keyword.value, ast.List)
-                            and len(keyword.value.elts) > 0
-                        ):
-                            # Append to existing list
-                            keyword.value.elts.append(
-                                ast.Name(id=self.class_name, ctx=ast.Load())
-                            )
-                        else:
-                            # Create a new list with the module
-                            keyword.value = ast.List(
-                                elts=[ast.Name(id=self.class_name, ctx=ast.Load())],
-                                ctx=ast.Load(),
-                            )
-                        modified = True
-                        break
+            # Check if the node is a ClassDef with a decorator named 'Module'
+            if isinstance(node, ast.ClassDef):
+                for decorator in node.decorator_list:
+                    if (
+                        isinstance(decorator, ast.Call)
+                        and hasattr(decorator.func, "id")
+                        and decorator.func.id == "Module"
+                    ):
+                        for keyword in decorator.keywords:
+                            if keyword.arg == "imports":
+                                # Append to existing imports list
+                                if isinstance(keyword.value, ast.List):
+                                    keyword.value.elts.append(
+                                        ast.Name(id=self.class_name, ctx=ast.Load())
+                                    )
+                                    modified = True
+                                break
 
         if modified:
             with open(path_to_app_py, "w") as file:

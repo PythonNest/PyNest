@@ -1,12 +1,12 @@
 from beanie import Document
-        
-        
+
+
 class Product(Document):
-    title: str
-    
+    name: str
+
     class Config:
         schema_extra = {
             "example": {
-                "title": "Example Title",
+                "name": "Example Name",
             }
         }

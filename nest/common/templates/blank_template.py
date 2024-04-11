@@ -1,7 +1,7 @@
+from abc import ABC
 from pathlib import Path
 
 from nest.common.templates.base_template import BaseTemplate
-from abc import ABC
 
 
 class BlankTemplate(BaseTemplate, ABC):
@@ -9,13 +9,27 @@ class BlankTemplate(BaseTemplate, ABC):
         super().__init__(module_name)
 
     def app_file(self):
-        return f"""from nest.core.app import App
+        return f"""from nest.core import PyNestFactory, Module
+        
+from .app_controller import AppController
+from .app_service import AppService
 
 
-app = App(
-    description="PyNest service",
-    modules=[]
+@Module(imports=[], controllers=[AppController], providers=[AppService])
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my PyNest app.",
+    title="PyNest Application",
+    version="1.0.0",
+    debug=True,
 )
+
+http_server = app.get_server()
+
                 """
 
     def config_file(self):
@@ -30,19 +44,6 @@ app = App(
     def gitignore_file(self):
         pass
 
-    def module_file(self):
-        return f"""from .{self.module_name}_controller import {self.capitalized_module_name}Controller
-from .{self.module_name}_service import {self.capitalized_module_name}Service
-
-
-class {self.capitalized_module_name}Module:
-
-    def __init__(self):
-        self.controllers = [{self.capitalized_module_name}Controller]
-        self.providers = [{self.capitalized_module_name}Service]
-
-"""
-
     def model_file(self):
         return f"""from pydantic import BaseModel
 
@@ -55,9 +56,10 @@ class {self.capitalized_module_name}(BaseModel):
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from functools import lru_cache
+from nest.core import Injectable
 
 
-@lru_cache()
+@Injectable
 class {self.capitalized_module_name}Service:
 
     def __init__(self):
@@ -73,7 +75,7 @@ class {self.capitalized_module_name}Service:
 """
 
     def controller_file(self):
-        return f"""from nest.core import Controller, Get, Post, Depends
+        return f"""from nest.core import Controller, Get, Post
 from .{self.module_name}_service import {self.capitalized_module_name}Service
 from .{self.module_name}_model import {self.capitalized_module_name}
 
@@ -81,15 +83,16 @@ from .{self.module_name}_model import {self.capitalized_module_name}
 @Controller("{self.module_name}")
 class {self.capitalized_module_name}Controller:
 
-    service: {self.capitalized_module_name}Service = Depends({self.capitalized_module_name}Service)
+    def __init__(self, {self.module_name}_service: {self.capitalized_module_name}Service):
+        self.{self.module_name}_service = {self.module_name}_service
     
     @Get("/")
     def get_{self.module_name}(self):
-        return self.service.get_{self.module_name}()
+        return self.{self.module_name}_service.get_{self.module_name}()
         
     @Post("/")
     def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
-        return self.service.add_{self.module_name}({self.module_name})
+        return self.{self.module_name}_service.add_{self.module_name}({self.module_name})
 
 """
 
@@ -110,7 +113,7 @@ class {self.capitalized_module_name}Controller:
             module_path / f"{module_name}_service.py", self.service_file()
         )
         self.create_template(module_path / f"{module_name}_model.py", self.model_file())
-        self.append_module_to_app(path_to_app_py=src_path.parent / "app.py")
+        self.append_module_to_app(path_to_app_py=src_path / "app_module.py")
 
     def generate_module(self, module_name: str):
         src_path = self.validate_new_module(module_name)
@@ -122,14 +125,16 @@ class {self.capitalized_module_name}Controller:
         src_path = root / "src"
         self.create_folder(root)
         self.create_template(root / "main.py", self.main_file())
-        self.create_template(root / "app.py", self.app_file())
         self.create_template(root / "README.md", self.readme_file())
         self.create_template(root / "requirements.txt", self.requirements_file())
         self.create_folder(src_path)
         self.create_template(src_path / "__init__.py", "")
+        self.create_template(src_path / "app_module.py", self.app_file())
+        self.create_template(src_path / "app_controller.py", self.app_controller_file())
+        self.create_template(src_path / "app_service.py", self.app_service_file())
 
     def settings_file(self):
-        return f"""# This file is used to configure the nest server.
+        return f"""# This file is used to configure the nest cli.
 config:
     db_type: null
     is_async: false

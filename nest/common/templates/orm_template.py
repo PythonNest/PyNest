@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from nest.common.templates.base_template import BaseTemplate, get_module_strings
 from nest.common.templates import Database
+from nest.common.templates.base_template import BaseTemplate
 
 
 class ORMTemplate(BaseTemplate, ABC):
@@ -13,16 +13,28 @@ class ORMTemplate(BaseTemplate, ABC):
         self.db_type = db_type
 
     def app_file(self):
-        return f"""from config import config
-from nest.core.app import App
+        return f"""from nest.core import PyNestFactory, Module
+from .config import config
+from .app_controller import AppController
+from .app_service import AppService
 
-app = App(
-    description="PyNest service",
-    modules=[]
+
+@Module(imports=[], controllers=[AppController], providers=[AppService])
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my PyNest app.",
+    title="PyNest Application",
+    version="1.0.0",
+    debug=True,
 )
 
+http_server = app.get_server()
 
-@app.on_event("startup")
+@http_server.on_event("startup")
 def startup():
     config.create_all()
 """
@@ -56,18 +68,6 @@ def startup():
 .env
 """
 
-    def module_file(self):
-        return f"""from .{self.module_name}_service import {self.capitalized_module_name}Service
-from .{self.module_name}_controller import {self.capitalized_module_name}Controller
-
-
-class {self.capitalized_module_name}Module:
-
-    def __init__(self):
-        self.providers = [{self.capitalized_module_name}Service]
-        self.controllers = [{self.capitalized_module_name}Controller]
-"""
-
     def model_file(self):
         return f"""from pydantic import BaseModel
 
@@ -78,7 +78,7 @@ class {self.capitalized_module_name}(BaseModel):
 """
 
     def entity_file(self):
-        return f"""from config import config
+        return f"""from src.config import config
 from sqlalchemy import Column, Integer, String, Float
     
     
@@ -93,12 +93,12 @@ class {self.capitalized_module_name}(config.Base):
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
-from config import config
-from nest.core.decorators import db_request_handler
-from functools import lru_cache
+from src.config import config
+from nest.core.decorators.database import db_request_handler
+from nest.core import Injectable
 
 
-@lru_cache()
+@Injectable
 class {self.capitalized_module_name}Service:
 
     def __init__(self):
@@ -121,7 +121,7 @@ class {self.capitalized_module_name}Service:
 """
 
     def controller_file(self):
-        return f"""from nest.core import Controller, Get, Post, Depends
+        return f"""from nest.core import Controller, Get, Post
 
 from .{self.module_name}_service import {self.capitalized_module_name}Service
 from .{self.module_name}_model import {self.capitalized_module_name}
@@ -130,15 +130,16 @@ from .{self.module_name}_model import {self.capitalized_module_name}
 @Controller("{self.module_name}")
 class {self.capitalized_module_name}Controller:
 
-    service: {self.capitalized_module_name}Service = Depends({self.capitalized_module_name}Service)
+    def __init__(self, {self.module_name}_service: {self.capitalized_module_name}Service):
+        self.{self.module_name}_service = {self.module_name}_service
     
     @Get("/")
     def get_{self.module_name}(self):
-        return self.service.get_{self.module_name}()
+        return self.{self.module_name}_service.get_{self.module_name}()
                 
     @Post("/")
     def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
-        return self.service.add_{self.module_name}({self.module_name})
+        return self.{self.module_name}_service.add_{self.module_name}({self.module_name})
  """
 
     def settings_file(self):
@@ -150,9 +151,9 @@ config:
 
     @staticmethod
     def validate_config_file(src_path: Path) -> Path:
-        config_file = src_path.parent / "config.py"
+        config_file = src_path / "config.py"
         if not config_file.exists():
-            raise Exception("orm_config.py file not found")
+            raise Exception("config.py file not found")
         return config_file
 
     def create_module(self, module_name: str, src_path: Path):
@@ -172,7 +173,7 @@ config:
         self.create_template(
             module_path / f"{module_name}_entity.py", self.entity_file()
         )
-        self.append_module_to_app(src_path.parent / "app.py")
+        self.append_module_to_app(src_path / "app_module.py")
 
     def generate_module(self, module_name: str):
         src_path = self.validate_new_module(module_name)
@@ -192,29 +193,44 @@ config:
         # create root level files
         self.create_template(root_path / "main.py", self.main_file())
         self.create_template(root_path / "README.md", self.readme_file())
-        self.create_template(root_path / "app.py", self.app_file())
-        self.create_template(root_path / "config.py", self.config_file())
         self.create_template(root_path / "requirements.txt", self.requirements_file())
         self.create_template(root_path / ".gitignore", self.gitignore_file())
 
         # create src level files
         self.create_template(src_path / "__init__.py", "")
+        self.create_template(src_path / "app_module.py", self.app_file())
+        self.create_template(src_path / "app_controller.py", self.app_controller_file())
+        self.create_template(src_path / "app_service.py", self.app_service_file())
+        self.create_template(src_path / "config.py", self.config_file())
 
 
 class AsyncORMTemplate(ORMTemplate, ABC):
     def app_file(self):
-        return f"""from config import config
-from nest.core.app import App
+        return f"""from nest.core import PyNestFactory, Module
+from .config import config
+from .app_controller import AppController
+from .app_service import AppService
 
-app = App(
-    description="PyNest service",
-    modules=[]
+
+@Module(imports=[], controllers=[AppController], providers=[AppService])
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my Async PyNest app.",
+    title="PyNest Application",
+    version="1.0.0",
+    debug=True,
 )
 
+http_server = app.get_server()
 
-@app.on_event("startup")
+@http_server.on_event("startup")
 async def startup():
     await config.create_all()
+    
 """
 
     @abstractmethod
@@ -226,7 +242,7 @@ async def startup():
         pass
 
     def entity_file(self):
-        return f"""from config import config
+        return f"""from src.config import config
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -242,12 +258,13 @@ class {self.capitalized_module_name}(config.Base):
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
-from nest.core.decorators import async_db_request_handler
+from nest.core.decorators.database import async_db_request_handler
+from nest.core import Injectable
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
+@Injectable
 class {self.capitalized_module_name}Service:
 
     @async_db_request_handler
@@ -269,7 +286,7 @@ class {self.capitalized_module_name}Service:
     def controller_file(self):
         return f"""from nest.core import Controller, Get, Post, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from config import config
+from src.config import config
 
 
 from .{self.module_name}_service import {self.capitalized_module_name}Service
@@ -279,15 +296,16 @@ from .{self.module_name}_model import {self.capitalized_module_name}
 @Controller("{self.module_name}")
 class {self.capitalized_module_name}Controller:
 
-    service: {self.capitalized_module_name}Service = Depends({self.capitalized_module_name}Service)
+    def __init__(self, {self.module_name}_service: {self.capitalized_module_name}Service):
+        self.{self.module_name}_service = {self.module_name}_service
 
     @Get("/")
     async def get_{self.module_name}(self, session: AsyncSession = Depends(config.get_db)):
-        return await self.service.get_{self.module_name}(session)
+        return await self.{self.module_name}_service.get_{self.module_name}(session)
 
     @Post("/")
     async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}, session: AsyncSession = Depends(config.get_db)):
-        return await self.service.add_{self.module_name}({self.module_name}, session)
+        return await self.{self.module_name}_service.add_{self.module_name}({self.module_name}, session)
  """
 
     def settings_file(self):

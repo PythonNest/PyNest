@@ -1,6 +1,7 @@
-from fastapi.exceptions import HTTPException
 import logging
 import time
+
+from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logging.basicConfig(level=logging.DEBUG)

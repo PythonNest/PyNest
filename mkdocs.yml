@@ -26,7 +26,11 @@ nav:
       - Async ORM Application: async_orm.md
       - MongoDB Application: mongodb.md
   - API Reference:
+    - Modules: decorators/module.md
+    - Controllers: decorators/controller.md
+    - Services: decorators/service.md
+    - Utils: decorators/utils.md
+    - Core: api.md
     - database: database.md
-    - decorators: decorators.md
-    - App: api.md
+
   - License: license.md

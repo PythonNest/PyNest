@@ -13,7 +13,7 @@ This documentation introduces a creation of the simplest Pynest Application.
 
 ### Installation and Setup
 
-Ensure you have the latest version of PyNest and SQLAlchemy 2.0 installed. You can install them using pip:
+Ensure you have the latest version of PyNest installed. You can install them using pip:
 
 ```bash
 pip install pynest-api
@@ -36,6 +36,9 @@ this command will create a new project with the following structure:
 |── README.md
 ├── src
 │    ├── __init__.py
+│    ├── app_module.py
+├──  |── app_controller.py
+├──  |── app_service.py
 ```
 
 After creating the project, let's create a new module:
@@ -57,19 +60,76 @@ This will create a new module called examples in your application with the follo
 
 Let's go over the boilerplate code the cli generated:
 
-`app.py`
+`app_service.py`
+```python
+from nest.core import Injectable
+
+
+@Injectable
+class AppService:
+    def __init__(self):
+        self.app_name = "BlankApp"
+        self.app_version = "1.0.0"
+
+    async def get_app_info(self):
+        return {"app_name": self.app_name, "app_version": self.app_version}
+```
+
+`app_controller.py`
+```python
+from nest.core import Controller, Get
+
+from .app_service import AppService
+
+
+@Controller("/")
+class AppController:
+
+    def __init__(self, service: AppService):
+        self.service = service
+
+    @Get("/")
+    async def get_app_info(self):
+        return await self.service.get_app_info()
+```
+
+`app_module.py`
 
 ```python
-from nest.core.app import App
-from src.examples.examples_module import ExamplesModule
+from nest.core import PyNestFactory, Module
+from src.example.example_module import ExampleModule
+from .app_controller import AppController
+from .app_service import AppService
+from fastapi import FastAPI
 
-app = App(
-    description="PyNest service",
-    modules=[
-        ExamplesModule,
-    ]
+@Module(
+    controllers=[AppController],
+    providers=[AppService],
+    imports=[ExampleModule],
 )
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my FastAPI app",
+    title="My App",
+    version="1.0.0",
+    debug=True,
+)
+
+http_server: FastAPI = app.get_server()
 ```
+
+`@Module(...)`: This is a decorator that defines a module. In PyNest, a module is a class annotated with a `@Module()` decorator.
+The imports array includes the modules required by this module. In this case, ExampleModule is imported. The controllers and providers arrays are empty here, indicating this module doesn't directly provide any controllers or services.
+
+`PyNestFactory.create()` is a command to create an instance of the application.
+The AppModule is passed as an argument, which acts as the root module of the application.
+Additional metadata like description, title, version, and debug flag are also provided
+
+`http_server: FastAPI = app.get_server()`: Retrieves the HTTP server instance from the application.
 
 ### Creating Model
 
@@ -93,18 +153,18 @@ Implement services to handle business logic.
 
 ```python
 from .examples_model import Examples
-from functools import lru_cache
+from nest.core import Injectable
 
 
-@lru_cache
+@Injectable
 class ExamplesService:
     def __init__(self):
         self.database = []
 
-    def get_examples(self):
+    async def get_examples(self):
         return self.database
 
-    def add_examples(self, examples: Examples):
+    async def add_examples(self, examples: Examples):
         self.database.append(examples)
         return {"message": "Example added successfully"}
 
@@ -116,7 +176,7 @@ logic.
 `example_controller.py`
 
 ```python
-from nest.core import Controller, Get, Post, Depends
+from nest.core import Controller, Get, Post
 
 from .examples_service import ExamplesService
 from .examples_model import Examples
@@ -124,7 +184,9 @@ from .examples_model import Examples
 
 @Controller("examples")
 class ExamplesController:
-    service: ExamplesService = Depends(ExamplesService)
+    
+    def __init__(self, service: ExamplesService):
+        self.service = service
 
     @Get("/")
     async def get_examples(self):
@@ -142,19 +204,23 @@ create the module file to register the controller and the service
 `examples_module.py`
 
 ```python
+from nest.core import Module
 from .examples_controller import ExamplesController
 from .examples_service import ExamplesService
 
 
+@Module(
+    controllers=[ExamplesController],
+    providers=[ExamplesService],
+)
 class ExamplesModule:
-    controllers = [ExamplesController]
-    services = [ExamplesService]
+    pass
 ```
 
-## Running the application
+## Run the application
 
-```bash
-uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
+```shell
+uvicorn "src.app_module:http_server" --host "0.0.0.0" --port "8000" --reload
 ```
 
 Now you can access the application at http://localhost:8000/docs and test the endpoints.
