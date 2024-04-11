@@ -14,4 +14,4 @@
 
 ## Pynest Application
 
-::: nest.core.pynest_applications.PyNestApp
+::: nest.core.pynest_application.PyNestApp
