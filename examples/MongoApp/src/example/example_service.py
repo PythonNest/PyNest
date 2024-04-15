@@ -9,7 +9,6 @@ from .example_model import Example
 
 @Injectable
 class ExampleService:
-
     @db_request_handler
     async def add_example(self, example: Example):
         new_example = ExampleEntity(**example.dict())

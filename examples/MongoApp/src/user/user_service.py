@@ -7,7 +7,6 @@ from .user_model import User
 
 @Injectable
 class UserService:
-
     @db_request_handler
     async def add_user(self, user: User):
         new_user = UserEntity(**user.dict())

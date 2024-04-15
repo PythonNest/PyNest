@@ -5,7 +5,6 @@ from .app_service import AppService
 
 @Controller("/")
 class AppController:
-
     def __init__(self, service: AppService):
         self.service = service
 

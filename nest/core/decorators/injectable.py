@@ -5,7 +5,8 @@ from nest.core.decorators.utils import get_instance_variables, parse_dependencie
 
 
 def Injectable(cls: str = None):
-    def __init__(self, *args, **kwargs): ...
+    def __init__(self, *args, **kwargs):
+        ...
 
     if "__init__" in cls.__dict__:
         pass

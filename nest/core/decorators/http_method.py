@@ -25,26 +25,26 @@ def route(method: str, path: Union[str, List[str]] = "/", **kwargs):
 
 
 # Decorator for defining a GET route with an optional path
-Get: Callable[[Union[str, List[str]]], Callable[..., Any]] = (
-    lambda path="/", **kwargs: route("GET", path, **kwargs)
-)
+Get: Callable[
+    [Union[str, List[str]]], Callable[..., Any]
+] = lambda path="/", **kwargs: route("GET", path, **kwargs)
 
 # Decorator for defining a POST route with an optional path
-Post: Callable[[Union[str, List[str]]], Callable[..., Any]] = (
-    lambda path="/", **kwargs: route("POST", path, **kwargs)
-)
+Post: Callable[
+    [Union[str, List[str]]], Callable[..., Any]
+] = lambda path="/", **kwargs: route("POST", path, **kwargs)
 
 # Decorator for defining a DELETE route with an optional path
-Delete: Callable[[Union[str, List[str]]], Callable[..., Any]] = (
-    lambda path="/", **kwargs: route("DELETE", path, **kwargs)
-)
+Delete: Callable[
+    [Union[str, List[str]]], Callable[..., Any]
+] = lambda path="/", **kwargs: route("DELETE", path, **kwargs)
 
 # Decorator for defining a PUT route with an optional path
-Put: Callable[[Union[str, List[str]]], Callable[..., Any]] = (
-    lambda path="/", **kwargs: route("PUT", path, **kwargs)
-)
+Put: Callable[
+    [Union[str, List[str]]], Callable[..., Any]
+] = lambda path="/", **kwargs: route("PUT", path, **kwargs)
 
 # Decorator for defining a PATCH route with an optional path
-Patch: Callable[[Union[str, List[str]]], Callable[..., Any]] = (
-    lambda path="/", **kwargs: route("PATCH", path, **kwargs)
-)
+Patch: Callable[
+    [Union[str, List[str]]], Callable[..., Any]
+] = lambda path="/", **kwargs: route("PATCH", path, **kwargs)

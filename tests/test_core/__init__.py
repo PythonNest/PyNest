@@ -21,7 +21,6 @@ class TestService:
 
 @Controller("test")
 class TestController:
-
     def __init__(self, test_service: TestService):
         self.test_service = test_service
 
