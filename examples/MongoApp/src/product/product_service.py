@@ -7,7 +7,6 @@ from .product_model import Product
 
 @Injectable
 class ProductService:
-
     @db_request_handler
     async def add_product(self, product: Product):
         new_product = ProductEntity(**product.dict())

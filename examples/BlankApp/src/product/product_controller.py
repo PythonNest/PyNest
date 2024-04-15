@@ -6,7 +6,6 @@ from .product_service import ProductService
 
 @Controller("product")
 class ProductController:
-
     def __init__(self, service: ProductService):
         self.service = service
 

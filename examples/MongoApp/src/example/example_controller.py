@@ -6,7 +6,6 @@ from .example_service import ExampleService
 
 @Controller("example")
 class ExampleController:
-
     def __init__(self, service: ExampleService):
         self.service = service
 

@@ -9,7 +9,6 @@ from .user_service import UserService
 
 @Controller("user")
 class UserController:
-
     def __init__(self, service: UserService):
         self.service = service
 
