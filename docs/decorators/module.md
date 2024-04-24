@@ -1,5 +1,3 @@
-# Decorators
-
 ## Module Decorator
 
 The `Module` decorator is used to define a module. A module is a class that contains the controllers and services that
