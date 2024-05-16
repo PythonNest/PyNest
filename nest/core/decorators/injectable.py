@@ -8,7 +8,7 @@ def Injectable(cls=None, *args, **kwargs):
     def decorator(inner_cls):
         if "__init__" not in inner_cls.__dict__:
             def __init__(self, *args, **kwargs):
-                pass
+                ...
             inner_cls.__init__ = __init__
         
         dependencies = parse_dependencies(inner_cls)
