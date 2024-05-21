@@ -3,8 +3,8 @@ from enum import Enum
 
 class ModuleMetadata(str, Enum):
     CONTROLLERS = "controllers"
-    IMPORT = "imports"
-    PROVIDER = "providers"
+    IMPORTS = "imports"
+    PROVIDERS = "providers"
     EXPORTS = "exports"
 
     def __str__(self):
