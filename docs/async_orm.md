@@ -227,7 +227,7 @@ There are two ways of creating service.
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from nest.core.decorators import async_db_request_handler
+from nest.core.decorators.database import async_db_request_handler
 from nest.core import Injectable
 
 from .example_entity import Example as ExampleEntity

@@ -18,9 +18,9 @@ class Module:
 
     def __call__(self, cls):
         setattr(cls, ModuleMetadata.CONTROLLERS, self.controllers)
-        setattr(cls, ModuleMetadata.PROVIDER, self.providers)
-        setattr(cls, ModuleMetadata.IMPORT, self.imports)
-        setattr(cls, ModuleMetadata.EXPORTS, self.imports)
+        setattr(cls, ModuleMetadata.PROVIDERS, self.providers)
+        setattr(cls, ModuleMetadata.IMPORTS, self.imports)
+        setattr(cls, ModuleMetadata.EXPORTS, self.exports)
         setattr(cls, "__is_module__", True)
         setattr(cls, "__is_global__", self.is_global)
 
