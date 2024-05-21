@@ -1,5 +1,5 @@
 from nest.core import Injectable
-from nest.core.decorators import db_request_handler
+from nest.core.decorators.database import db_request_handler
 
 from ..config import config
 from .product_entity import Product as ProductEntity

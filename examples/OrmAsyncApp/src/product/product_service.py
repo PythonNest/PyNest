@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from nest.core import Injectable
-from nest.core.decorators import async_db_request_handler
+from nest.core.decorators.database import async_db_request_handler
 
 from .product_entity import Product as ProductEntity
 from .product_model import Product

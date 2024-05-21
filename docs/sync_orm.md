@@ -190,7 +190,8 @@ Implement services to handle business logic.
 from src.config import config
 from .examples_model import Examples
 from .examples_entity import Examples as ExamplesEntity
-from nest.core.decorators import db_request_handler, Injectable
+from nest.core.decorators.database import db_request_handler
+from nest.core import Injectable
 
 
 @Injectable
