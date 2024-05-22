@@ -1,15 +1,36 @@
 site_name: PyNest
 
 site_url: https://PyNest.github.io/PyNest/
+docs_dir: docs
+repo_url: https://github.com/PythonNest/PyNest
+repo_name: Pynest
+
 
 theme:
+  favicon: imgs/pynest-logo.png
   name: material
   features:
     - content.code.copy
+  palette:
+    scheme: slate
+    primary: indigo
+    accent: indigo
+    toggle:
+      icon: material/toggle-switch-off-outline
+      name: Switch to dark mode
+    light:
+      primary: indigo
+      accent: indigo
+    dark:
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
 
 plugins:
-- search
-- mkdocstrings
+  - search
+  - mkdocstrings
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -18,19 +39,24 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
 
+
+
+extra_css:
+  - styles/extra.css
+
 nav:
-  - Overview: index.md
-  - Usage:
+  - Introduction: introduction.md
+  - Getting Started: getting_started.md
+  - CLI Usage: cli.md
+  - Modules: modules.md
+  - Controllers: controllers.md
+  - Providers: providers.md
+  - Dependency Injection: dependency_injection.md
+  - Deployment:
+    - Docker: docker.md
+  - Application Examples:
       - Blank Application: blank.md
       - Sync ORM Application: sync_orm.md
       - Async ORM Application: async_orm.md
       - MongoDB Application: mongodb.md
-  - API Reference:
-    - Modules: decorators/module.md
-    - Controllers: decorators/controller.md
-    - Services: decorators/service.md
-    - Utils: decorators/utils.md
-    - Core: api.md
-    - database: database.md
-
   - License: license.md
