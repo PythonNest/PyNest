@@ -367,3 +367,15 @@ class ExampleModule:
 ```shell
 uvicorn "src.app_module:http_server" --host "0.0.0.0" --port "8000" --reload
 ```
+
+---
+
+
+<nav class="md-footer-nav">
+  <a href="/PyNest/blank" class="md-footer-nav__link">
+    <span>&larr; Application Example With sync ORM</span>
+  </a>
+  <a href="/PyNest/mongodb" class="md-footer-nav__link">
+    <span>Application Example With MongoDB &rarr;</span>
+  </a>
+</nav>
