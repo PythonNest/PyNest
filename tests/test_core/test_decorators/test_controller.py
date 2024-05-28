@@ -5,8 +5,7 @@ from nest.core import Controller, Delete, Get, Injectable, Patch, Post, Put
 
 @Controller(prefix="api/v1/user", tag="test")
 class TestController:
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     @Get("/get_all_users")
     def get_endpoint(self):
