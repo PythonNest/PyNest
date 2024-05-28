@@ -2,6 +2,7 @@ from fastapi.routing import APIRouter
 
 from nest.core.decorators.class_based_view import class_based_view as ClassBasedView
 from nest.core.decorators.utils import get_instance_variables, parse_dependencies
+from nest.core.decorators.http_method import HTTPMethod
 
 
 def Controller(tag: str = None, prefix: str = None):
@@ -38,8 +39,6 @@ def Controller(tag: str = None, prefix: str = None):
         except AttributeError:
             raise AttributeError("Class must have an __init__ method")
 
-        http_method_names = ("GET", "POST", "PUT", "DELETE", "PATCH")
-
         for name, method in cls.__dict__.items():
             if callable(method) and hasattr(method, "method"):
                 # Check if method is decorated with an HTTP method decorator
@@ -49,13 +48,20 @@ def Controller(tag: str = None, prefix: str = None):
 
                 http_method = method.method
                 # Ensure that the method is a valid HTTP method
-                assert http_method in http_method_names, f"Invalid method {http_method}"
+                assert isinstance(
+                    http_method, HTTPMethod
+                ), f"Invalid method {http_method}"
+
                 if prefix:
                     method.__path__ = prefix + method.__path__
                 if not method.__path__.startswith("/"):
                     method.__path__ = "/" + method.__path__
+
                 router.add_api_route(
-                    method.__path__, method, methods=[http_method], **method.__kwargs__
+                    method.__path__,
+                    method,
+                    methods=[http_method.value],
+                    **method.__kwargs__,
                 )
 
         def get_router() -> APIRouter:

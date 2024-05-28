@@ -47,5 +47,5 @@ def test_endpoints(test_controller, function, endpoint, expected_message):
     attribute = getattr(test_controller, function)
     assert attribute.__path__ == "/api/v1/user/" + endpoint
     assert attribute.__kwargs__ == {}
-    assert attribute.method == function.split("_")[0].upper()
+    assert attribute.method.value == function.split("_")[0].upper()
     assert attribute() == {"message": f"{function.split('_')[0].upper()} endpoint"}
