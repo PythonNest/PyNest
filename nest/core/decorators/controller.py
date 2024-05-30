@@ -57,12 +57,17 @@ def Controller(tag: str = None, prefix: str = None):
                 if not method.__path__.startswith("/"):
                     method.__path__ = "/" + method.__path__
 
-                router.add_api_route(
-                    method.__path__,
-                    method,
-                    methods=[http_method.value],
+                route_kwargs = {
+                    "path": method.__path__,
+                    "endpoint": method,
+                    "methods": [http_method.value],
                     **method.__kwargs__,
-                )
+                }
+
+                if hasattr(method, "status_code"):
+                    route_kwargs["status_code"] = method.status_code
+
+                router.add_api_route(**route_kwargs)
 
         def get_router() -> APIRouter:
             """
