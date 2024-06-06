@@ -32,7 +32,7 @@ dependencies = [
     "injector>=0.20.1",
     "pydantic<2.0.0",
     "sqlalchemy == 2.0.19",
-    "alembic == 1.7.4",
+    "alembic == 1.7.5",
 ]
 
 [tool.setuptools.dynamic]
