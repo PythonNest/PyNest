@@ -20,7 +20,7 @@ def test_singleton_pattern(container):
 
 def test_add_module(container, test_module):
     result = container.add_module(test_module)
-    assert result["inserted"] is False, "Module should be added successfully"
+    assert result["inserted"] is True, "Module should be added successfully"
     module_ref = result["module_ref"]
     assert module_ref is not None, "Module reference should not be None"
     assert container.modules.has(

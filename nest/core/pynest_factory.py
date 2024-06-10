@@ -26,7 +26,8 @@ class PyNestFactory:
         """
         container = PyNestContainer()
         container.add_module(main_module)
-        return PyNestApp(container, PyNestFactory._create_server(**kwargs))
+        http_server = PyNestFactory._create_server(**kwargs)
+        return PyNestApp(container, http_server)
 
     @staticmethod
     def _create_server(**kwargs) -> FastAPI:
