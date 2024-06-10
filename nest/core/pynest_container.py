@@ -71,11 +71,6 @@ class PyNestContainer:
         provider: Optional[Union[TProvider, TController]] = None,
     ):
         try:
-            print(f"dependency type: {type(dependency)}")
-            print(f"dependency: {dependency}")
-            print(f"provider type: {type(provider)}")
-            print(f"provider: {provider}")
-
             self._injector.binder.bind(dependency, scope=singleton)
             instance = self._injector.get(dependency)
             self.logger.info(click.style(dependency.__name__ + " Detected ", fg="blue"))
