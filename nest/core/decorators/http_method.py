@@ -1,13 +1,24 @@
+from enum import Enum
 from typing import Any, Callable, List, Union
 
 
-def route(method: str, path: Union[str, List[str]] = "/", **kwargs):
+class HTTPMethod(Enum):
+    GET = "GET"
+    POST = "POST"
+    DELETE = "DELETE"
+    PUT = "PUT"
+    PATCH = "PATCH"
+    HEAD = "HEAD"
+    OPTIONS = "OPTIONS"
+
+
+def route(http_method: HTTPMethod, route_path: Union[str, List[str]] = "/", **kwargs):
     """
     Decorator that defines a route for the controller.
 
     Args:
-        method (str): The HTTP method for the route (GET, POST, DELETE, PUT, PATCH).
-        path (Union[str, List[str]]): The URL path for the route.
+        http_method (HTTPMethod): The HTTP method for the route (GET, POST, DELETE, PUT, PATCH).
+        route_path (Union[str, List[str]]): The route path for the route. example: "/users"
         **kwargs: Additional keyword arguments to configure the route.
 
     Returns:
@@ -15,8 +26,8 @@ def route(method: str, path: Union[str, List[str]] = "/", **kwargs):
     """
 
     def decorator(func):
-        func.method = method
-        func.__path__ = path
+        func.__http_method__ = http_method
+        func.__route_path__ = route_path
         func.__kwargs__ = kwargs
 
         return func
@@ -24,27 +35,29 @@ def route(method: str, path: Union[str, List[str]] = "/", **kwargs):
     return decorator
 
 
-# Decorator for defining a GET route with an optional path
-Get: Callable[
-    [Union[str, List[str]]], Callable[..., Any]
-] = lambda path="/", **kwargs: route("GET", path, **kwargs)
+def Get(route_path: Union[str, List[str]] = "/", **kwargs) -> Callable[..., Any]:
+    return route(HTTPMethod.GET, route_path, **kwargs)
 
-# Decorator for defining a POST route with an optional path
-Post: Callable[
-    [Union[str, List[str]]], Callable[..., Any]
-] = lambda path="/", **kwargs: route("POST", path, **kwargs)
 
-# Decorator for defining a DELETE route with an optional path
-Delete: Callable[
-    [Union[str, List[str]]], Callable[..., Any]
-] = lambda path="/", **kwargs: route("DELETE", path, **kwargs)
+def Post(route_path: Union[str, List[str]] = "/", **kwargs) -> Callable[..., Any]:
+    return route(HTTPMethod.POST, route_path, **kwargs)
 
-# Decorator for defining a PUT route with an optional path
-Put: Callable[
-    [Union[str, List[str]]], Callable[..., Any]
-] = lambda path="/", **kwargs: route("PUT", path, **kwargs)
 
-# Decorator for defining a PATCH route with an optional path
-Patch: Callable[
-    [Union[str, List[str]]], Callable[..., Any]
-] = lambda path="/", **kwargs: route("PATCH", path, **kwargs)
+def Delete(route_path: Union[str, List[str]] = "/", **kwargs) -> Callable[..., Any]:
+    return route(HTTPMethod.DELETE, route_path, **kwargs)
+
+
+def Put(route_path: Union[str, List[str]] = "/", **kwargs) -> Callable[..., Any]:
+    return route(HTTPMethod.PUT, route_path, **kwargs)
+
+
+def Patch(route_path: Union[str, List[str]] = "/", **kwargs) -> Callable[..., Any]:
+    return route(HTTPMethod.PATCH, route_path, **kwargs)
+
+
+def Head(route_path: Union[str, List[str]] = "/", **kwargs) -> Callable[..., Any]:
+    return route(HTTPMethod.HEAD, route_path, **kwargs)
+
+
+def Options(route_path: Union[str, List[str]] = "/", **kwargs) -> Callable[..., Any]:
+    return route(HTTPMethod.OPTIONS, route_path, **kwargs)

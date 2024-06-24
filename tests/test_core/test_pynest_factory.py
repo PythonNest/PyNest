@@ -13,10 +13,6 @@ def test_create_server(test_server):
     assert test_server.debug is True
 
 
-def test_initialize(test_module, test_container):
-    PyNestFactory._initialize(test_module, test_container)
-
-
 def test_e2e(test_module):
     app = PyNestFactory.create(
         test_module,

@@ -9,8 +9,9 @@ from nest.core.decorators import (
     Patch,
     Post,
     Put,
+    HttpCode,
 )
-from nest.core.decorators.utils import HttpCode
+
 from nest.core.pynest_application import PyNestApp
 from nest.core.pynest_container import PyNestContainer
 from nest.core.pynest_factory import PyNestFactory
