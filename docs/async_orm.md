@@ -94,9 +94,11 @@ config = AsyncOrmProvider(
 )
 ```
 
-Note: you can add any parameters that needed in order to configure the database connection.
+Disable asyncpg logging by set the parameter of `echo=False` in the `AsyncOrmProvider` object.
+more on engine parameters [here](https://docs.sqlalchemy.org/en/20/core/engines.html)
 
 `app_service.py`
+
 ```python
 from nest.core import Injectable
 
@@ -104,7 +106,7 @@ from nest.core import Injectable
 @Injectable
 class AppService:
     def __init__(self):
-        self.app_name = "MongoApp"
+        self.app_name = "AsyncOrmApp"
         self.app_version = "1.0.0"
 
     async def get_app_info(self):
@@ -112,6 +114,7 @@ class AppService:
 ```
 
 `app_controller.py`
+
 ```python
 from nest.core import Controller, Get
 
@@ -168,8 +171,10 @@ async def startup():
     await config.create_all()
 ```
 
-`@Module(...)`: This is a decorator that defines a module. In PyNest, a module is a class annotated with a `@Module()` decorator.
-The imports array includes the modules required by this module. In this case, ExampleModule is imported. The controllers and providers arrays are empty here, indicating this module doesn't directly provide any controllers or services.
+`@Module(...)`: This is a decorator that defines a module. In PyNest, a module is a class annotated with a `@Module()`
+decorator.
+The imports array includes the modules required by this module. In this case, ExampleModule is imported. The controllers
+and providers arrays are empty here, indicating this module doesn't directly provide any controllers or services.
 
 `PyNestFactory.create()` is a command to create an instance of the application.
 The AppModule is passed as an argument, which acts as the root module of the application.
@@ -188,8 +193,6 @@ other parameters for efficient database access.
 
 AsyncSession from sqlalchemy.ext.asyncio is used for executing asynchronous database operations. It is essential for
 leveraging the full capabilities of SQLAlchemy 2.0 in an async environment.
-
-
 
 ## Implementing Async Features
 
@@ -305,11 +308,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 @Controller("examples")
 class ExamplesController:
-    
-   def __init__(self, service: ExamplesService):
+
+    def __init__(self, service: ExamplesService):
         self.service = service
 
     @Get("/")
+
     async def get_examples(self, session: AsyncSession = Depends(config.get_db)):
         return await self.service.get_examples(session)
 
@@ -330,11 +334,12 @@ from .examples_model import Examples
 
 @Controller("examples")
 class ExamplesController:
-   
-   def __init__(self, service: ExamplesService):
+
+    def __init__(self, service: ExamplesService):
         self.service = service
 
     @Get("/")
+
     async def get_examples(self):
         return await self.service.get_examples()
 

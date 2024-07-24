@@ -99,7 +99,8 @@ class AsyncOrmProvider(BaseOrmProvider):
     def __init__(
         self, db_type: str = "postgresql", config_params: dict = None, **kwargs
     ):
-        kwargs["engine_params"] = dict(echo=True)
+        echo = kwargs.get("echo", True)
+        kwargs["engine_params"] = dict(echo=echo)
         kwargs["session_params"] = dict(expire_on_commit=False, class_=AsyncSession)
         super().__init__(
             db_type=db_type, config_params=config_params, async_mode=True, **kwargs
