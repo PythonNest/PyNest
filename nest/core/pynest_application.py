@@ -1,7 +1,8 @@
 from typing import Any
 
-from fastapi import FastAPI
-
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from nest.common.exceptions import HttpException 
 from nest.common.route_resolver import RoutesResolver
 from nest.core.pynest_app_context import PyNestApplicationContext
 from nest.core.pynest_container import PyNestContainer
@@ -33,6 +34,7 @@ class PyNestApp(PyNestApplicationContext):
         self.routes_resolver = RoutesResolver(self.container, self.http_server)
         self.select_context_module()
         self.register_routes()
+        self._setup_except_hanlder()
 
     def use(self, middleware: type, **options: Any) -> "PyNestApp":
         """
@@ -62,3 +64,16 @@ class PyNestApp(PyNestApplicationContext):
         Register the routes using the RoutesResolver.
         """
         self.routes_resolver.register_routes()
+    
+    def _setup_except_hanlder(self):
+        @self.http_server.exception_handler(HttpException)
+        async def global_exception_handler(request: Request, exc:HttpException):
+            if isinstance(exc, HttpException):
+                return JSONResponse(
+                    status_code=exc.status_code,
+                    content=HttpException.create_body(
+                        message=exc.message,
+                        error=exc.options,
+                        status_code=exc.status 
+                    )
+                )
