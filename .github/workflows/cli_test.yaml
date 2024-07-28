@@ -55,7 +55,7 @@ jobs:
           esac
           
           cd "$app_name"
-          pynest generate module -n user
+          pynest generate resource -n user
 
       - name: Verify Boilerplate
         run: |

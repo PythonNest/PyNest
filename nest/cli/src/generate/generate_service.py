@@ -114,7 +114,7 @@ class GenerateService:
         """
         template = self.get_template(name)
         if path is None:
-            path = Path.cwd()
+            path = Path.cwd() / "src"
         with open(f"{path}/{name}_module.py", "w") as f:
             f.write(template.generate_empty_module_file())
 
