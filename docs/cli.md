@@ -13,7 +13,7 @@ pip install pynest-api
 ## CLI Commands and Usage 🛠️
 The PyNest CLI provides a variety of commands to help you create and manage your PyNest applications. Below are the detailed descriptions of the available commands and their usage.
 
-### create-nest-app
+### Generate New Application
 Create a new PyNest application.
 
 ```bash
@@ -24,6 +24,7 @@ pynest generate application --app-name <app_name> [--db-type <db_type>] [--is-as
 * `--app-name`, `-n`: The name of the new application. (Required)
 * `--db-type`, `-db`: The type of database to use (postgresql, mysql, sqlite, mongodb). (Optional)
 * `--is-async`: Whether the project should be async or not. This is applicable only for relational databases. (Optional)
+* `--is-cli`: Whether the project should be a CLI App. (Optional)
 
 #### Example
 ```bash
@@ -42,12 +43,13 @@ my_pynest_app/
 │   ├── app_module.py
 │   ├── app_controller.py
 │   ├── app_service.py
+│   ├── config.py
 ├── main.py
 ├── requirements.txt
 └── README.md
 ```
 
-Note: The actual file structure may vary based on the modules and components you create.:
+!Note: The actual file structure may vary based on the modules and components you create
 
 
 ### generate command
