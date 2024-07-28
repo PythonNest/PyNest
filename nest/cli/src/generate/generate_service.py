@@ -72,6 +72,8 @@ class GenerateService:
                 ├── module_name_controller.py
         """
         template = self.get_template(name)
+        if path is None:
+            path = Path.cwd()
         with open(f"{path}/{name}_controller.py", "w") as f:
             f.write(template.generate_empty_controller_file())
 
@@ -90,6 +92,8 @@ class GenerateService:
                 ├── module_name_service.py
         """
         template = self.get_template(name)
+        if path is None:
+            path = Path.cwd()
         with open(f"{path}/{name}_service.py", "w") as f:
             f.write(template.generate_empty_service_file())
 
@@ -109,6 +113,8 @@ class GenerateService:
                 ├── module_name_module.py
         """
         template = self.get_template(name)
+        if path is None:
+            path = Path.cwd()
         with open(f"{path}/{name}_module.py", "w") as f:
             f.write(template.generate_empty_module_file())
 
