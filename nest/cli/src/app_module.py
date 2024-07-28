@@ -11,6 +11,3 @@ class AppModule:
 
 
 nest_cli = CLIAppFactory().create(AppModule)
-
-if __name__ == "__main__":
-    nest_cli()
