@@ -66,6 +66,7 @@ pynest generate resource --name <module_name>
 
 
 * `--name`, `-n`: The name of the new module. (Required)
+* `--path`, `-p`: The path where the module should be created. (Optional)
 
 **Example**
 ```bash

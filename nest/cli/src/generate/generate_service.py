@@ -37,7 +37,7 @@ class GenerateService:
         Create a new nest resource
 
         :param name: The name of the module
-        :param path: The path where the module will be created
+        :param path: The path where the module will be created, Must be in a scope of the src folder.
 
         The files structure are:
         ├── ...
@@ -51,10 +51,9 @@ class GenerateService:
                 ├── module_name_entity.py (only for databases)
                 ├── module_name_module.py
 
-        Args:
-            path:
-            path:
         """
+        if path is None:
+            path = Path.cwd()
         template = self.get_template(name)
         template.generate_module(name, path)
 
