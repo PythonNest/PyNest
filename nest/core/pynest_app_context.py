@@ -97,9 +97,7 @@ class PyNestApplicationContext:
         module_token_factory = self.container.module_token_factory
 
         metadata = self._module_compiler.extract_metadata(module)
-        token = module_token_factory.create(
-            metadata["type"], metadata["dynamic_metadata"]
-        )
+        token = module_token_factory.create(metadata["type"])
         selected_module = modules_container.get(token)
         if selected_module is None:
             raise UnknownModuleException()

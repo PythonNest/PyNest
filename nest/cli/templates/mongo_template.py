@@ -2,8 +2,8 @@ import ast
 from abc import ABC
 from pathlib import Path
 
-from nest.common.templates import Database
-from nest.common.templates.orm_template import AsyncORMTemplate
+from nest.cli.templates import Database
+from nest.cli.templates.orm_template import AsyncORMTemplate
 
 
 class MongoTemplate(AsyncORMTemplate, ABC):

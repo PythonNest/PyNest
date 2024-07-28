@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from nest.common.templates import Database
-from nest.common.templates.base_template import BaseTemplate
+from nest.cli.templates import Database
+from nest.cli.templates.base_template import BaseTemplate
 
 
 class ORMTemplate(BaseTemplate, ABC):

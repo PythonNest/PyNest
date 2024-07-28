@@ -1,10 +1,9 @@
-from typing import TypeVar, Type
+from typing import Type, TypeVar
 
 from fastapi import FastAPI
 
 from nest.core.pynest_application import PyNestApp
 from nest.core.pynest_container import PyNestContainer
-
 
 ModuleType = TypeVar("ModuleType")
 

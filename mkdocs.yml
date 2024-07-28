@@ -45,12 +45,13 @@ extra_css:
   - styles/extra.css
 
 nav:
-  - Introduction: introduction.md
-  - Getting Started: getting_started.md
-  - CLI Usage: cli.md
-  - Modules: modules.md
-  - Controllers: controllers.md
-  - Providers: providers.md
+  - Overview:
+    - Introduction: introduction.md
+    - Getting Started: getting_started.md
+    - CLI Usage: cli.md
+    - Modules: modules.md
+    - Controllers: controllers.md
+    - Providers: providers.md
   - Dependency Injection: dependency_injection.md
   - Deployment:
     - Docker: docker.md
