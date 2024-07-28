@@ -7,3 +7,4 @@ click==8.1.6
 PyYAML==6.0.1
 injector==0.21.0
 pydantic<2.0.0
+astor>=0.8.1

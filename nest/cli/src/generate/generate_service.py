@@ -32,11 +32,12 @@ class GenerateService:
         )
         return template
 
-    def generate_resource(self, name: str):
+    def generate_resource(self, name: str, path: str = None):
         """
         Create a new nest resource
 
         :param name: The name of the module
+        :param path: The path where the module will be created
 
         The files structure are:
         ├── ...
@@ -49,9 +50,13 @@ class GenerateService:
                 ├── module_name_model.py
                 ├── module_name_entity.py (only for databases)
                 ├── module_name_module.py
+
+        Args:
+            path:
+            path:
         """
         template = self.get_template(name)
-        template.generate_module(name)
+        template.generate_module(name, path)
 
     def generate_controller(self, name: str, path: str = None):
         """

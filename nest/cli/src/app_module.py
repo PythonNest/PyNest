@@ -5,7 +5,11 @@ from nest.core import Module
 from nest.core.cli_factory import CLIAppFactory
 
 
-@Module(imports=[GenerateModule], controllers=[AppController], providers=[AppService])
+@Module(
+    imports=[GenerateModule],
+    controllers=[AppController],
+    providers=[AppService],
+)
 class AppModule:
     pass
 

@@ -15,8 +15,9 @@ class GenerateController:
     def generate_resource(
         self,
         name: SharedOptions.NAME,
+        path: SharedOptions.PATH,
     ):
-        self.generate_service.generate_resource(name)
+        self.generate_service.generate_resource(name, path)
 
     @CliCommand("controller", help="Generate a new nest controller")
     def generate_controller(self, name: SharedOptions.NAME, path: SharedOptions.PATH):

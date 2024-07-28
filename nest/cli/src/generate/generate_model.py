@@ -8,7 +8,6 @@ class SharedOptions:
         help="Name of the resource",
         required=True,
         type=str,
-        prompt="What name do you want to give to the resource?",
     )
     APP_NAME = Option(
         ["-n", "--app-name"],
