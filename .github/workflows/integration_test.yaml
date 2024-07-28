@@ -45,7 +45,7 @@ jobs:
           fi
 
           cd "$app_name"
-          pynest generate module -n user
+          pynest generate resource -n user
           uvicorn "src.app_module:http_server" --host "0.0.0.0" --port 8000 --reload &
 
       - name: Wait for the server to start
