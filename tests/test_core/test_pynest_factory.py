@@ -14,8 +14,13 @@ def test_create_server(test_server):
 
 
 def test_e2e(test_module):
-    app = PyNestFactory.create(test_module, title="Test Server", description="This is a test server", version="1.0.0",
-                               debug=True)
+    app = PyNestFactory.create(
+        test_module,
+        title="Test Server",
+        description="This is a test server",
+        version="1.0.0",
+        debug=True,
+    )
     http_server = app.get_server()
     assert isinstance(http_server, FastAPI)
     assert http_server.title == "Test Server"

@@ -1,7 +1,8 @@
+from abc import ABC, abstractmethod
 from typing import Type, TypeVar
 
 from fastapi import FastAPI
-from abc import abstractmethod, ABC
+
 from nest.core.pynest_application import PyNestApp
 from nest.core.pynest_container import PyNestContainer
 

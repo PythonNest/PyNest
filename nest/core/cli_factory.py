@@ -1,7 +1,9 @@
-import click
 import asyncio
-from nest.core.pynest_factory import AbstractPyNestFactory, ModuleType
+
+import click
+
 from nest.core.pynest_container import PyNestContainer
+from nest.core.pynest_factory import AbstractPyNestFactory, ModuleType
 
 
 class CLIAppFactory(AbstractPyNestFactory):
@@ -26,5 +28,5 @@ class CLIAppFactory(AbstractPyNestFactory):
     def _run_async(coro):
         def wrapper(*args, **kwargs):
             return asyncio.run(coro(*args, **kwargs))
-        return wrapper
 
+        return wrapper
