@@ -6,6 +6,7 @@ from typing import Callable, List, Tuple, Union
 
 import astor
 import black
+import click
 
 from nest import __version__
 
@@ -184,9 +185,14 @@ class AppService:
         """
         if callable(content):
             content = content()
-        print("Generate file: ", path.stem)
         with open(path, "w") as f:
             f.write(content)
+            f.flush()
+            file_size = os.path.getsize(path)
+        message = click.style(
+            f"CREATE {path.parent.name}/{path.name} ({file_size} bytes)", fg="green"
+        )
+        print(message)
 
     @staticmethod
     def create_folder(path: Path) -> None:
@@ -200,6 +206,8 @@ class AppService:
             None
         """
         if not os.path.exists(path):
+            message = click.style(f"CREATE {path.parent.name}/{path.name}", fg="blue")
+            print(message)
             os.makedirs(path)
 
     @abstractmethod
@@ -214,7 +222,7 @@ class AppService:
                 print("-" * 100)
 
     @staticmethod
-    def find_target_folder(path: str, target: str = "src"):
+    def find_target_folder(path: Union[str, Path], target: str = "src"):
         """
         Find the target folder within the specified path.
 
@@ -344,7 +352,7 @@ class AppService:
         raise NotImplementedError
 
     @abstractmethod
-    def generate_module(self, module_name: str):
+    def generate_module(self, module_name: str, path: str = None):
         """
         Create a new nest module with the following structure:
 
@@ -356,3 +364,27 @@ class AppService:
         ├── module_name_module.py
         """
         raise NotImplementedError
+
+    def generate_empty_controller_file(self) -> str:
+        return f"""from nest.core import Controller
+
+@Controller("{self.module_name}")
+class {self.capitalized_module_name}Controller:
+    ...
+    """
+
+    def generate_empty_service_file(self) -> str:
+        return f"""from nest.core import Injectable
+
+@Injectable
+class {self.capitalized_module_name}Service:
+    ...
+        """
+
+    def generate_empty_module_file(self) -> str:
+        return f"""from nest.core import Module
+
+@Module()
+class {self.capitalized_module_name}Module:
+    ...
+        """

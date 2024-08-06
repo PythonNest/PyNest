@@ -1,15 +1,21 @@
-from typing import TypeVar, Type
+from abc import ABC, abstractmethod
+from typing import Type, TypeVar
 
 from fastapi import FastAPI
 
 from nest.core.pynest_application import PyNestApp
 from nest.core.pynest_container import PyNestContainer
 
-
 ModuleType = TypeVar("ModuleType")
 
 
-class PyNestFactory:
+class AbstractPyNestFactory(ABC):
+    @abstractmethod
+    def create(self, main_module: Type[ModuleType], **kwargs):
+        raise NotImplementedError
+
+
+class PyNestFactory(AbstractPyNestFactory):
     """Factory class for creating PyNest applications."""
 
     @staticmethod

@@ -135,13 +135,8 @@ class AppModule:
     pass
 
 
-app = PyNestFactory.create(
-    AppModule,
-    description="This is my FastAPI app drive by ORM Engine",
-    title="My App",
-    version="1.0.0",
-    debug=True,
-)
+app = PyNestFactory.create(AppModule, description="This is my FastAPI app drive by ORM Engine", title="My App",
+                           version="1.0.0", debug=True)
 
 http_server: FastAPI = app.get_server()
 
@@ -282,3 +277,4 @@ Now you can access the application at http://localhost:8000/docs and test the en
     <span>Application Example With Async ORM &rarr;</span>
   </a>
 </nav>
+

@@ -6,6 +6,7 @@ class Database(Enum):
     MYSQL = "mysql"
     SQLITE = "sqlite"
     MONGODB = "mongodb"
+    CLI = "cli"
 
     def __str__(self):
         return self.value
