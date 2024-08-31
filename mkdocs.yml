@@ -51,6 +51,7 @@ nav:
   - Modules: modules.md
   - Controllers: controllers.md
   - Providers: providers.md
+  - Exception Handling: pynest_exceptions_guide.md
   - Dependency Injection: dependency_injection.md
   - Deployment:
     - Docker: docker.md
