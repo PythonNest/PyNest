@@ -2,8 +2,8 @@ import ast
 from abc import ABC
 from pathlib import Path
 
-from nest.common.templates import Database
-from nest.common.templates.orm_template import AsyncORMTemplate
+from nest.cli.templates import Database
+from nest.cli.templates.orm_template import AsyncORMTemplate
 
 
 class MongoTemplate(AsyncORMTemplate, ABC):
@@ -130,7 +130,7 @@ class {self.capitalized_module_name}Service:
             self.save_file_with_astor(config_file, tree)
             self.format_with_black(config_file)
 
-    def generate_module(self, module_name: str):
+    def generate_module(self, module_name: str, path: str = None):
         src_path = self.validate_new_module(module_name)
         config_file = self.validate_config_file(src_path)
         self.create_module(

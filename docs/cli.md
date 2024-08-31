@@ -13,21 +13,22 @@ pip install pynest-api
 ## CLI Commands and Usage 🛠️
 The PyNest CLI provides a variety of commands to help you create and manage your PyNest applications. Below are the detailed descriptions of the available commands and their usage.
 
-### create-nest-app
+### Generate New Application
 Create a new PyNest application.
 
 ```bash
-pynest create-nest-app --app-name <app_name> [--db-type <db_type>] [--is-async]
+pynest generate application --app-name <app_name> [--db-type <db_type>] [--is-async]
 ```
 **Options**
 
 * `--app-name`, `-n`: The name of the new application. (Required)
 * `--db-type`, `-db`: The type of database to use (postgresql, mysql, sqlite, mongodb). (Optional)
 * `--is-async`: Whether the project should be async or not. This is applicable only for relational databases. (Optional)
+* `--is-cli`: Whether the project should be a CLI App. (Optional)
 
 #### Example
 ```bash
-pynest create-nest-app --app-name my_pynest_app --db-type postgresql --is-async
+pynest generate application --app-name my_pynest_app --db-type postgresql --is-async
 ```
 
 This example will create a skeleton PyNest application named `my_pynest_app` with PostgreSQL as the database and async support.
@@ -42,40 +43,100 @@ my_pynest_app/
 │   ├── app_module.py
 │   ├── app_controller.py
 │   ├── app_service.py
+│   ├── config.py
 ├── main.py
 ├── requirements.txt
 └── README.md
 ```
 
-Note: The actual file structure may vary based on the modules and components you create.:
+!Note: The actual file structure may vary based on the modules and components you create
 
 
-### generate (Alias: g)
+### generate command
 Generate boilerplate code for various components of the application.
 
 #### Subcommands
 
-**module**
-Generate a new module with the associated controller, service, model and module files._
+**Resource**
+Generate a new resource with the associated controller, service, model and module files, with respect to the project configurations (e.g. database type).
 
 ```bash
-pynest g module --name <module_name>
+pynest generate resource --name <module_name>
 ```
 
 **Options**
 
 
 * `--name`, `-n`: The name of the new module. (Required)
+* `--path`, `-p`: The path where the module should be created. (Optional)
 
 **Example**
 ```bash
-pynest g module --name users
+pynest generate resource --name users
 ```
 
-This will create a new module named `users` with the associated controller, service, model and module files.
+This will create a new resource named `users` with the associated controller, service, model and module files.
 
-Note: In the future the cli will support more subcommands like `controller`, `service`, `model` and `provider` and `resource` that will replace the current `g module` as in nestjs cli:
 
+**Module**
+
+Generate a new module file, which can be used to group related components of the application.
+
+```bash
+pynest generate module --name <module_name>
+``` 
+
+**Options**
+
+* `--name`, `-n`: The name of the new module. (Required)
+* `--path`, `-p`: The path where the module should be created. (Optional)
+
+**Example**
+```bash
+pynest generate module --name auth
+```
+
+This will create a new module named `auth` in the default path.
+
+**Controller**
+
+Generate a new controller file, which will handle the routing and responses for a specific resource.
+
+```bash
+pynest generate controller --name <controller_name>
+```
+
+**Options**
+
+* `--name`, `-n`: The name of the new controller. (Required)
+* `--path`, `-p`: The path where the controller should be created. (Optional)
+
+**Example**
+```bash
+pynest generate controller --name users
+```
+
+This will create a new controller named `users` in the default path.
+
+**Service**
+
+Generate a new service file, which will contain the business logic for a specific resource.
+
+```bash
+pynest generate service --name <service_name>
+```
+
+**Options**
+
+* `--name`, `-n`: The name of the new service. (Required)
+* `--path`, `-p`: The path where the service should be created. (Optional)
+
+**Example**
+```bash
+pynest generate service --name users
+```
+
+This will create a new service named `users` in the default path.
 
 
 ## Best Practices 🌟
