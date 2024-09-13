@@ -34,11 +34,11 @@ from pynest.core import Module
 from .book_controller import BookController
 from .book_service import BookService
 
-@Module({
-    'controllers': [BookController],
-    'providers': [BookService],
-    'exports': [BookService],
-})
+@Module(
+    providers=[BookService],
+    controllers=[BookController],
+    exports=[BookService],
+)
 class BookModule:
     pass
 ```
@@ -57,33 +57,17 @@ and the second module imports it.
 from pynest.core import Module
 from .book_module import BookModule
 
-@Module({
-    'imports': [BookModule],
-})
+@Module(
+    imports=[BookModule],
+)
 class AppModule:
     pass
 ```
 
-In this example, the `AppModule` imports the `BookModule`, which means that all the providers exported by the `BookModule` are available in the `AppModule`.
+In this example, the `AppModule` imports the `BookModule`,
+which means that all the providers exported by the `BookModule` are available in the
+`AppModule` and all the routes in `BookController` will be registered to the main application.
 
-## Global Modules
-Global modules provide a set of providers that should be available across the entire application without needing to import the module in every module's import array.
-
-```python
-from pynest.core import Module
-from .shared_service import SharedService
-
-@Global()
-@Module({
-    'providers': [SharedService],
-    'exports': [SharedService],
-    'is_global': True,
-})
-class SharedModule:
-    pass
-```
-
-Global modules should be registered only once, typically by the root or core module. This approach reduces boilerplate and makes the application more maintainable.
 
 ---
 

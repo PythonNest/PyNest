@@ -1,7 +1,7 @@
 from abc import ABC
 
-from nest.common.templates import Database
-from nest.common.templates.orm_template import AsyncORMTemplate, ORMTemplate
+from nest.cli.templates import Database
+from nest.cli.templates.orm_template import AsyncORMTemplate, ORMTemplate
 
 
 class SQLiteTemplate(ORMTemplate, ABC):

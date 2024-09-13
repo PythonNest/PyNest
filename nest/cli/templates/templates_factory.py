@@ -1,15 +1,16 @@
 from typing import Optional, Union
 
-from nest.common.templates import Database
-from nest.common.templates.base_template import BaseTemplate
-from nest.common.templates.blank_template import BlankTemplate
-from nest.common.templates.mongo_template import MongoTemplate
-from nest.common.templates.mysql_template import AsyncMySQLTemplate, MySQLTemplate
-from nest.common.templates.postgres_template import (
+from nest.cli.templates import Database
+from nest.cli.templates.base_template import BaseTemplate
+from nest.cli.templates.blank_template import BlankTemplate
+from nest.cli.templates.cli_templates import ClickTemplate
+from nest.cli.templates.mongo_template import MongoTemplate
+from nest.cli.templates.mysql_template import AsyncMySQLTemplate, MySQLTemplate
+from nest.cli.templates.postgres_template import (
     AsyncPostgresqlTemplate,
     PostgresqlTemplate,
 )
-from nest.common.templates.sqlite_template import AsyncSQLiteTemplate, SQLiteTemplate
+from nest.cli.templates.sqlite_template import AsyncSQLiteTemplate, SQLiteTemplate
 
 
 class TemplateFactory:
@@ -18,7 +19,10 @@ class TemplateFactory:
         db_type: Union[Database, str, None],
         module_name: str,
         is_async: Optional[bool] = False,
+        is_cli: Optional[bool] = False,
     ) -> BaseTemplate:
+        if is_cli:
+            return ClickTemplate(module_name=module_name)
         if not db_type:
             return BlankTemplate(module_name=module_name)
         elif db_type == Database.POSTGRESQL.value:

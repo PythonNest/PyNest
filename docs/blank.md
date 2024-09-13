@@ -102,6 +102,7 @@ from .app_controller import AppController
 from .app_service import AppService
 from fastapi import FastAPI
 
+
 @Module(
     controllers=[AppController],
     providers=[AppService],
@@ -111,13 +112,7 @@ class AppModule:
     pass
 
 
-app = PyNestFactory.create(
-    AppModule,
-    description="This is my FastAPI app",
-    title="My App",
-    version="1.0.0",
-    debug=True,
-)
+app = PyNestFactory.create(AppModule, description="This is my FastAPI app", title="My App", version="1.0.0", debug=True)
 
 http_server: FastAPI = app.get_server()
 ```
