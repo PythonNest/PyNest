@@ -5,7 +5,7 @@ from nest.core import Injectable
 from nest.plugins.modules.redis.redis_model import RedisConfig, RedisInput
 
 
-@Injectable
+@Injectable()
 class RedisService:
     def __init__(self):
         self.redis_config = RedisConfig()

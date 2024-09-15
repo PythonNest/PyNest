@@ -265,7 +265,7 @@ class ExamplesService:
 
     def __init__(self):
         self.orm_config = config
-        self.session = self.orm_config.session
+        self.session = self.orm_config.get_session
 
     @async_db_request_handler
     async def add_examples(self, examples: Examples):

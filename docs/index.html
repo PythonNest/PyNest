@@ -3,130 +3,520 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PyNest</title>
-        <link rel="icon" href="imgs/pynest-logo.png" type="image/x-icon">
-
+    <title>PyNest - A Modular Python Framework</title>
+    <link rel="icon" href="imgs/pynest-logo.png" type="image/x-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <!-- Prism.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <!-- Custom Styles -->
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #121212;
-            color: #ffffff;
+        /* Reset */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1E1E1E;
+            color: #FFFFFF;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             min-height: 100vh;
-            text-align: center;
+            overflow-x: hidden;
         }
+
+        /* Header */
         .header {
-            width: 100%;
-            padding: 5px;
-            color: #fff;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-left: 15px;
-            margin-right: 15px;
+            justify-content: space-between;
+            padding: 20px 50px;
+            background-color: #121212;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
         }
-        .header img.logo {
-            width: 150px;
+
+        .header .logo {
+            width: 50px;
         }
+
+        .header nav {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .header nav a {
+            color: #FFFFFF;
+            margin-left: 30px;
+            text-decoration: none;
+            font-size: 1em;
+            transition: color 0.3s ease;
+        }
+
+        .header nav a:hover {
+            color: #00B3E6;
+        }
+
+        /* Social Icons in Header */
         .header .social-icons {
             display: flex;
             align-items: center;
+            margin-left: 30px;
         }
+
         .header .social-icons a {
-            margin: 0 20px;
-            color: #fff;
+            color: #FFFFFF;
+            margin-left: 20px;
+            font-size: 1.2em;
             transition: color 0.3s ease;
         }
+
         .header .social-icons a:hover {
-            color: #007acc;
+            color: #00B3E6;
         }
-        .header .social-icons svg {
-            width: 30px;
-            height: 30px;
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #007acc 0%, #00b3e6 100%);
+            padding: 180px 20px 100px 20px;
+            text-align: center;
+            position: relative;
+            margin-top: 80px; /* Adjusted for fixed header */
         }
-        .container {
-            padding: 50px;
-            width: 70%;
-            margin: 60px auto;
-            margin-bottom: 200px;
+
+        .hero::after {
+            content: '';
+            background: url('imgs/hero-background.svg') no-repeat center center;
+            background-size: cover;
+            opacity: 0.05;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            position: absolute;
+            z-index: -1;
         }
-        h1 {
-            font-size: 2.5em;
-            color: #ffffff;
-            margin: 20px 0;
+
+        .hero-content {
+            max-width: 1000px;
+            padding: 0 20px;
+            animation: fadeInUp 1s ease-out;
         }
-        p {
-            font-size: 1.4em;
-            color: #cccccc;
-            margin: 20px 0;
+
+        .hero h1 {
+            font-size: 6em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-family: 'Roboto', sans-serif;
+            color: #FFFFFF;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            line-height: 1.1;
         }
-        .buttons {
-            margin-top: 30px;
+
+        .hero p {
+            font-size: 1.5em;
+            margin-bottom: 40px;
+            color: #f0f0f0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .buttons a {
+
+        .hero .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero .buttons a {
             text-decoration: none;
             margin: 10px;
             padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 1.4em;
+            border-radius: 30px;
+            font-size: 1.2em;
             transition: background 0.3s ease, transform 0.3s ease;
+            display: inline-block;
         }
-        .buttons a.primary {
-            background: #007acc;
-            color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+        .hero .buttons a.primary {
+            background: #FFFFFF;
+            color: #007acc;
         }
-        .buttons a.secondary {
-            background: #000;
-            color: #fff;
-            border: 2px solid #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+        .hero .buttons a.secondary {
+            background: transparent;
+            color: #FFFFFF;
+            border: 2px solid #FFFFFF;
         }
-        .buttons a:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
+
+        .hero .buttons a:hover {
+            transform: translateY(-3px);
         }
-        .footer {
-            padding: 20px;
-            background: #1e1e1e;
-            color: #fff;
-            width: 100%;
+
+        /* Features Section */
+        .features {
+            padding: 80px 50px;
+            background-color: #1E1E1E;
             text-align: center;
+        }
+
+        .features h2 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        .features-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .feature-item {
+            background-color: #2A2A2A;
+            padding: 40px 30px;
+            border-radius: 10px;
+            width: 300px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-item i {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #00B3E6;
+        }
+
+        .feature-item h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .feature-item p {
+            font-size: 1em;
+            color: #CCCCCC;
+        }
+
+        /* Code Section */
+        .code-section {
+            padding: 80px 50px;
+            background-color: #121212;
+            text-align: left;
+        }
+
+        .code-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            font-weight: 500;
+            color: #FFFFFF;
+            text-align: center;
+        }
+
+        .code-block {
+            position: relative;
+            background-color: #1E1E1E;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #007acc;
+            color: #FFFFFF;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: #005f99;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #121212;
+            padding: 40px 20px;
+            text-align: center;
+            color: #FFFFFF;
+            font-size: 0.9em;
+            margin-top: auto;
+        }
+
+        .social-icons {
+            margin-bottom: 20px;
+        }
+
+        .social-icons a {
+            color: #FFFFFF;
+            margin: 0 10px;
+            font-size: 1.5em;
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: #00B3E6;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate3d(0, 40px, 0);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        /* Media Queries */
+        @media (max-width: 1200px) {
+            .hero h1 {
+                font-size: 5em;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 4em;
+            }
+            .hero p {
+                font-size: 1.3em;
+            }
+            .header nav a {
+                margin-left: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header, .hero, .footer, .features, .code-section {
+                padding: 20px;
+            }
+
+            .header nav {
+                display: none; /* Hide navigation on mobile */
+            }
+
+            .header .social-icons {
+                margin-left: auto;
+            }
+
+            .hero h1 {
+                font-size: 3em;
+            }
+
+            .hero p {
+                font-size: 1.2em;
+            }
+
+            .hero .buttons a {
+                font-size: 1em;
+            }
+
+            .features-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .feature-item {
+                width: 100%;
+            }
+
+            .code-section h2 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero {
+                padding: 150px 20px 80px 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .hero p {
+                font-size: 1em;
+            }
+
+            .header .logo {
+                width: 40px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <img src="imgs/pynest-logo.png" alt="PyNest Logo" class="logo" style="margin-left: 200px">
-        <div class="social-icons" style="margin-right: 200px">
+    <!-- Header -->
+    <header class="header">
+        <a href="/" aria-label="PyNest Home">
+            <img src="imgs/pynest-logo.png" alt="PyNest Logo" class="logo">
+        </a>
+        <div class="social-icons">
             <a href="https://github.com/PythonNest/PyNest" target="_blank" aria-label="GitHub">
-                <svg class="svg-inline--fa fa-github" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8z"></path></svg>
+                <i class="fab fa-github"></i>
             </a>
             <a href="https://www.linkedin.com/company/pynest-api" target="_blank" aria-label="LinkedIn">
-                <svg class="svg-inline--fa fa-linkedin" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="linkedin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M100.28 448H7.4V148.9h92.88zm-46.14-340a53.54 53.54 0 1 1 53.49-53.54 53.56 53.56 0 0 1-53.49 53.54zm384.1 340h-92.79V302.4c0-34.7-12.49-58.4-43.69-58.4-23.85 0-38.04 16.06-44.31 31.56-2.28 5.57-2.85 13.31-2.85 21.05V448H160V148.9h89.08v39.1h1.28c12.43-23.52 42.82-48.24 87.97-48.24 60.73 0 106.08 39.59 106.08 124.64z"></path></svg>
+                <i class="fab fa-linkedin"></i>
             </a>
-            <a href="https://twitter.com/NestJS" target="_blank" aria-label="Twitter">
-                <svg class="svg-inline--fa fa-twitter" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M459.4 151.7c.32 4.54.32 9.14.32 13.74 0 140.93-107.5 303.2-303.2 303.2A301.3 301.3 0 0 1 0 433.1a219.71 219.71 0 0 0 25.66 1.31 213.15 213.15 0 0 0 132.3-45.67A106.56 106.56 0 0 1 70.78 311v-1.31a106.63 106.63 0 0 0 48.13 13.34 106.56 106.56 0 0 1-33.08-142.11 302.2 302.2 0 0 0 219.64 111.46 120.64 120.64 0 0 1-2.79-24.34 106.56 106.56 0 0 1 106.56-106.56c30.72 0 58.37 12.95 77.94 33.74a211.09 211.09 0 0 0 67.57-25.66 106.56 106.56 0 0 1-46.81 58.75 212.76 212.76 0 0 0 61.28-16.61 223.26 223.26 0 0 1-53.2 55.14z"></path></svg>
+            <a href="https://medium.com/@itay2803" target="_blank" aria-label="Twitter">
+                <i class="fab fa-medium-m"></i>
             </a>
         </div>
-    </div>
-    <div class="container" style="margin-bottom: 400px">
-        <h1 style="font-size: 72px">PyNest</h1>
-        <p>PyNest is a Python framework built on top of FastAPI that follows the modular architecture of NestJS.</p>
-        <div class="buttons" style="margin-top: 50px">
-            <a href="/PyNest/introduction" class="primary" target="_blank">Documentation</a>
-            <a href="https://github.com/PythonNest/PyNest" class="secondary" target="_blank">GitHub</a>
-        </div>
-    </div>
-    <div class="footer">
-        Copyright &copy; 2024 PyNest <br>
-        Made with Material for MkDocs <br>
-        All rights reserved - Itay Dar
+    </header>
 
-    </div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>PyNest</h1>
+            <p>A modern, modular Python framework inspired by NestJS, built on top of FastAPI.</p>
+            <div class="buttons">
+                <a href="/PyNest/introduction" class="primary">Get Started</a>
+                <a href="https://github.com/PythonNest/PyNest" class="secondary" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2>Why Choose PyNest?</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <i class="fas fa-layer-group"></i>
+                <h3>Modular Architecture</h3>
+                <p>Organize your code into reusable modules for better scalability and maintainability.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-rocket"></i>
+                <h3>Built on FastAPI</h3>
+                <p>Leverage the speed and performance of FastAPI, one of the fastest Python web frameworks.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-code"></i>
+                <h3>Type Safety</h3>
+                <p>Enjoy robust type checking and autocomplete features with Python's type hints.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-users"></i>
+                <h3>Community Driven</h3>
+                <p>Join a growing community of developers contributing to the evolution of PyNest.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-plug"></i>
+                <h3>Extensible</h3>
+                <p>Easily integrate with various libraries and tools to extend functionality.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Secure</h3>
+                <p>Implement best security practices with built-in support for authentication and authorization.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Section -->
+    <section class="code-section">
+        <h2>Get Started with PyNest</h2>
+        <div class="code-block">
+            <button class="copy-button" onclick="copyCode()">Copy</button>
+            <pre><code class="language-python">
+from nest.core import PyNestFactory, Module, Controller, Get, Injectable
+
+@Injectable()
+class AppService:
+    def __init__(self):
+        self.app_name = "PyNest App"
+        self.app_version = "1.0.0"
+
+    def get_app_info(self):
+        return {"app_name": self.app_name, "app_version": self.app_version}
+
+@Controller("/")
+class AppController:
+    def __init__(self, app_service: AppService):
+        self.app_service = app_service
+
+    @Get("/")
+    def get_app_info(self):
+        return self.app_service.get_app_info()
+
+@Module(controllers=[AppController], providers=[AppService])
+class AppModule:
+    pass
+
+app = PyNestFactory.create(
+    AppModule,
+    description="This is my PyNest app.",
+    title="PyNest Application",
+    version="1.0.0",
+    debug=True,
+)
+
+            </code></pre>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="social-icons">
+            <a href="https://github.com/PythonNest/PyNest" target="_blank" aria-label="GitHub">
+                <i class="fab fa-github"></i>
+            </a>
+            <a href="https://www.linkedin.com/company/pynest-api" target="_blank" aria-label="LinkedIn">
+                <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="https://medium.com/@itay2803" target="_blank" aria-label="Twitter">
+                <i class="fab fa-medium-m"></i>
+            </a>
+        </div>
+        <p>&copy; 2024 PyNest</p>
+        <p>Made with Material for MkDocs</p>
+        <p>All rights reserved - Itay Dar</p>
+    </footer>
+
+    <!-- Prism.js JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-python.min.js"></script>
+
+    <!-- Copy Code Script -->
+    <script>
+        function copyCode() {
+            const code = document.querySelector('.code-block pre code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            }, (err) => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
 </body>
 </html>
