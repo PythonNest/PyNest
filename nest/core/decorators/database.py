@@ -79,6 +79,6 @@ def async_db_request_handler(func):
             elif session and session_type == "class":
                 async with session() as session:
                     await session.rollback()
-            return HTTPException(status_code=500, detail=str(e))
+            raise Exception(f"Error in async request: {e}")
 
     return wrapper
