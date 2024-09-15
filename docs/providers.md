@@ -130,7 +130,7 @@ The EmailService is defined as a provider in the EmailModule and exported for us
 
 ## Conclusion
 
-Providers are essential components in PyNest applications, handling business logic and other functionalities.
+Providers are essential parts in PyNest applications, handling business logic and other functionalities.
 By defining, importing, exporting,
 and injecting providers, you can create modular and maintainable applications with clear separation of concerns.
 Understanding how providers work and how to use them effectively will help

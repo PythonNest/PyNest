@@ -1,7 +1,7 @@
 from abc import ABC
 from pathlib import Path
 
-from nest.common.templates.base_template import BaseTemplate
+from nest.cli.templates.base_template import BaseTemplate
 
 
 class BlankTemplate(BaseTemplate, ABC):
@@ -55,7 +55,6 @@ class {self.capitalized_module_name}(BaseModel):
 
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
-from functools import lru_cache
 from nest.core import Injectable
 
 
@@ -71,7 +70,6 @@ class {self.capitalized_module_name}Service:
     def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
         self.database.append({self.module_name})
         return {self.module_name}
-        
 """
 
     def controller_file(self):
@@ -113,9 +111,9 @@ class {self.capitalized_module_name}Controller:
             module_path / f"{module_name}_service.py", self.service_file()
         )
         self.create_template(module_path / f"{module_name}_model.py", self.model_file())
-        self.append_module_to_app(path_to_app_py=src_path / "app_module.py")
+        self.append_module_to_app(path_to_app_py=f"{src_path / 'app_module.py'}")
 
-    def generate_module(self, module_name: str):
+    def generate_module(self, module_name: str, path: str = None):
         src_path = self.validate_new_module(module_name)
         self.create_module(module_name, src_path)
 

@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from nest.common.templates import Database
-from nest.common.templates.base_template import BaseTemplate
+from nest.cli.templates import Database
+from nest.cli.templates.base_template import BaseTemplate
 
 
 class ORMTemplate(BaseTemplate, ABC):
@@ -175,7 +175,7 @@ config:
         )
         self.append_module_to_app(src_path / "app_module.py")
 
-    def generate_module(self, module_name: str):
+    def generate_module(self, module_name: str, path: str = None):
         src_path = self.validate_new_module(module_name)
         self.validate_config_file(src_path)
         self.create_module(module_name, src_path)

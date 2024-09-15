@@ -5,7 +5,9 @@ from nest.plugins.modules.redis.redis_service import RedisService
 
 @Controller("redis")
 class RedisController:
-    redis_service: RedisService = Depends(RedisService)
+
+    def __init__(self, redis_service: RedisService):
+        self.redis_service = redis_service
 
     @Get("/{key}")
     def get(self, key: str):
