@@ -6,6 +6,10 @@ beanie==1.20.0
 PyYAML==6.0.1
 injector==0.21.0
 astor==0.8.1
+APScheduler==3.10.4
+pytz==2024.2
+six==1.16.0
+tzlocal==5.2
 
 # package release
 setuptools
