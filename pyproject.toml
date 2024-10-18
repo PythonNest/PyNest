@@ -33,6 +33,10 @@ dependencies = [
     "pydantic<2.0.0",
     "sqlalchemy == 2.0.19",
     "alembic == 1.7.5",
+    "APScheduler >= "3.10.4",
+    "pytz >= "2024.2",
+    "six >= "1.16.0",
+    "tzlocal >= "5.2",
 ]
 
 [tool.setuptools.dynamic]
