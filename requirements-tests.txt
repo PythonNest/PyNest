@@ -10,3 +10,7 @@ pydantic<2.0.0
 python-dotenv>=1.0.0
 uvicorn>=0.23.1
 astor>=0.8.1
+APScheduler==3.10.4
+pytz==2024.2
+six==1.16.0
+tzlocal==5.2
