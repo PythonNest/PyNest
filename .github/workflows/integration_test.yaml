@@ -38,14 +38,14 @@ jobs:
           fi
 
           if [ "${{ matrix.app_type }}" == "Blank" ]; then
-            pynest create-nest-app -n "$app_name"
+            pynest generate application -n "$app_name"
           else
-            pynest create-nest-app -n "$app_name" -db sqlite $is_async
+            pynest generate application -n "$app_name" -db sqlite $is_async
             pip install aiosqlite
           fi
 
           cd "$app_name"
-          pynest g module -n user
+          pynest generate resource -n user
           uvicorn "src.app_module:http_server" --host "0.0.0.0" --port 8000 --reload &
 
       - name: Wait for the server to start

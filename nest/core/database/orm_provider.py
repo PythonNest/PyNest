@@ -122,7 +122,7 @@ class AsyncOrmProvider(BaseOrmProvider):
             await db.close()
 
     @asynccontextmanager
-    async def session(self) -> AsyncSession:
+    async def get_session(self) -> AsyncSession:
         db = self.session()
         try:
             yield db

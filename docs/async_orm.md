@@ -155,13 +155,8 @@ class AppModule:
     pass
 
 
-app = PyNestFactory.create(
-    AppModule,
-    description="This is my FastAPI app drive by Async ORM Engine",
-    title="My App",
-    version="1.0.0",
-    debug=True,
-)
+app = PyNestFactory.create(AppModule, description="This is my FastAPI app drive by Async ORM Engine", title="My App",
+                           version="1.0.0", debug=True)
 
 http_server = app.get_server()
 
@@ -270,7 +265,7 @@ class ExamplesService:
 
     def __init__(self):
         self.orm_config = config
-        self.session = self.orm_config.session
+        self.session = self.orm_config.get_session
 
     @async_db_request_handler
     async def add_examples(self, examples: Examples):

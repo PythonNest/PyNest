@@ -1,5 +1,8 @@
 import ast
 import inspect
+from typing import Callable, List
+
+import click
 
 from nest.common.constants import INJECTABLE_TOKEN
 
@@ -72,3 +75,15 @@ def parse_dependencies(cls):
         except Exception as e:
             raise e
     return dependecies
+
+
+def parse_params(func: Callable) -> List[click.Option]:
+    signature = inspect.signature(func)
+    params = []
+    for param in signature.parameters.values():
+        try:
+            if param.annotation != param.empty:
+                params.append(param.annotation)
+        except Exception as e:
+            raise e
+    return params
