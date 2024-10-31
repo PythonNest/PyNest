@@ -12,7 +12,7 @@ class SQLiteTemplate(ORMTemplate, ABC):
         )
 
     def config_file(self):
-        return """from nest.core.database.orm_provider import OrmProvider
+        return """from nest.database.orm_provider import OrmProvider
 import os
 from dotenv import load_dotenv
 

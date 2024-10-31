@@ -1,5 +1,5 @@
+from nest.cli import CliCommand, CliController
 from nest.cli.src.app_service import AppService
-from nest.core.decorators.cli.cli_decorators import CliCommand, CliController
 
 
 @CliController("app")
