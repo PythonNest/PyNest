@@ -1,9 +1,7 @@
-import os
-
 import pytest
 
-from nest.core.database.odm_config import ConfigFactory, MongoDBConfig
-from nest.core.database.odm_provider import OdmProvider
+from nest.database.odm_config import MongoDBConfig
+from nest.database.odm_provider import OdmProvider
 
 
 @pytest.fixture(scope="module")

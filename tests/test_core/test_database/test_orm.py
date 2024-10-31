@@ -2,8 +2,8 @@ import os
 
 import pytest
 
-from nest.core.database.orm_config import ConfigFactory
-from nest.core.database.orm_provider import OrmProvider
+from nest.database.orm_config import ConfigFactory
+from nest.database.orm_provider import OrmProvider
 
 
 @pytest.fixture(scope="module")

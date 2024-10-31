@@ -1,13 +1,13 @@
 import pytest
 
-from nest.core import PyNestApp
+from nest.web import PyNestFastapiApp
 from tests.test_core import test_container, test_resolver
 from tests.test_core.test_pynest_factory import test_server
 
 
 @pytest.fixture
 def pynest_app(test_container, test_server):
-    return PyNestApp(container=test_container, http_server=test_server)
+    return PyNestFastapiApp(container=test_container, http_server=test_server)
 
 
 def test_is_listening_property(pynest_app):

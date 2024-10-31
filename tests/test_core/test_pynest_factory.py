@@ -1,7 +1,8 @@
 import pytest
 from fastapi import FastAPI
 
-from nest.core import PyNestFactory  # Replace 'your_module' with the actual module name
+from nest.web import \
+    PyNestWebFactory  # Replace 'your_module' with the actual module name
 from tests.test_core import test_container, test_module, test_server
 
 
@@ -14,7 +15,7 @@ def test_create_server(test_server):
 
 
 def test_e2e(test_module):
-    app = PyNestFactory.create(
+    app = PyNestWebFactory.create(
         test_module,
         title="Test Server",
         description="This is a test server",
