@@ -5,18 +5,11 @@ import click
 from injector import Injector, UnknownProvider, singleton
 
 from nest.common.constants import DEPENDENCIES, INJECTABLE_TOKEN
-from nest.common.exceptions import (
-    CircularDependencyException,
-    NoneInjectableException,
-    UnknownModuleException,
-)
-from nest.common.module import (
-    Module,
-    ModuleCompiler,
-    ModuleFactory,
-    ModulesContainer,
-    ModuleTokenFactory,
-)
+from nest.common.exceptions import (CircularDependencyException,
+                                    NoneInjectableException,
+                                    UnknownModuleException)
+from nest.common.module import (Module, ModuleCompiler, ModuleFactory,
+                                ModulesContainer, ModuleTokenFactory)
 
 TController = type("TController", (), {})
 TProvider = type("TProvider", (), {})

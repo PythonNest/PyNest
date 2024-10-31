@@ -5,7 +5,7 @@ import uuid
 from typing import Any, List, Type
 from uuid import uuid4
 
-from nest.core import Module
+from nest.core.module import Module
 
 
 class ModulesContainer(dict):
