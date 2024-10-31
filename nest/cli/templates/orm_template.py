@@ -258,37 +258,43 @@ class {self.capitalized_module_name}(config.Base):
 """
 
     def service_file(self):
-        return f"""from .{self.module_name}_model import {self.capitalized_module_name}
-from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
-from nest.core.decorators.database import async_db_request_handler
+        return f"""from nest.database.utils import async_db_request_handler
 from nest.core import Injectable
+
+from .{self.module_name}_model import {self.capitalized_module_name}
+from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
+from src.config import config
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-@Injectable
+@Injectable()
 class {self.capitalized_module_name}Service:
 
-    @async_db_request_handler
-    async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}, session: AsyncSession):
-        new_{self.module_name} = {self.capitalized_module_name}Entity(
-            **{self.module_name}.model_dump()
-        )
-        session.add(new_{self.module_name})
-        await session.commit()
-        return new_{self.module_name}.id
+    def __init__(self):
+        self.session: AsyncSession = config.get_session
 
     @async_db_request_handler
-    async def get_{self.module_name}(self, session: AsyncSession):
-        query = select({self.capitalized_module_name}Entity)
-        result = await session.execute(query)
-        return result.scalars().all()
+    async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
+        async with self.session() as session:
+            new_{self.module_name} = {self.capitalized_module_name}Entity(
+                **{self.module_name}.model_dump()
+            )
+            session.add(new_{self.module_name})
+            await session.commit()
+            return new_{self.module_name}.id
+
+    @async_db_request_handler
+    async def get_{self.module_name}(self):
+        async with self.session() as session:
+            query = select({self.capitalized_module_name}Entity)
+            result = await session.execute(query)
+            return result.scalars().all()
 """
 
     def controller_file(self):
-        return f"""from nest.core import Controller, Get, Post, Depends
+        return f"""from nest.web import Controller, Get, Post
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.config import config
 
 
 from .{self.module_name}_service import {self.capitalized_module_name}Service
@@ -302,12 +308,12 @@ class {self.capitalized_module_name}Controller:
         self.{self.module_name}_service = {self.module_name}_service
 
     @Get("/")
-    async def get_{self.module_name}(self, session: AsyncSession = Depends(config.get_db)):
+    async def get_{self.module_name}(self):
         return await self.{self.module_name}_service.get_{self.module_name}(session)
 
     @Post("/")
-    async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}, session: AsyncSession = Depends(config.get_db)):
-        return await self.{self.module_name}_service.add_{self.module_name}({self.module_name}, session)
+    async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
+        return await self.{self.module_name}_service.add_{self.module_name}({self.module_name})
  """
 
     def settings_file(self):
