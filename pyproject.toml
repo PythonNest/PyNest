@@ -45,6 +45,27 @@ postgres = ["sqlalchemy", "asyncpg", "psycopg2", "alembic", "greenlet", "python-
 mongo = ["beanie", "python-dotenv"]
 test = ["pytest"]
 
+[tool.poetry.group.build.dependencies]
+setuptools = "^68.0.0"
+wheel = "^0.41.0"
+build = "^0.10.0"
+twine = "^4.0.2"
+git-changelog = "^0.7.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.0.1"
+fastapi = "^0.115.4"
+sqlalchemy = "^2.0.36"
+motor = "^3.2.0"
+beanie = "^1.27.0"
+pydantic = "^2.9.2"
+python-dotenv = "^1.0.1"
+uvicorn = "^0.32.0"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs-material = "^9.1.20"
+mkdocstrings-python = "^0.9.1"
+
 
 [tool.black]
 force-exclude = '''
