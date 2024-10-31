@@ -2,7 +2,7 @@ import logging
 from typing import TypeVar, Union
 
 from nest.common.exceptions import UnknownModuleException
-from nest.common.nest_module import NestModule, ModuleCompiler
+from nest.core.nest_module import NestModule, ModuleCompiler
 from nest.core.pynest_container import PyNestContainer
 
 T = TypeVar("T")

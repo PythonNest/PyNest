@@ -2,8 +2,8 @@ import pytest
 from fastapi import FastAPI
 
 from nest.core import Injectable, Module, PyNestContainer
-from nest.web import (Controller, Get, PyNestFastapiApp, PyNestWebFactory,
-                      RoutesResolver)
+from nest.web import Controller, Get, PyNestWebFactory
+from nest.web.route_resolver import RoutesResolver
 
 
 @Injectable

@@ -1,6 +1,6 @@
 import pytest
 
-from nest.web import PyNestFastapiApp
+from nest.web.pynest_fastapi_application import PyNestFastapiApp
 from tests.test_core import test_container, test_resolver
 from tests.test_core.test_pynest_factory import test_server
 

@@ -11,7 +11,7 @@ from nest.common.exceptions import (
     UnknownModuleException,
 )
 from nest.core.nest_module import (
-    Module,
+    NestModule,
     ModuleCompiler,
     ModuleFactory,
     ModulesContainer,
@@ -95,7 +95,7 @@ class PyNestContainer:
             return {"module_ref": self.modules.get(token), "inserted": False}
         return {"module_ref": self.register_module(module_factory), "inserted": True}
 
-    def register_module(self, module_factory: ModuleFactory) -> Module:
+    def register_module(self, module_factory: ModuleFactory) -> NestModule:
         """
         Register a module in the container.
 
@@ -111,7 +111,7 @@ class PyNestContainer:
             Module: The module reference that has been registered in the container.
 
         """
-        module_ref = Module(module_factory.type, self)
+        module_ref = NestModule(module_factory.type, self)
         module_ref.token = module_factory.token
         self._modules[module_factory.token] = module_ref
 
@@ -140,7 +140,7 @@ class PyNestContainer:
         if not self.modules.has(token):
             return
         module_metadata = self._modules_metadata.get(token)
-        module_ref: Module = self.modules.get(token)
+        module_ref: NestModule = self.modules.get(token)
         imports_mod: List[Any] = module_metadata.get("imports")
         self.add_modules(imports_mod)
         module_ref.add_imports(imports_mod)
@@ -158,7 +158,7 @@ class PyNestContainer:
 
     def add_provider(self, token: str, provider):
         """Add a provider to a module."""
-        module_ref: Module = self.modules[token]
+        module_ref: NestModule = self.modules[token]
         if not provider:
             raise CircularDependencyException(module_ref.metatype)
 
@@ -200,7 +200,7 @@ class PyNestContainer:
         """Add a controller to a module."""
         if not self.modules.has(token):
             raise UnknownModuleException()
-        module_ref: Module = self.modules[token]
+        module_ref: NestModule = self.modules[token]
         module_ref.add_controller(controller)
         if hasattr(controller, DEPENDENCIES):
             for provider_name, provider_type in getattr(
@@ -228,5 +228,5 @@ class PyNestContainer:
 
     # UNUSED: This function is currently not used but retained for potential future use.
     # It retrieves a module from the container by its key.
-    def get_module_by_key(self, module_key: str) -> Module:
+    def get_module_by_key(self, module_key: str) -> NestModule:
         return self._modules[module_key]

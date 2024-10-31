@@ -40,7 +40,7 @@ python-dotenv = { version = "^1.0.1", optional = true }
 greenlet = { version = "^3.1.1", optional = true }
 
 [tool.poetry.extras]
-web = ["fastapi", "pydantic", "uvicorn"]
+fastapi = ["fastapi", "pydantic", "uvicorn"]
 postgres = ["sqlalchemy", "asyncpg", "psycopg2", "alembic", "greenlet", "python-dotenv"]
 mongo = ["beanie", "python-dotenv"]
 test = ["pytest"]
