@@ -2,8 +2,7 @@ from functools import partial
 
 import click
 
-from nest.core.utils import (get_instance_variables, parse_dependencies,
-                             parse_params)
+from nest.core.utils import get_instance_variables, parse_dependencies, parse_params
 
 
 def CliController(name: str, **kwargs):

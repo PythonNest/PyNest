@@ -2,8 +2,7 @@ from typing import Callable, Optional, Type
 
 from injector import inject
 
-from nest.common.constants import (DEPENDENCIES, INJECTABLE_NAME,
-                                   INJECTABLE_TOKEN)
+from nest.common.constants import DEPENDENCIES, INJECTABLE_NAME, INJECTABLE_TOKEN
 from nest.core.utils import parse_dependencies
 
 

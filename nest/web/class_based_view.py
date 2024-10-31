@@ -4,8 +4,17 @@ Source: https://github.com/dmontagu/fastapi-utils/blob/master/fastapi_utils/cbv.
 """
 
 import inspect
-from typing import (Any, Callable, ClassVar, List, Type, TypeVar, Union,
-                    get_origin, get_type_hints)
+from typing import (
+    Any,
+    Callable,
+    ClassVar,
+    List,
+    Type,
+    TypeVar,
+    Union,
+    get_origin,
+    get_type_hints,
+)
 
 from fastapi import APIRouter, Depends
 from starlette.routing import Route, WebSocketRoute

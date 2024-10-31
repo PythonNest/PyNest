@@ -1,4 +1,4 @@
-from nest.database.base_config import BaseProvider
+from nest.database.base_config import BaseProvider, ConfigFactoryBase
 from urllib.parse import urlencode
 
 
@@ -83,8 +83,6 @@ class MongoDBConfig(BaseProvider):
         return uri
 
 
-
-
 class ConfigFactory(ConfigFactoryBase):
     """
     Factory class for retrieving the appropriate ORM configuration based on the database type.
@@ -119,4 +117,3 @@ class ConfigFactory(ConfigFactoryBase):
             return MongoDBConfig
         else:
             raise Exception(f"Database type {self.db_type} is not supported")
-
