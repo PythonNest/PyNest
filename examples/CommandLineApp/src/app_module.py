@@ -1,6 +1,5 @@
+from nest.cli.cli_factory import CLIAppFactory
 from nest.core import Module
-from nest.core.cli_factory import CLIAppFactory
-from nest.core.pynest_factory import PyNestFactory
 
 from .app_controller import AppController
 from .app_service import AppService

@@ -1,4 +1,4 @@
-from nest.core import Controller, Get, HttpCode, Post
+from nest.web import Controller, Get, Post
 
 from .example_model import Example
 from .example_service import ExampleService
@@ -14,6 +14,5 @@ class ExampleController:
         return self.service.get_example()
 
     @Post("/")
-    @HttpCode(201)
     def add_example(self, example: Example):
         return self.service.add_example(example)

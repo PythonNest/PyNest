@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
-from nest.core import Module, PyNestFactory
+from nest.core import Module
+from nest.web import PyNestWebFactory
 
 from .app_controller import AppController
 from .app_service import AppService

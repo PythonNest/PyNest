@@ -1,4 +1,4 @@
-from nest.core.decorators.cli.cli_decorators import CliCommand, CliController
+from nest.cli.cli_decorators import CliCommand, CliController
 
 from .app_service import AppService
 
