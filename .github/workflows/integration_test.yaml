@@ -38,15 +38,15 @@ jobs:
           fi
 
           if [ "${{ matrix.app_type }}" == "Blank" ]; then
-            pynest generate application -n "$app_name"
+            poetry run pynest generate application -n "$app_name"
           else
-            pynest generate application -n "$app_name" -db sqlite $is_async
+            poetry run pynest generate application -n "$app_name" -db sqlite $is_async
             poetry add aiosqlite
           fi
 
           cd "$app_name"
-          pynest generate resource -n user
-          uvicorn "src.app_module:http_server" --host "0.0.0.0" --port 8000 --reload &
+          poetry run pynest generate resource -n user
+          poetry run uvicorn "src.app_module:http_server" --host "0.0.0.0" --port 8000 --reload &
 
       - name: Wait for the server to start
         run: sleep 10

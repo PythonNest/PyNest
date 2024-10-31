@@ -29,33 +29,33 @@ jobs:
           app_name="${{ matrix.app_type }}App"
           case "${{ matrix.app_type }}" in
             "Blank")
-              pynest generate application -n "$app_name"
+              poetry run pynest generate application -n "$app_name"
               ;;
             "SyncORM")
-              pynest generate application -n "$app_name" -db sqlite
+              poetry run pynest generate application -n "$app_name" -db sqlite
               ;;
             "AsyncORM")
-              pynest generate application -n "$app_name" -db sqlite --is-async
+              poetry run pynest generate application -n "$app_name" -db sqlite --is-async
               ;;
             "MongoDB")
-              pynest generate application -n "$app_name" -db mongodb
+              poetry run pynest generate application -n "$app_name" -db mongodb
               ;;
             "PostgresSync")
-              pynest generate application -n "$app_name" -db postgresql
+              poetry run pynest generate application -n "$app_name" -db postgresql
               ;;
             "PostgresAsync")
-              pynest generate application -n "$app_name" -db postgresql --is-async
+              poetry run pynest generate application -n "$app_name" -db postgresql --is-async
               ;;
             "MySQLSync")
-              pynest generate application -n "$app_name" -db mysql
+              poetry run pynest generate application -n "$app_name" -db mysql
               ;;
             "MySQLAsync")
-              pynest generate application -n "$app_name" -db mysql --is-async
+              poetry run pynest generate application -n "$app_name" -db mysql --is-async
               ;;
           esac
           
           cd "$app_name"
-          pynest generate resource -n user
+          poetry run pynest generate resource -n user
 
       - name: Verify Boilerplate
         run: |
