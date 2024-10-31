@@ -87,7 +87,7 @@ Let's go over the boilerplate code that support the mongo integration:
 `config.py`
 
 ```python
-from nest.core.database.odm_provider import OdmProvider
+from nest.database.odm_provider import OdmProvider
 from src.examples.examples_entity import Examples
 import os
 from dotenv import load_dotenv
@@ -231,7 +231,7 @@ Implement services to handle business logic.
 ```python
 from .examples_model import Examples
 from .examples_entity import Examples as ExamplesEntity
-from nest.core.decorators.database import db_request_handler
+from nest.database import db_request_handler
 from nest.core import Injectable
 
 
