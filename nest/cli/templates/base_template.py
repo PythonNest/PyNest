@@ -123,7 +123,7 @@ class {self.capitalized_module_name}Module:
 
     @staticmethod
     def app_controller_file():
-        return f"""from nest.core import Controller, Get, Post
+        return f"""from nest.web import Controller, Get, Post
 from .app_service import AppService
 
 
@@ -284,7 +284,11 @@ class AppService:
         return ast.parse(source)
 
     def append_import(
-        self, file_path: str, module_path: str, class_name: str, import_exception: str
+        self,
+        file_path: Union[str, Path],
+        module_path: str,
+        class_name: str,
+        import_exception: str,
     ) -> ast.Module:
         tree = self.get_ast_tree(file_path)
         import_node = ast.ImportFrom(
@@ -304,7 +308,7 @@ class AppService:
 
         return tree
 
-    def append_module_to_app(self, path_to_app_py: str):
+    def append_module_to_app(self, path_to_app_py: Union[str, Path]):
         tree = self.append_import(
             file_path=path_to_app_py,
             module_path=f"src.{self.module_name}.{self.module_name}_module",
@@ -366,9 +370,9 @@ class AppService:
         raise NotImplementedError
 
     def generate_empty_controller_file(self) -> str:
-        return f"""from nest.core import Controller
+        return f"""from nest.web import Controller
 
-@Controller("{self.module_name}")
+@Controller("{self.module_name}", tag="{self.module_name}")
 class {self.capitalized_module_name}Controller:
     ...
     """

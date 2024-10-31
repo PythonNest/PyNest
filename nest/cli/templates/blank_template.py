@@ -9,7 +9,8 @@ class BlankTemplate(BaseTemplate, ABC):
         super().__init__(module_name)
 
     def app_file(self):
-        return f"""from nest.core import PyNestFactory, Module
+        return f"""from nest.core import Module
+from nest.web import PyNestWebFactory
         
 from .app_controller import AppController
 from .app_service import AppService
@@ -20,7 +21,7 @@ class AppModule:
     pass
 
 
-app = PyNestFactory.create(
+app = PyNestWebFactory.create(
     AppModule,
     description="This is my PyNest app.",
     title="PyNest Application",
@@ -73,12 +74,12 @@ class {self.capitalized_module_name}Service:
 """
 
     def controller_file(self):
-        return f"""from nest.core import Controller, Get, Post
+        return f"""from nest.web import Controller, Get, Post
 from .{self.module_name}_service import {self.capitalized_module_name}Service
 from .{self.module_name}_model import {self.capitalized_module_name}
 
 
-@Controller("{self.module_name}")
+@Controller("{self.module_name}", tag="{self.module_name}")
 class {self.capitalized_module_name}Controller:
 
     def __init__(self, {self.module_name}_service: {self.capitalized_module_name}Service):

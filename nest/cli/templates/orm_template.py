@@ -13,7 +13,8 @@ class ORMTemplate(BaseTemplate, ABC):
         self.db_type = db_type
 
     def app_file(self):
-        return f"""from nest.core import PyNestFactory, Module
+        return f"""from nest.core import Module
+from nest.web import PyNestWebFactory
 from .config import config
 from .app_controller import AppController
 from .app_service import AppService
@@ -24,7 +25,7 @@ class AppModule:
     pass
 
 
-app = PyNestFactory.create(
+app = PyNestWebFactory.create(
     AppModule,
     description="This is my PyNest app.",
     title="PyNest Application",
@@ -94,11 +95,11 @@ class {self.capitalized_module_name}(config.Base):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
 from src.config import config
-from nest.core.decorators.database import db_request_handler
+from nest.database.utils import db_request_handler
 from nest.core import Injectable
 
 
-@Injectable
+@Injectable()
 class {self.capitalized_module_name}Service:
 
     def __init__(self):
@@ -108,7 +109,7 @@ class {self.capitalized_module_name}Service:
     @db_request_handler
     def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
         new_{self.module_name} = {self.capitalized_module_name}Entity(
-            **{self.module_name}.dict()
+            **{self.module_name}.model_dump()
         )
         self.session.add(new_{self.module_name})
         self.session.commit()
@@ -121,13 +122,13 @@ class {self.capitalized_module_name}Service:
 """
 
     def controller_file(self):
-        return f"""from nest.core import Controller, Get, Post
+        return f"""from nest.web import Controller, Get, Post
 
 from .{self.module_name}_service import {self.capitalized_module_name}Service
 from .{self.module_name}_model import {self.capitalized_module_name}
 
 
-@Controller("{self.module_name}")
+@Controller("{self.module_name}", tag="{self.module_name}")
 class {self.capitalized_module_name}Controller:
 
     def __init__(self, {self.module_name}_service: {self.capitalized_module_name}Service):
@@ -206,7 +207,8 @@ config:
 
 class AsyncORMTemplate(ORMTemplate, ABC):
     def app_file(self):
-        return f"""from nest.core import PyNestFactory, Module
+        return f"""from nest.web import PyNestWebFactory
+from nest.core import Module
 from .config import config
 from .app_controller import AppController
 from .app_service import AppService
@@ -217,7 +219,7 @@ class AppModule:
     pass
 
 
-app = PyNestFactory.create(
+app = PyNestWebFactory.create(
     AppModule,
     description="This is my Async PyNest app.",
     title="PyNest Application",
@@ -270,7 +272,7 @@ class {self.capitalized_module_name}Service:
     @async_db_request_handler
     async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}, session: AsyncSession):
         new_{self.module_name} = {self.capitalized_module_name}Entity(
-            **{self.module_name}.dict()
+            **{self.module_name}.model_dump()
         )
         session.add(new_{self.module_name})
         await session.commit()
@@ -293,7 +295,7 @@ from .{self.module_name}_service import {self.capitalized_module_name}Service
 from .{self.module_name}_model import {self.capitalized_module_name}
 
 
-@Controller("{self.module_name}")
+@Controller("{self.module_name}", tag="{self.module_name}")
 class {self.capitalized_module_name}Controller:
 
     def __init__(self, {self.module_name}_service: {self.capitalized_module_name}Service):

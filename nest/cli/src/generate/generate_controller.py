@@ -1,9 +1,8 @@
 import click
-from click import Option
 
+from nest.cli.cli_decorators import CliCommand, CliController
 from nest.cli.src.generate.generate_model import SharedOptions
 from nest.cli.src.generate.generate_service import GenerateService
-from nest.core.decorators.cli.cli_decorators import CliCommand, CliController
 
 
 @CliController("generate")

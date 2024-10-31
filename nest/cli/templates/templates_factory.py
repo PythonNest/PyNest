@@ -6,11 +6,10 @@ from nest.cli.templates.blank_template import BlankTemplate
 from nest.cli.templates.cli_templates import ClickTemplate
 from nest.cli.templates.mongo_template import MongoTemplate
 from nest.cli.templates.mysql_template import AsyncMySQLTemplate, MySQLTemplate
-from nest.cli.templates.postgres_template import (
-    AsyncPostgresqlTemplate,
-    PostgresqlTemplate,
-)
-from nest.cli.templates.sqlite_template import AsyncSQLiteTemplate, SQLiteTemplate
+from nest.cli.templates.postgres_template import (AsyncPostgresqlTemplate,
+                                                  PostgresqlTemplate)
+from nest.cli.templates.sqlite_template import (AsyncSQLiteTemplate,
+                                                SQLiteTemplate)
 
 
 class TemplateFactory:
