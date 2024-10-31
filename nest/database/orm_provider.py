@@ -3,10 +3,11 @@ from contextlib import asynccontextmanager
 from typing import Any, Dict
 
 from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
+                                    create_async_engine)
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-from nest.core.database.orm_config import AsyncConfigFactory, ConfigFactory
+from nest.database.orm_config import AsyncConfigFactory, ConfigFactory
 
 
 class Base(DeclarativeBase):

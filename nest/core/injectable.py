@@ -2,8 +2,9 @@ from typing import Callable, Optional, Type
 
 from injector import inject
 
-from nest.common.constants import DEPENDENCIES, INJECTABLE_NAME, INJECTABLE_TOKEN
-from nest.core.decorators.utils import parse_dependencies
+from nest.common.constants import (DEPENDENCIES, INJECTABLE_NAME,
+                                   INJECTABLE_TOKEN)
+from nest.core.utils import parse_dependencies
 
 
 def Injectable(target_class: Optional[Type] = None, *args, **kwargs) -> Callable:

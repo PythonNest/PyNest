@@ -1,4 +1,5 @@
-from nest.core.database.base_config import BaseConfig, BaseProvider, ConfigFactoryBase
+from nest.database.base_config import (BaseConfig, BaseProvider,
+                                       ConfigFactoryBase)
 
 
 class PostgresConfig(BaseProvider):

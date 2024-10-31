@@ -6,7 +6,7 @@ from nest.core.pynest_container import PyNestContainer
 from nest.core.pynest_factory import AbstractPyNestFactory, ModuleType
 
 
-class CLIAppFactory(AbstractPyNestFactory):
+class PyNestCLIFactory(AbstractPyNestFactory):
     def __init__(self):
         super().__init__()
 

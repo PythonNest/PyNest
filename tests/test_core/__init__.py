@@ -1,16 +1,9 @@
 import pytest
 from fastapi import FastAPI
 
-from nest.common.route_resolver import RoutesResolver
-from nest.core import (
-    Controller,
-    Get,
-    Injectable,
-    Module,
-    PyNestContainer,
-    PyNestFactory,
-)
-from nest.core.pynest_application import PyNestApp
+from nest.core import Injectable, Module, PyNestContainer
+from nest.web import (Controller, Get, PyNestFastapiApp, PyNestWebFactory,
+                      RoutesResolver)
 
 
 @Injectable
@@ -45,7 +38,7 @@ def test_module():
 
 @pytest.fixture
 def test_server() -> FastAPI:
-    server = PyNestFactory._create_server(
+    server = PyNestWebFactory._create_server(
         title="Test Server",
         description="This is a test server",
         version="1.0.0",
