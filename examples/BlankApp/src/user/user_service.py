@@ -1,6 +1,6 @@
 import time
 
-from nest.core.decorators import Injectable
+from nest.core import Injectable
 
 from .user_model import User
 
@@ -9,8 +9,6 @@ from .user_model import User
 class UserService:
     def __init__(self):
         self.database = []
-        time.sleep(5)
-        print("UserService initialized")
 
     def get_user(self):
         return self.database

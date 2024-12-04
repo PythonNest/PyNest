@@ -12,7 +12,7 @@ class SQLiteTemplate(ORMTemplate, ABC):
         )
 
     def config_file(self):
-        return """from nest.core.database.orm_provider import OrmProvider
+        return """from nest.database.orm_provider import OrmProvider
 import os
 from dotenv import load_dotenv
 
@@ -45,7 +45,7 @@ class AsyncSQLiteTemplate(AsyncORMTemplate, ABC):
         )
 
     def config_file(self):
-        return """from nest.core.database.orm_provider import AsyncOrmProvider
+        return """from nest.database.orm_provider import AsyncOrmProvider
 import os
 from dotenv import load_dotenv
 

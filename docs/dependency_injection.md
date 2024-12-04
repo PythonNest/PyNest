@@ -43,7 +43,7 @@ class LoggerModule:
 ### Injecting the Provider into a Controller
 ```python
 # app_controller.py
-from nest.core import Controller, Get
+from nest.web import Controller, Get
 from src.providers.logger.logger_service import LoggerService
 
 @Controller('/')

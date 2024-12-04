@@ -16,7 +16,7 @@ class MongoTemplate(AsyncORMTemplate, ABC):
     def config_file(self):
         return f"""import os
 from dotenv import load_dotenv
-from nest.core.database.odm_provider import OdmProvider
+from nest.database.odm_provider import OdmProvider
 
 load_dotenv()
 
@@ -47,7 +47,7 @@ class {self.capitalized_module_name}(Document):
     name: str
     
     class Config:
-        schema_extra = {{
+        json_schema_extra = {{
             "example": {{
                 "name": "Example Name",
             }}
@@ -55,13 +55,13 @@ class {self.capitalized_module_name}(Document):
 """
 
     def controller_file(self):
-        return f"""from nest.core import Controller, Get, Post
+        return f"""from nest.web import Controller, Get, Post
 
 from .{self.module_name}_service import {self.capitalized_module_name}Service
 from .{self.module_name}_model import {self.capitalized_module_name}
 
 
-@Controller("{self.module_name}")
+@Controller("{self.module_name}", tag="{self.module_name}")
 class {self.capitalized_module_name}Controller:
 
     def __init__(self, {self.module_name}_service: {self.capitalized_module_name}Service):
@@ -79,22 +79,19 @@ class {self.capitalized_module_name}Controller:
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
-from nest.core.decorators.database import db_request_handler
 from nest.core import Injectable
 
 
-@Injectable
+@Injectable()
 class {self.capitalized_module_name}Service:
 
-    @db_request_handler
     async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
         new_{self.module_name} = {self.capitalized_module_name}Entity(
-            **{self.module_name}.dict()
+            **{self.module_name}.model_dump()
         )
         await new_{self.module_name}.save()
         return new_{self.module_name}.id
 
-    @db_request_handler
     async def get_{self.module_name}(self):
         return await {self.capitalized_module_name}Entity.find_all().to_list()
 """

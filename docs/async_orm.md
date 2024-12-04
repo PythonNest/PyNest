@@ -35,7 +35,7 @@ pip install asyncpg
 #### Create a new project
 
 ```bash
-pynest create-nest-app -n my_app_name -db postgresql --is-async
+pynest generate application -n my_app_name -db postgresql --is-async
 ```
 
 this command will create a new project with the following structure:
@@ -76,21 +76,21 @@ once you have created your app, this is the code that support the asynchronous f
 `config.py`
 
 ```python
-from nest.core.database.orm_provider import AsyncOrmProvider
+from nest.database.orm_provider import AsyncOrmProvider
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
 config = AsyncOrmProvider(
-    db_type="postgresql",
-    config_params=dict(
-        host=os.getenv("POSTGRESQL_HOST", "localhost"),
-        db_name=os.getenv("POSTGRESQL_DB_NAME", "default_nest_db"),
-        user=os.getenv("POSTGRESQL_USER", "postgres"),
-        password=os.getenv("POSTGRESQL_PASSWORD", "postgres"),
-        port=int(os.getenv("POSTGRESQL_PORT", 5432)),
-    )
+   db_type="postgresql",
+   config_params=dict(
+      host=os.getenv("POSTGRESQL_HOST", "localhost"),
+      db_name=os.getenv("POSTGRESQL_DB_NAME", "default_nest_db"),
+      user=os.getenv("POSTGRESQL_USER", "postgres"),
+      password=os.getenv("POSTGRESQL_PASSWORD", "postgres"),
+      port=int(os.getenv("POSTGRESQL_PORT", 5432)),
+   )
 )
 ```
 
@@ -116,7 +116,7 @@ class AppService:
 `app_controller.py`
 
 ```python
-from nest.core import Controller, Get
+from nest.web import Controller, Get
 
 from .app_service import AppService
 
@@ -143,7 +143,8 @@ from .example.example_module import ExampleModule
 from .app_controller import AppController
 from .app_service import AppService
 
-from nest.core import Module, PyNestFactory
+from nest.core import Module
+from nest.web import PyNestWebFactory
 
 
 @Module(
@@ -155,7 +156,7 @@ class AppModule:
     pass
 
 
-app = PyNestFactory.create(AppModule, description="This is my FastAPI app drive by Async ORM Engine", title="My App",
+app = PyNestWebFactory.create(AppModule, description="This is my FastAPI app drive by Async ORM Engine", title="My App",
                            version="1.0.0", debug=True)
 
 http_server = app.get_server()
@@ -171,7 +172,7 @@ decorator.
 The imports array includes the modules required by this module. In this case, ExampleModule is imported. The controllers
 and providers arrays are empty here, indicating this module doesn't directly provide any controllers or services.
 
-`PyNestFactory.create()` is a command to create an instance of the application.
+`PyNestWebFactory.create()` is a command to create an instance of the application.
 The AppModule is passed as an argument, which acts as the root module of the application.
 Additional metadata like description, title, version, and debug flag are also provided
 
@@ -225,7 +226,7 @@ There are two ways of creating service.
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from nest.core.decorators.database import async_db_request_handler
+from nest.database import async_db_request_handler
 from nest.core import Injectable
 
 from .example_entity import Example as ExampleEntity
@@ -234,18 +235,18 @@ from .example_model import Example
 
 @Injectable
 class ExampleService:
-    @async_db_request_handler
-    async def add_example(self, example: Example, session: AsyncSession):
-        new_example = ExampleEntity(**example.dict())
-        session.add(new_example)
-        await session.commit()
-        return new_example.id
+   @async_db_request_handler
+   async def add_example(self, example: Example, session: AsyncSession):
+      new_example = ExampleEntity(**example.dict())
+      session.add(new_example)
+      await session.commit()
+      return new_example.id
 
-    @async_db_request_handler
-    async def get_example(self, session: AsyncSession):
-        query = select(ExampleEntity)
-        result = await session.execute(query)
-        return result.scalars().all()
+   @async_db_request_handler
+   async def get_example(self, session: AsyncSession):
+      query = select(ExampleEntity)
+      result = await session.execute(query)
+      return result.scalars().all()
 ```
 
 2. In that way, the service init the async session in the constructor, and each function that depends on the database is
@@ -255,7 +256,7 @@ class ExampleService:
 from .examples_model import Examples
 from .examples_entity import Examples as ExamplesEntity
 from src.config import config
-from nest.core.decorators.database import async_db_request_handler
+from nest.database import async_db_request_handler
 from nest.core import Injectable
 from sqlalchemy import select
 
@@ -263,26 +264,26 @@ from sqlalchemy import select
 @Injectable
 class ExamplesService:
 
-    def __init__(self):
-        self.orm_config = config
-        self.session = self.orm_config.get_session
+   def __init__(self):
+      self.orm_config = config
+      self.session = self.orm_config.get_session
 
-    @async_db_request_handler
-    async def add_examples(self, examples: Examples):
-        examples_entity = ExamplesEntity(
-            **examples.dict()
-        )
-        async with self.session() as session:
-            session.add(examples_entity)
-            await session.commit()
-            return examples_entity.id
+   @async_db_request_handler
+   async def add_examples(self, examples: Examples):
+      examples_entity = ExamplesEntity(
+         **examples.dict()
+      )
+      async with self.session() as session:
+         session.add(examples_entity)
+         await session.commit()
+         return examples_entity.id
 
-    @async_db_request_handler
-    async def get_examples(self):
-        query = select(ExamplesEntity)
-        async with self.session() as session:
-            result = await session.execute(query)
-            return result.scalars().all()
+   @async_db_request_handler
+   async def get_examples(self):
+      query = select(ExamplesEntity)
+      async with self.session() as session:
+         result = await session.execute(query)
+         return result.scalars().all()
 ```
 
 create a controller to handle the requests and responses. The controller should call the service to execute business
@@ -293,7 +294,7 @@ Here we have also two ways of creating the controller.
 1. In that way, the controller's functions are getting the async session from the config
 
 ```python
-from nest.core import Controller, Get, Post, Depends
+from nest.web import Controller, Get, Post, Depends
 
 from .examples_service import ExamplesService
 from .examples_model import Examples
@@ -321,7 +322,7 @@ class ExamplesController:
    in his constructor.
 
 ```python
-from nest.core import Controller, Get, Post
+from nest.web import Controller, Get, Post
 
 from .examples_service import ExamplesService
 from .examples_model import Examples

@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from nest.core.database.odm_provider import OdmProvider
+from nest.database.odm_provider import OdmProvider
 
 from .example.example_entity import Example
 from .product.product_entity import Product

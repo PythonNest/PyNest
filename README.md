@@ -23,20 +23,26 @@
 
 PyNest is designed to help structure your APIs in an intuitive, easy to understand, and enjoyable way.
 
-With PyNest, you can build scalable and maintainable APIs with ease. The framework supports dependency injection, type
+`With PyNest, you can build scalable and maintainable APIs with ease. The framework supports dependency injection, type
 annotations, decorators, and code generation, making it easy to write clean and testable code.
 
 This framework is not a direct port of NestJS to Python but rather a re-imagining of the framework specifically for
 Python developers, including backend engineers and ML engineers. It aims to assist them in building better and faster
 APIs for their data applications.
-
+`
 ## Getting Started
 
 To get started with PyNest, you'll need to install it using pip:
 
-```bash
-pip install pynest-api
-```
+=== "pip"
+    ```bash
+    pip install pynest-api
+    ```
+
+=== "Poetry"
+    ```bash
+    poetry add pynest-api
+    ```
 
 ### Start with cli
 
@@ -47,13 +53,15 @@ pynest generate appplication -n my_app_name
 this command will create a new project with the following structure:
 
 ```text
-├── app.py
 ├── main.py
 ├── requirements.txt
 ├── .gitignore
 ├── README.md
 ├── src
 │    ├── __init__.py
+│    ├── app_module.py
+│    ├── app_controller.py
+│    ├── app_service.py
 ```
 
 once you have created your app, get into the folder and run the following command:
@@ -65,7 +73,7 @@ cd my_app_name
 run the server with the following command:
 
 ```bash
-uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
+uvicorn "src.app_module:http_server" --host "0.0.0.0" --port "8000" --reload
 ```
 
 Now you can visit [OpenAPI](http://localhost:8000/docs) in your browser to see the default API documentation.
@@ -75,20 +83,20 @@ Now you can visit [OpenAPI](http://localhost:8000/docs) in your browser to see t
 To add a new module to your application, you can use the pynest generate module command:
 
 ```bash
-pynest generate resource -n users
+pynest generate resource -n user
 ```
 
-This will create a new resource called ```users``` in your application with the following structure under the ```src```
+This will create a new resource called ```user``` in your application with the following structure under the ```src```
 folder:
 
 ```text
 ├── users
 │    ├── __init__.py
-│    ├── users_controller.py
-│    ├── users_service.py
-│    ├── users_model.py
-│    ├── users_entity.py
-│    ├── users_module.py
+│    ├── user_controller.py
+│    ├── user_service.py
+│    ├── user_model.py
+│    ├── user_entity.py
+│    ├── user_module.py
 ```
 
 The users module will immediately register itself with the application and will be available for use.
@@ -113,6 +121,7 @@ and their descriptions:
     - `--app-name`/`-n`: The name of the nest app (required).
     - `--db-type`/`-db`: The type of the database (optional). You can specify PostgreSQL, MySQL, SQLite, or MongoDB.
     - `--is-async`: Whether the project should be asynchronous (optional, default is False).
+    - `--is-cli`: For creating CLI-based application (optional, default is False).
 
 ### `generate` command group
 
@@ -133,7 +142,7 @@ and their descriptions:
   `pynest generate application -n my_app_name -db postgresql --is-async`
 
 * create new module -
-  `pynest generate resource -n users`
+  `pynest generate resource -n user`
 
 ## Key Features
 
@@ -162,15 +171,6 @@ controllers, services, and providers with types to make your code more robust.
 PyNest includes a code generation tool that can create boilerplate code for modules, controllers, and other components.
 This saves you time and helps you focus on writing the code that matters.
 
-## Future Plans
-
-- [ ] Create plugins Marketplace for modules where developers can share their modules and download modules created by
-  others.
-- [ ] Implement IOC mechanism and introduce Module decorator
-- [ ] Add support for new databases
-- [ ] Create out-of-the-box authentication module that can be easily integrated into any application.
-- [ ] Add support for other testing frameworks and create testing templates.
-- [ ] Add support for other web frameworks (Litestar, blackship, etc.) - Same Architecture, different engine.
 
 ## Contributing
 

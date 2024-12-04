@@ -2,9 +2,9 @@ from typing import Optional, Type
 
 from fastapi.routing import APIRouter
 
-from nest.core.decorators.class_based_view import class_based_view as ClassBasedView
-from nest.core.decorators.http_method import HTTPMethod
-from nest.core.decorators.utils import get_instance_variables, parse_dependencies
+from nest.core.utils import get_instance_variables, parse_dependencies
+from nest.web.class_based_view import class_based_view as ClassBasedView
+from nest.web.http_method import HTTPMethod
 
 
 def Controller(prefix: Optional[str] = None, tag: Optional[str] = None):

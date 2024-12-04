@@ -1,4 +1,4 @@
-from nest.core import Controller, Get, Post
+from nest.web import Controller, Get, Post
 
 from .product_model import Product
 from .product_service import ProductService

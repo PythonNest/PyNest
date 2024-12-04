@@ -2,7 +2,7 @@ import logging
 from typing import TypeVar, Union
 
 from nest.common.exceptions import UnknownModuleException
-from nest.common.module import Module, ModuleCompiler
+from nest.core.nest_module import NestModule, ModuleCompiler
 from nest.core.pynest_container import PyNestContainer
 
 T = TypeVar("T")
@@ -60,7 +60,7 @@ class PyNestApplicationContext:
         return self
 
     def __init__(
-        self, container: PyNestContainer, context_module: Union[Module, None] = None
+        self, container: PyNestContainer, context_module: Union[NestModule, None] = None
     ):
         """
         Constructor for the PyNestApplicationContext.
@@ -70,7 +70,7 @@ class PyNestApplicationContext:
             context_module (Union[Module, None], optional): The initial context module of the application.
         """
         self.container = container
-        self.context_module: Module = context_module
+        self.context_module: NestModule = context_module
         self.logger = logging.getLogger(PyNestApplicationContext.__name__)
 
     def select_context_module(self):

@@ -2,12 +2,12 @@ from typing import Any
 
 from fastapi import FastAPI
 
-from nest.common.route_resolver import RoutesResolver
 from nest.core.pynest_app_context import PyNestApplicationContext
 from nest.core.pynest_container import PyNestContainer
+from nest.web.route_resolver import RoutesResolver
 
 
-class PyNestApp(PyNestApplicationContext):
+class PyNestFastapiApp(PyNestApplicationContext):
     """
     PyNestApp is the main application class for the PyNest framework,
     managing the container and HTTP server.

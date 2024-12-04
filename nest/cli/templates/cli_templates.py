@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from nest.cli.templates.base_template import BaseTemplate
-from nest.core.decorators.cli.cli_decorators import CliCommand, CliController
 
 
 class ClickTemplate(BaseTemplate):
@@ -9,8 +8,7 @@ class ClickTemplate(BaseTemplate):
         super().__init__(module_name)
 
     def app_file(self):
-        return f"""from nest.core.pynest_factory import PyNestFactory
-from nest.core.cli_factory import CLIAppFactory
+        return f"""from nest.cli import PyNestCLIFactory
 from nest.core import Module
 from src.app_service import AppService
 from src.app_controller import AppController
@@ -25,10 +23,10 @@ class AppModule:
     pass
 
 
-cli_app = CLIAppFactory().create(AppModule)
+nest_app = PyNestCLIFactory().create(AppModule)
 
 if __name__ == "__main__":
-    cli_app()
+    nest_app()
 """
 
     def module_file(self):
@@ -46,7 +44,7 @@ class {self.module_name.capitalize()}Module:
 """
 
     def controller_file(self):
-        return f"""from nest.core.decorators.cli.cli_decorators import CliCommand, CliController
+        return f"""from nest.cli import CliCommand, CliController
 from src.{self.module_name}.{self.module_name}_service import {self.module_name.capitalize()}Service
 
 @CliController("{self.module_name}")
@@ -78,7 +76,7 @@ class {self.module_name.capitalize()}Service:
 """
 
     def app_controller_file(self):
-        return f"""from nest.core.decorators.cli.cli_decorators import CliCommand, CliController
+        return f"""from nest.cli import CliCommand, CliController
 from src.app_service import AppService
         
         
@@ -105,10 +103,10 @@ import click
 class AppService:
 
     def version(self):
-        print(click.style("1.0.0", fg="blue"))
+        click.echo(click.style("1.0.0", fg="blue"))
         
     def info(self):
-        print(click.style("This is a cli nest app!", fg="green"))
+        click.echo(click.style("This is a cli nest app!", fg="green"))
 """
 
     def create_module(self, module_name: str, src_path: Path):

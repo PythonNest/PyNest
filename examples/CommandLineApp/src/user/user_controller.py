@@ -1,7 +1,7 @@
 import click
 
 from examples.CommandLineApp.src.user.user_service import UserService
-from nest.core.decorators.cli.cli_decorators import CliCommand, CliController
+from nest.cli.cli_decorators import CliCommand, CliController
 
 
 class ListOptions:

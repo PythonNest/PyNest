@@ -1,9 +1,7 @@
-import os
-
 import pytest
 
-from nest.core.database.odm_config import ConfigFactory, MongoDBConfig
-from nest.core.database.odm_provider import OdmProvider
+from nest.database.odm_config import MongoDBConfig
+from nest.database.odm_provider import OdmProvider
 
 
 @pytest.fixture(scope="module")
@@ -36,7 +34,7 @@ def test_odm_service_definition(odm_service):
 
 def test_odm_service_config_url(odm_service):
     config_url = odm_service.config_url
-    assert config_url == "mongodb://user:password@host:port"
+    assert config_url == "mongodb://user:password@host:port/db_name"
 
 
 def test_mongo_config_definition(mongodb_config):

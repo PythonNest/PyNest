@@ -37,22 +37,27 @@ read more about motor [here](https://motor.readthedocs.io/en/stable/)
 
 Ensure you have the latest version of PyNest and SQLAlchemy 2.0 installed. You can install them using pip:
 
-```bash
-pip install pynest-api
-```
+=== "pip"
+    ```bash
+    pip install pynest-api[mongo, fastapi]
+    ```
+
+=== "Poetry"
+    ```bash
+    poetry add pynest-api[mongo, fastapi]
+    ```
 
 ## Start with cli
 
 #### Create a new project
 
 ```bash
-pynest create-nest-app -n my_app_name -db mongodb
+pynest generate application -n my_app_name -db mongodb
 ```
 
 this command will create a new project with the following structure:
 
 ```text
-├── app.py
 ├── main.py
 |── requirements.txt
 |── README.md
@@ -67,19 +72,19 @@ this command will create a new project with the following structure:
 once you have created your app, you can create a new module:
 
 ```bash
-pynest g module -n examples
+pynest g module -n example
 ```
 
-This will create a new module called examples in your application with the following structure under the src folder:
+This will create a new module called `example` in your application with the following structure under the src folder:
 
 ```text
-├── examples
+├── example
 │    ├── __init__.py
-│    ├── examples_controller.py
-│    ├── examples_service.py
-│    ├── examples_model.py
-│    ├── examples_entity.py
-│    ├── examples_module.py
+│    ├── example_controller.py
+│    ├── example_service.py
+│    ├── example_model.py
+│    ├── example_entity.py
+│    ├── example_module.py
 ```
 
 Let's go over the boilerplate code that support the mongo integration:
@@ -87,26 +92,26 @@ Let's go over the boilerplate code that support the mongo integration:
 `config.py`
 
 ```python
-from nest.core.database.odm_provider import OdmProvider
-from src.examples.examples_entity import Examples
+from nest.database.odm_provider import OdmProvider
+from src.example.example_entity import Example
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
 config = OdmProvider(
-    config_params={{
+    config_params={
         "db_name": os.getenv("DB_NAME", "default_nest_db"),
         "host": os.getenv("DB_HOST", "localhost"),
         "user": os.getenv("DB_USER", "root"),
         "password": os.getenv("DB_PASSWORD", "root"),
         "port": os.getenv("DB_PORT", 27017),
-    }},
-    document_models=[Examples]
+    },
+    document_models=[Example]
 )       
 ```
 
-Note: you can add any parameters that needed in order to configure the database connection.
+Note: you can add any parameters that needed in order to configure the database connection inside the config params.
 
 `app_service.py`
 
@@ -127,9 +132,9 @@ class AppService:
 `app_controller.py`
 
 ```python
-from nest.core import Controller, Get
+from nest.web import Controller, Get
 
-from .app_service import AppService
+from src.app_service import AppService
 
 
 @Controller("/")
@@ -148,17 +153,18 @@ Now we need to declare the App object and register the module in
 `app_module.py`
 
 ```python
-from .config import config
+from src.config import config
 
-from nest.core import Module, PyNestFactory
-from src.examples.examples_module import ExamplesModule
+from nest.core import Module
+from nest.web import PyNestWebFactory
+from src.example.example_module import ExampleModule
 
-from .app_controller import AppController
-from .app_service import AppService
+from src.app_controller import AppController
+from src.app_service import AppService
 
 
 @Module(
-    imports=[ExamplesModule],
+    imports=[ExampleModule],
     controllers=[AppController],
     providers=[AppService],
 )
@@ -166,7 +172,7 @@ class AppModule:
     pass
 
 
-app = PyNestFactory.create(
+app = PyNestWebFactory.create(
     AppModule,
     description="This is my FastAPI app drive by MongoDB Engine",
     title="My App",
@@ -187,11 +193,11 @@ decorator.
 The imports array includes the modules required by this module. In this case, ExampleModule is imported. The controllers
 and providers arrays are empty here, indicating this module doesn't directly provide any controllers or services.
 
-`PyNestFactory.create()` is a command to create an instance of the application.
+`PyNestWebFactory.create()` is a command to create an instance of the application.
 The AppModule is passed as an argument, which acts as the root module of the application.
 Additional metadata like description, title, version, and debug flag are also provided
 
-`http_server: FastAPI = app.get_server()`: Retrieves the HTTP server instance from the application.
+`http_server = app.get_server()`: Retrieves the HTTP server instance from the application.
 
 ### Creating Entity
 
@@ -220,7 +226,7 @@ Define your model using Pydantic. For example, the Examples model:
 from pydantic import BaseModel
 
 
-class Examples(BaseModel):
+class Example(BaseModel):
     name: str
 ```
 
@@ -229,9 +235,9 @@ class Examples(BaseModel):
 Implement services to handle business logic.
 
 ```python
-from .examples_model import Examples
-from .examples_entity import Examples as ExamplesEntity
-from nest.core.decorators.database import db_request_handler
+from .example_model import Examples
+from .example_entity import Example as ExamplesEntity
+from nest.database import db_request_handler
 from nest.core import Injectable
 
 
@@ -239,15 +245,15 @@ from nest.core import Injectable
 class ExamplesService:
 
     @db_request_handler
-    async def add_examples(self, examples: Examples):
-        new_examples = ExamplesEntity(
-            **examples.dict()
+    async def add_example(self, example: Examples):
+        new_example = ExamplesEntity(
+            **example.dict()
         )
-        await new_examples.save()
-        return new_examples.id
+        await new_example.save()
+        return new_example.id
 
     @db_request_handler
-    async def get_examples(self):
+    async def get_example(self):
         return await ExamplesEntity.find_all().to_list()
 ```
 
@@ -255,25 +261,25 @@ create a controller to handle the requests and responses. The controller should 
 logic.
 
 ```python
-from nest.core import Controller, Get, Post
+from nest.web import Controller, Get, Post
 
-from .examples_service import ExamplesService
-from .examples_model import Examples
+from .example_service import ExampleService
+from .example_model import Example
 
 
-@Controller("examples")
-class ExamplesController:
+@Controller("example")
+class ExampleController:
 
-    def __init__(self, service: ExamplesService):
+    def __init__(self, service: ExampleService):
         self.service = service
 
     @Get("/")
-    async def get_examples(self):
-        return await self.service.get_examples()
+    async def get_example(self):
+        return await self.service.get_example()
 
     @Post("/")
-    async def add_examples(self, examples: Examples):
-        return await self.service.add_examples(examples)
+    async def add_example(self, example: Example):
+        return await self.service.add_example(example)
 ```
 
 ### Creating Module
@@ -282,15 +288,15 @@ Create a module to register the controller and service.
 
 ```python
 from nest.core import Module
-from .examples_controller import ExamplesController
-from .examples_service import ExamplesService
+from .example_controller import ExampleController
+from .example_service import ExampleService
 
 
 @Module(
-    controllers=[ExamplesController],
-    providers=[ExamplesService]
+    controllers=[ExampleController],
+    providers=[ExampleService]
 )
-class ExamplesModule:
+class ExampleModule:
     pass
 ```
 

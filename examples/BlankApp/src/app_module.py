@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
-from nest.core import Module, PyNestFactory
+from nest.core import Module
+from nest.web import PyNestWebFactory
 
 from .app_controller import AppController
 from .app_service import AppService
@@ -18,7 +19,7 @@ class AppModule:
     pass
 
 
-app = PyNestFactory.create(
+app = PyNestWebFactory.create(
     AppModule,
     description="This is my FastAPI app.",
     title="My App",

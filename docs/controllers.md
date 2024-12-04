@@ -9,7 +9,8 @@ This decorator is required to define a controller and specify an optional route 
 which helps group related routes and minimize repetitive code.
 
 ```python
-from nest.core import Controller, Get, Post
+from nest.web import Controller, Get, Post
+from src.book.book_service import BookService
 
 @Controller('/books')
 class BookController:
@@ -29,7 +30,7 @@ class BookController:
 Let's take this step by step:
 
 ```python
-from nest.core import Controller, Get, Post
+from nest.web import Controller, Get, Post
 ```
 
 PyNest exposes an api for creating Controllers, a class that is responsible for the module routing and requests handling.
@@ -76,7 +77,7 @@ Each controller can have multiple routes, and different routes can perform diffe
 
 ### Example
 ```python
-from nest.core import Controller, Get, Post
+from nest.web import Controller, Get, Post
 
 @Controller('/book')
 class BookController:
@@ -106,7 +107,7 @@ Since pynest is an abstraction of fastapi, we can use those methods in the same 
 
 ### Example
 ```python
-from nest.core import Controller, Get, Post
+from nest.web import Controller, Get, Post
 
 from .book_service import BookService
 from typing import List
@@ -170,7 +171,7 @@ POST, PUT, DELETE, etc.
 ### Full CRUD Example
 
 ```python
-from nest.core import Controller, Get, Post, Put, Delete
+from nest.web import Controller, Get, Post, Put, Delete
 from .book_service import BookService
 from .book_models import Book
 

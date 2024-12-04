@@ -1,4 +1,4 @@
-from nest.core.decorators import Injectable
+from nest.core import Injectable
 
 from ..user.user_service import UserService
 from .example_model import Example

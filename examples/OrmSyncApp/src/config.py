@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from nest.core.database.orm_provider import OrmProvider
+from nest.database.orm_provider import OrmProvider
 
 load_dotenv()
 
