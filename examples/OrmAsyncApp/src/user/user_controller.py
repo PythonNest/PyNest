@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from nest.core import Controller, Depends, Get, Post
+from nest.web import Controller, Depends, Get, Post
 
 from ..config import config
 from .user_model import User

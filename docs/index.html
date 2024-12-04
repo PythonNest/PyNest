@@ -449,7 +449,8 @@
         <div class="code-block">
             <button class="copy-button" onclick="copyCode()">Copy</button>
             <pre><code class="language-python">
-from nest.core import PyNestFactory, Module, Controller, Get, Injectable
+from nest.core import Module, Injectable
+from nest.web import Controller, Get
 
 @Injectable()
 class AppService:
@@ -473,7 +474,7 @@ class AppController:
 class AppModule:
     pass
 
-app = PyNestFactory.create(
+app = PyNestWebFactory.create(
     AppModule,
     description="This is my PyNest app.",
     title="PyNest Application",

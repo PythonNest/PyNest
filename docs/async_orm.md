@@ -35,7 +35,7 @@ pip install asyncpg
 #### Create a new project
 
 ```bash
-pynest create-nest-app -n my_app_name -db postgresql --is-async
+pynest generate application -n my_app_name -db postgresql --is-async
 ```
 
 this command will create a new project with the following structure:
@@ -116,7 +116,7 @@ class AppService:
 `app_controller.py`
 
 ```python
-from nest.core import Controller, Get
+from nest.web import Controller, Get
 
 from .app_service import AppService
 
@@ -143,7 +143,8 @@ from .example.example_module import ExampleModule
 from .app_controller import AppController
 from .app_service import AppService
 
-from nest.core import Module, PyNestFactory
+from nest.core import Module
+from nest.web import PyNestWebFactory
 
 
 @Module(
@@ -155,7 +156,7 @@ class AppModule:
     pass
 
 
-app = PyNestFactory.create(AppModule, description="This is my FastAPI app drive by Async ORM Engine", title="My App",
+app = PyNestWebFactory.create(AppModule, description="This is my FastAPI app drive by Async ORM Engine", title="My App",
                            version="1.0.0", debug=True)
 
 http_server = app.get_server()
@@ -171,7 +172,7 @@ decorator.
 The imports array includes the modules required by this module. In this case, ExampleModule is imported. The controllers
 and providers arrays are empty here, indicating this module doesn't directly provide any controllers or services.
 
-`PyNestFactory.create()` is a command to create an instance of the application.
+`PyNestWebFactory.create()` is a command to create an instance of the application.
 The AppModule is passed as an argument, which acts as the root module of the application.
 Additional metadata like description, title, version, and debug flag are also provided
 
@@ -293,7 +294,7 @@ Here we have also two ways of creating the controller.
 1. In that way, the controller's functions are getting the async session from the config
 
 ```python
-from nest.core import Controller, Get, Post, Depends
+from nest.web import Controller, Get, Post, Depends
 
 from .examples_service import ExamplesService
 from .examples_model import Examples
@@ -321,7 +322,7 @@ class ExamplesController:
    in his constructor.
 
 ```python
-from nest.core import Controller, Get, Post
+from nest.web import Controller, Get, Post
 
 from .examples_service import ExamplesService
 from .examples_model import Examples

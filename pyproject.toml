@@ -14,6 +14,18 @@ documentation = "https://pythonnest.github.io/PyNest/"
 packages = [
     { include = "nest" }
 ]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
 
 
 [tool.poetry.dependencies]
@@ -96,4 +108,6 @@ Documentation = "https://pythonnest.github.io/PyNest/"
 
 [tool.poetry.scripts]
 pynest = "nest.cli.cli:nest_cli"
+
+
 

@@ -4,11 +4,17 @@ This guide will help you get started with setting up a new PyNest project, creat
 
 ## Installation
 
-To install PyNest, ensure you have Python 3.9+ installed. Then, install PyNest using pip:
+To install PyNest, ensure you have Python 3.10+ installed. Then, install PyNest using your preferred package manager:
 
-```bash
-pip install pynest-api
-```
+=== "pip"
+    ```bash
+    pip install pynest-api
+    ```
+
+=== "Poetry"
+    ```bash
+    poetry add pynest-api
+    ```
 
 ## Creating a New Project 📂
 
@@ -18,6 +24,20 @@ Start by creating a new directory for your project and navigating into it:
 mkdir my_pynest_project
 cd my_pynest_project
 ```
+
+You can simply use the pynest-cli to create the project structure:
+
+=== "pip"
+    ```bash
+    pynest generate application -n .
+    ```
+
+=== "Poetry"
+    ```bash
+    poetry run pynest generate application -n .
+    ```
+
+Or you can create the file structure manually.
 
 ## Creating the Application Structure 🏗️
 
@@ -42,7 +62,8 @@ The app_module.py file is where we define our main application module. Create th
 ```python
 # src/app_module.py
 
-from nest.core import Module, PyNestFactory
+from nest.core import Module
+from nest.web import PyNestWebFactory
 from .app_controller import AppController
 from .app_service import AppService
 
@@ -53,12 +74,13 @@ from .app_service import AppService
 class AppModule:
     pass
 
-app = PyNestFactory.create(
+app = PyNestWebFactory.create(
     AppModule,
     description="This is my PyNest app",
     title="My App",
     version="1.0.0",
-    debug=True,
+    # here you can add more of the fastapi kwargs as describe here -         
+    # https://fastapi.tiangolo.com/reference/fastapi/#fastapi.FastAPI
 )
 
 http_server = app.get_server()
@@ -90,7 +112,7 @@ The app_controller.py file will handle the routing and responses. Create the fil
 ```python
 # src/app_controller.py
 
-from nest.core import Controller, Get
+from nest.web import Controller, Get
 from .app_service import AppService
 
 @Controller("/")
@@ -111,10 +133,9 @@ The main.py file will run our PyNest application. Create the file and add the fo
 # main.py
 
 import uvicorn
-from src.app_module import http_server
 
 if __name__ == "__main__":
-    uvicorn.run(http_server, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("src.app_module:http_server", host="0.0.0.0", port=8000, reload=True)
 ```
 
 ### File Structure 🗂️

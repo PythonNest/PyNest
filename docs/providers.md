@@ -82,7 +82,7 @@ In this Service, the `LoggerService` is injected into the `S3Service` via the co
 `s3_controller.py`
 
 ```python
-from nest.core import Controller, Post
+from nest.web import Controller, Post
 from .s3_service import S3Service
 
 @Controller('/s3')

@@ -1,4 +1,4 @@
-from nest.core import Controller, Get
+from nest.web import Controller, Get
 
 from .app_service import AppService
 
