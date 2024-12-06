@@ -36,7 +36,7 @@ def test_odm_service_definition(odm_service):
 
 def test_odm_service_config_url(odm_service):
     config_url = odm_service.config_url
-    assert config_url == "mongodb://user:password@host:port"
+    assert config_url == "mongodb://user:password@host:port/db_name"
 
 
 def test_mongo_config_definition(mongodb_config):
