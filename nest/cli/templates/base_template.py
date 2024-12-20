@@ -25,7 +25,6 @@ class BaseTemplate(ABC):
         )
         self.class_name = f"{self.capitalized_module_name}Module"
         self.base_path = Path(os.getcwd())
-        self.version = __version__
         self.nest_path = Path(__file__).parent.parent.parent
 
     @staticmethod
@@ -368,7 +367,7 @@ class AppService:
     def generate_empty_controller_file(self) -> str:
         return f"""from nest.core import Controller
 
-@Controller("{self.module_name}")
+@Controller("{self.module_name}", tag="{self.module_name}")
 class {self.capitalized_module_name}Controller:
     ...
     """

@@ -33,7 +33,7 @@ config = OdmProvider(
 """
 
     def requirements_file(self):
-        return f"""pynest-api=={self.version}
+        return f"""pynest-api
 beanie==1.20.0"""
 
     def docker_file(self):
@@ -61,7 +61,7 @@ from .{self.module_name}_service import {self.capitalized_module_name}Service
 from .{self.module_name}_model import {self.capitalized_module_name}
 
 
-@Controller("{self.module_name}")
+@Controller("{self.module_name}", tag="{self.module_name}")
 class {self.capitalized_module_name}Controller:
 
     def __init__(self, {self.module_name}_service: {self.capitalized_module_name}Service):

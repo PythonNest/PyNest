@@ -24,7 +24,7 @@ class AbstractEmptyTemplate(AbstractBaseTemplate):
         from src.{name}.{name}_model import {self.capitalized_name}
 
 
-        @Controller("{name}")
+        @Controller("{name}", tag="{name}")
         class {self.capitalized_name}Controller:
 
             service: {self.capitalized_name}Service = Depends({self.capitalized_name}Service)

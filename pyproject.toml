@@ -1,48 +1,85 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel>=0.37.0"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 
-[project]
+[tool.poetry]
 name = "pynest-api"
+version = "0.3.1"
 description = "PyNest is a FastAPI Abstraction for building microservices, influenced by NestJS."
+authors = ["itay.dar <itay.dar@lemonade.com>"]
 readme = "README.md"
-requires-python = ">=3.8.1"
-license = { file = "LICENSE" }
-authors = [
-    { name = "Itay Dar", email = "itay2803@gmail.com" },
+homepage = "https://github.com/PythonNest/PyNest"
+documentation = "https://pythonnest.github.io/PyNest/"
+packages = [
+    { include = "nest" }
 ]
-dynamic = ["version"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
-]
-dependencies = [
-    "click>=8.1.6",
-    "fastapi>=0.88.0,<1.0.0",
-    "python-dotenv>=1.0.0",
-    "uvicorn>=0.23.1",
-    "PyYAML>=6.0.1",
-    "astor>=0.8.1",
-    "black>=23.11.0",
-    "injector>=0.20.1",
-    "pydantic<2.0.0",
-    "sqlalchemy == 2.0.19",
-    "alembic == 1.7.5",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-[tool.setuptools.dynamic]
-version = { attr = "nest.__init__.__version__" }
 
-[tool.pip]
-index-url = "https://pypi.org/simple"
-trusted-host = ["pypi.org", "files.pythonhosted.org"]
 
-[tools.black]
+[tool.poetry.dependencies]
+python = "^3.9"
+# Core dependencies
+click = "^8.1.7"
+injector = "^0.22.0"
+astor = "^0.8.1"
+pyyaml = "^6.0.2"
+fastapi = "^0.115.4"
+pydantic = "^2.9.2"
+uvicorn = "^0.32.0"
+
+
+# Optional dependencies
+sqlalchemy = { version = "^2.0.36", optional = true }
+asyncpg = { version = "^0.30.0", optional = true }
+psycopg2 = { version = "^2.9.3", optional = true }
+alembic = { version = "^1.13.3", optional = true }
+beanie = { version = "^1.27.0", optional = true }
+python-dotenv = { version = "^1.0.1", optional = true }
+greenlet = { version = "^3.1.1", optional = true }
+black = "^24.10.0"
+
+
+
+[tool.poetry.extras]
+postgres = ["sqlalchemy", "asyncpg", "psycopg2", "alembic", "greenlet", "python-dotenv"]
+mongo = ["beanie", "python-dotenv"]
+test = ["pytest"]
+
+[tool.poetry.group.build.dependencies]
+setuptools = "^75.3.0"
+wheel = "^0.44.0"
+build = "^1.2.2.post1"
+twine = "^5.1.1"
+git-changelog = "^2.5.2"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.0.1"
+fastapi = "^0.115.4"
+sqlalchemy = "^2.0.36"
+motor = "^3.2.0"
+beanie = "^1.27.0"
+pydantic = "^2.9.2"
+python-dotenv = "^1.0.1"
+uvicorn = "^0.32.0"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs-material = "^9.5.43"
+mkdocstrings-python = "^1.12.2"
+
+
+[tool.black]
 force-exclude = '''
 /(
   | /*venv*
@@ -58,34 +95,17 @@ force-exclude = '''
 )/
 '''
 
-[project.optional-dependencies]
-test = [
-    "pytest == 6.2.5",
-]
-
-orm = [
-    "sqlalchemy == 2.0.19",
-    "alembic == 1.7.4",
-]
-mongo = [
-    "pymongo == 3.12.0",
-    "motor == 3.2.0",
-    "beanie == 1.20.0",
-]
-
-[project.scripts]
-pynest = "nest.cli.cli:nest_cli"
-
-[tool.setuptools.packages.find]
-include = ["nest*"]
-namespaces = false
-
 [tool.mypy]
 exclude = [
     "/*venv*"
 ]
 ignore_missing_imports = true
 
-[project.urls]
-"Homepage" = "https://github.com/PythonNest/PyNest"
-"Documentation" = "https://pythonnest.github.io/PyNest/"
+[tool.poetry.urls]
+Homepage = "https://github.com/PythonNest/PyNest"
+Documentation = "https://pythonnest.github.io/PyNest/"
+
+[tool.poetry.scripts]
+pynest = "nest.cli.cli:nest_cli"
+
+

@@ -1,6 +1,6 @@
 name: CLI Test
 
-on: [ push, workflow_call, pull_request ]
+on: [push, workflow_call, pull_request]
 
 jobs:
   test:
@@ -8,54 +8,54 @@ jobs:
 
     strategy:
       matrix:
-        app_type: [ "Blank", "SyncORM", "AsyncORM", "MongoDB", "PostgresSync", "PostgresAsync", "MySQLSync", "MySQLAsync" ]
+        app_type: ["Blank", "SyncORM", "AsyncORM", "MongoDB", "PostgresSync", "PostgresAsync", "MySQLSync", "MySQLAsync"]
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.9'
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install .
+          pip install poetry
+          poetry install
 
       - name: Test CLI Commands
         run: |
           app_name="${{ matrix.app_type }}App"
           case "${{ matrix.app_type }}" in
             "Blank")
-              pynest generate application -n "$app_name"
+              poetry run pynest generate application -n "$app_name"
               ;;
             "SyncORM")
-              pynest generate application -n "$app_name" -db sqlite
+              poetry run pynest generate application -n "$app_name" -db sqlite
               ;;
             "AsyncORM")
-              pynest generate application -n "$app_name" -db sqlite --is-async
+              poetry run pynest generate application -n "$app_name" -db sqlite --is-async
               ;;
             "MongoDB")
-              pynest generate application -n "$app_name" -db mongodb
+              poetry run pynest generate application -n "$app_name" -db mongodb
               ;;
             "PostgresSync")
-              pynest generate application -n "$app_name" -db postgresql
+              poetry run pynest generate application -n "$app_name" -db postgresql
               ;;
             "PostgresAsync")
-              pynest generate application -n "$app_name" -db postgresql --is-async
+              poetry run pynest generate application -n "$app_name" -db postgresql --is-async
               ;;
             "MySQLSync")
-              pynest generate application -n "$app_name" -db mysql
+              poetry run pynest generate application -n "$app_name" -db mysql
               ;;
             "MySQLAsync")
-              pynest generate application -n "$app_name" -db mysql --is-async
+              poetry run pynest generate application -n "$app_name" -db mysql --is-async
               ;;
           esac
           
           cd "$app_name"
-          pynest generate resource -n user
+          poetry run pynest generate resource -n user
 
       - name: Verify Boilerplate
         run: |
@@ -73,7 +73,6 @@ jobs:
             echo "Directory $app_name does not exist."
             exit 1
           fi
-
 
           # List of expected files
           declare -a files=("main.py" "requirements.txt" "README.md")
@@ -100,7 +99,6 @@ jobs:
             fi
           done
 
-          
           # Check each file in the list of module_files
           for file in "${module_files[@]}"; do
             if [ -f "$app_name/src/user/$file" ]; then

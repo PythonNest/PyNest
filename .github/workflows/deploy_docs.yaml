@@ -2,13 +2,11 @@ name: Deploy Docs
 
 on: [workflow_call, workflow_dispatch]
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -27,15 +25,15 @@ jobs:
       - name: Copy License File
         run: cp LICENSE docs/license.md
 
-      - name: Set up Python 3.10
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: "3.9"
 
-      - name: Install MKDocs
+      - name: Install dependencies
         run: |
-          pip install --upgrade pip
-          pip install mkdocs-material mkdocstrings-python
+          pip install poetry
+          poetry install --with docs
 
       - name: Build docs
         run: mkdocs build --clean

@@ -31,7 +31,7 @@ config = OrmProvider(
 """
 
     def requirements_file(self):
-        return f"""pynest-api=={self.version}
+        return f"""pynest-api
 mysql-connector-python==8.2.0
 """
 
@@ -63,6 +63,6 @@ config = AsyncOrmProvider(
 """
 
     def requirements_file(self):
-        return f"""pynest-api=={self.version}
+        return f"""pynest-api
 aiomysql==0.2.0
 """

@@ -31,7 +31,7 @@ config = OrmProvider(
 """
 
     def requirements_file(self):
-        return f"""pynest-api=={self.version}
+        return f"""pynest-api
 psycopg2==2.9.6
 """
 
@@ -63,6 +63,6 @@ config = AsyncOrmProvider(
 """
 
     def requirements_file(self):
-        return f"""pynest-api=={self.version}
+        return f"""pynest-api
 asyncpg==0.29.0
 """

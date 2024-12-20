@@ -17,7 +17,7 @@ on:
           - patch
 
 env:
-  VERSION_FILE_PATH: nest/__init__.py
+  VERSION_FILE_PATH: pyproject.toml
   CHANGELOG_FILE_PATH: CHANGELOG.md
 
 jobs:
@@ -36,65 +36,60 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_GIT_TOKEN }}
 
-      - name: Set version
-        run: |
-          VERSION_REGEX='^(__version__ = \")(([[:digit:]]+\.)*[[:digit:]]+)((a|b|rc)[[:digit:]]+)?(\.post[[:digit:]]+)?(.dev[[:digit:]]+)?(\")$'
-          
-          # get current version from version file
-          CURRENT_VERSION=`sed -n -E "s/$VERSION_REGEX/\2/p" $VERSION_FILE_PATH`
-          echo "Current version: $CURRENT_VERSION"
-          
-          # switch case for incrementing_version based on input
-          case ${{ inputs.increment_version }} in
-            major)
-            NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$1=$1+1; $2=0; $3=0; print $0}' OFS=".")
-            ;;
-            minor)
-            NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$2=$2+1; $3=0; print $0}' OFS=".")
-            ;;
-            patch)
-            NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$3=$3+1; print $0}' OFS=".")
-            ;;
-            *)
-            echo "Invalid input for increment_version"
-            exit 1
-            ;;
-          esac
-          echo "New version: $NEW_VERSION"
-          echo "RELEASE_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-          
-          # update version file
-          sed -i -E "s/$VERSION_REGEX/\1$NEW_VERSION\8/" $VERSION_FILE_PATH
-
-      - name: Install python
+      - name: Install Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: Install python dependencies
+      - name: Install Poetry
         run: |
-          pip install --upgrade pip
-          pip install -r requirements-release.txt
+          pip install poetry
+
+      - name: Set version using Poetry
+        run: |
+          # Extract the current version
+          CURRENT_VERSION=$(poetry version -s)
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Increment version
+          case ${{ inputs.increment_version }} in
+            major)
+              NEW_VERSION=$(poetry version major | awk '{print $NF}')
+              ;;
+            minor)
+              NEW_VERSION=$(poetry version minor | awk '{print $NF}')
+              ;;
+            patch)
+              NEW_VERSION=$(poetry version patch | awk '{print $NF}')
+              ;;
+            *)
+              echo "Invalid input for increment_version"
+              exit 1
+              ;;
+          esac
+          echo "New version: $NEW_VERSION"
+          echo "RELEASE_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Update CHANGELOG.md
         run: git-changelog . -o $CHANGELOG_FILE_PATH
 
-      - name: Build package
-        run: python -m build
+      - name: Build package with Poetry
+        run: |
+          poetry build
 
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github@actions.com"
-          git add $CHANGELOG_FILE_PATH $VERSION_FILE_PATH
+          git add $CHANGELOG_FILE_PATH pyproject.toml
           git commit -m "Increment version to $NEW_VERSION"
           git push
 
-      - name: Publish a Python distribution to PyPI
+      - name: Publish package to PyPI
         run: |
-          python -m twine upload dist/* -u ${{ secrets.PYPI_API_USER }} -p ${{ secrets.PYPI_API_TOKEN }} 
+          poetry publish --username ${{ secrets.PYPI_API_USER }} --password ${{ secrets.PYPI_API_TOKEN }}
 
-      - name: Release New Version
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
           name: v${{ env.RELEASE_VERSION }}

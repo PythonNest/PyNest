@@ -12,17 +12,17 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.9'
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install .
+          pip install poetry
+          poetry install
 
       - name: Start Application
         run: |
@@ -38,15 +38,15 @@ jobs:
           fi
 
           if [ "${{ matrix.app_type }}" == "Blank" ]; then
-            pynest generate application -n "$app_name"
+            poetry run pynest generate application -n "$app_name"
           else
-            pynest generate application -n "$app_name" -db sqlite $is_async
-            pip install aiosqlite
+            poetry run pynest generate application -n "$app_name" -db sqlite $is_async
+            poetry add aiosqlite
           fi
 
           cd "$app_name"
-          pynest generate resource -n user
-          uvicorn "src.app_module:http_server" --host "0.0.0.0" --port 8000 --reload &
+          poetry run pynest generate resource -n user
+          poetry run uvicorn "src.app_module:http_server" --host "0.0.0.0" --port 8000 --reload &
 
       - name: Wait for the server to start
         run: sleep 10
