@@ -144,7 +144,7 @@ class AppService:
         self.create_template(src_path / "app_service.py", self.app_service_file())
 
     def requirements_file(self):
-        return f"""pynest-api=={self.version}"""
+        return f"""pynest-api"""
 
     def config_file(self):
         return ""

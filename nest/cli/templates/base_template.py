@@ -25,7 +25,6 @@ class BaseTemplate(ABC):
         )
         self.class_name = f"{self.capitalized_module_name}Module"
         self.base_path = Path(os.getcwd())
-        self.version = __version__
         self.nest_path = Path(__file__).parent.parent.parent
 
     @staticmethod

@@ -33,7 +33,7 @@ config = OdmProvider(
 """
 
     def requirements_file(self):
-        return f"""pynest-api=={self.version}
+        return f"""pynest-api
 beanie==1.20.0"""
 
     def docker_file(self):

@@ -139,4 +139,4 @@ config:
 """
 
     def requirements_file(self):
-        return f"""pynest-api=={self.version}"""
+        return f"""pynest-api"""

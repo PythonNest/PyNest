@@ -27,7 +27,7 @@ config = OrmProvider(
 """
 
     def requirements_file(self):
-        return f"""pynest-api=={self.version}"""
+        return f"""pynest-api"""
 
     def docker_file(self):
         return """FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11
@@ -60,7 +60,7 @@ config = AsyncOrmProvider(
 """
 
     def requirements_file(self):
-        return f"""pynest-api=={self.version}
+        return f"""pynest-api
 aiosqlite==0.19.0"""
 
     def docker_file(self):

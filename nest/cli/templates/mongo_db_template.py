@@ -82,13 +82,8 @@ class {self.capitalized_name}(Document):
 """
 
     def generate_requirements_file(self) -> str:
-        return f"""click==8.1.6
-fastapi==0.95.1
-python-dotenv==1.0.0
-uvicorn==0.23.1
-motor==3.2.0
-beanie==1.20.0
-pynest-api=={self.version}
+        return f"""
+pynest-api
     """
 
     def generate_dockerfile(self) -> str:
