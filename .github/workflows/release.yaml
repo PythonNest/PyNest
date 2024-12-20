@@ -70,6 +70,10 @@ jobs:
           echo "New version: $NEW_VERSION"
           echo "RELEASE_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
+      - name: Install build dependencies
+        run: |
+          poetry install --with build
+      
       - name: Update CHANGELOG.md
         run: git-changelog . -o $CHANGELOG_FILE_PATH
 
