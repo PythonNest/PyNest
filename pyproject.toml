@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pynest-api"
-version = "0.3.1"
+version = "0.3.2"
 description = "PyNest is a FastAPI Abstraction for building microservices, influenced by NestJS."
 authors = ["itay.dar <itay.dar@lemonade.com>"]
 readme = "README.md"
