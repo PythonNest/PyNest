@@ -13,3 +13,12 @@ nav.md-footer-nav a.md-footer-nav__link span {
   display: flex;
   align-items: center;
 }
+
+.md-header__button.md-logo img, .md-header__button.md-logo svg {
+  height: 2rem;
+  width: 2rem;
+}
+.md-header__button.md-logo {
+  margin: 0;
+  padding: 0;
+}
