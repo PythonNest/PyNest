@@ -21,7 +21,7 @@ theme:
       primary: teal
       accent: amber
       toggle:
-        icon: material/toggle-switch-off-outline
+        icon: material/toggle-switch
         name: Switch to dark mode
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
@@ -29,7 +29,7 @@ theme:
       primary: teal
       accent: amber
       toggle:
-        icon: material/toggle-switch
+        icon: material/toggle-switch-off-outline
         name: Switch to light mode
 
 plugins:
