@@ -9,23 +9,27 @@ repo_name: Pynest
 theme:
   favicon: imgs/pynest-logo.png
   name: material
+  logo: imgs/pynest-logo.png
   features:
     - content.code.copy
+    - navigation.tabs
+  icon:
+    repo: fontawesome/brands/github-alt
   palette:
-    scheme: slate
-    primary: indigo
-    accent: indigo
-    toggle:
-      icon: material/toggle-switch-off-outline
-      name: Switch to dark mode
-    light:
-      primary: indigo
-      accent: indigo
-    dark:
-      primary: indigo
-      accent: indigo
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: amber
       toggle:
         icon: material/toggle-switch
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/toggle-switch-off-outline
         name: Switch to light mode
 
 plugins:
