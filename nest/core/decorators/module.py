@@ -11,8 +11,6 @@ class Module:
     imports: List[type] = dataclasses.field(default_factory=list)
     is_global: List[type] = dataclasses.field(default=False)
 
-    __slots__ = ("controllers", "providers", "exports", "imports", "is_global")
-
     def __call__(self, cls):
         setattr(cls, ModuleMetadata.CONTROLLERS, self.controllers)
         setattr(cls, ModuleMetadata.PROVIDERS, self.providers)
