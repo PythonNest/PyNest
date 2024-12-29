@@ -1,11 +1,28 @@
 import ast
 import inspect
-from typing import Callable, List, Dict, Type, Set
+from typing import Callable, List, Dict, Type
 
 import click
 
 from nest.common.constants import INJECTABLE_TOKEN
 
+
+def _is_valid_instance_variable(target):
+    """
+    Checks if the target is a valid instance variable.
+
+    Args:
+        target: The AST target node to check.
+        dependencies: A list of attribute names to exclude.
+
+    Returns:
+        bool: True if the target is a valid instance variable, False otherwise.
+    """
+    return (
+        isinstance(target, ast.Attribute)
+        and isinstance(target.value, ast.Name)
+        and target.value.id == "self"
+    )
 
 def get_instance_variables(cls):
     """
@@ -31,9 +48,7 @@ def get_instance_variables(cls):
             target.attr: ast.get_source_segment(source, node.value)
             for node in assign_nodes
             for target in node.targets
-            if isinstance(target, ast.Attribute)
-            and isinstance(target.value, ast.Name)
-            and target.value.id == "self"
+            if _is_valid_instance_variable(target)
             and target.attr not in dependencies  # Exclude dependencies
         }
     except Exception:
@@ -50,30 +65,29 @@ def get_non_dependencies_params(cls: Type):
     }
 
 
+def _check_injectable_in_object(param: inspect.Parameter) -> bool:
+    return (
+        param.annotation != param.empty
+        and hasattr(param.annotation, "__dict__")
+        and INJECTABLE_TOKEN in param.annotation.__dict__
+    )
+
+def _check_injectable_in_object_and_parents(param: inspect.Parameter) -> bool:
+    return param.annotation != param.empty and getattr(
+        param.annotation, INJECTABLE_TOKEN, False
+    )
+
 def parse_dependencies(cls: Type, check_parent: bool = False) -> Dict[str, Type]:
     """
     Returns:
         mapping of injectable parameters name to there annotation
     """
-
-    def _check_only_child(param: inspect.Parameter) -> bool:
-        return (
-            param.annotation != param.empty
-            and hasattr(param.annotation, "__dict__")
-            and INJECTABLE_TOKEN in param.annotation.__dict__
-        )
-
-    def _check_with_parent(param: inspect.Parameter) -> bool:
-        return param.annotation != param.empty and getattr(
-            param.annotation, INJECTABLE_TOKEN, False
-        )
-
     signature = inspect.signature(cls.__init__)
-    filter_by = _check_with_parent if check_parent else _check_only_child
+    filter_by = _check_injectable_in_object_and_parents if check_parent else _check_injectable_in_object
+    params: List[inspect.Parameter] = filter(filter_by, signature.parameters.values())
     return {
         param.name: param.annotation
-        for param in signature.parameters.values()
-        if filter_by(param)
+        for param in params
     }
 
 
