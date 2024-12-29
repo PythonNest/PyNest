@@ -24,6 +24,7 @@ def _is_valid_instance_variable(target):
         and target.value.id == "self"
     )
 
+
 def get_instance_variables(cls):
     """
     Retrieves instance variables assigned in the __init__ method of a class,
@@ -72,10 +73,12 @@ def _check_injectable_in_object(param: inspect.Parameter) -> bool:
         and INJECTABLE_TOKEN in param.annotation.__dict__
     )
 
+
 def _check_injectable_in_object_and_parents(param: inspect.Parameter) -> bool:
     return param.annotation != param.empty and getattr(
         param.annotation, INJECTABLE_TOKEN, False
     )
+
 
 def parse_dependencies(cls: Type, check_parent: bool = False) -> Dict[str, Type]:
     """
@@ -83,12 +86,13 @@ def parse_dependencies(cls: Type, check_parent: bool = False) -> Dict[str, Type]
         mapping of injectable parameters name to there annotation
     """
     signature = inspect.signature(cls.__init__)
-    filter_by = _check_injectable_in_object_and_parents if check_parent else _check_injectable_in_object
+    filter_by = (
+        _check_injectable_in_object_and_parents
+        if check_parent
+        else _check_injectable_in_object
+    )
     params: List[inspect.Parameter] = filter(filter_by, signature.parameters.values())
-    return {
-        param.name: param.annotation
-        for param in params
-    }
+    return {param.name: param.annotation for param in params}
 
 
 def parse_params(func: Callable) -> List[click.Option]:
