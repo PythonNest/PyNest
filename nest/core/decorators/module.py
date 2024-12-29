@@ -3,13 +3,15 @@ from typing import List
 import dataclasses
 
 
-@dataclasses.dataclass(frozen=True, slots=True)
+@dataclasses.dataclass(frozen=True)
 class Module:
     controllers: List[type] = dataclasses.field(default_factory=list)
     providers: List[type] = dataclasses.field(default_factory=list)
     exports: List[type] = dataclasses.field(default_factory=list)
     imports: List[type] = dataclasses.field(default_factory=list)
     is_global: List[type] = dataclasses.field(default=False)
+
+    __slots__ = ("controllers", "providers", "exports", "imports", "is_global")
 
     def __call__(self, cls):
         setattr(cls, ModuleMetadata.CONTROLLERS, self.controllers)
