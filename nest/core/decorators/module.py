@@ -9,7 +9,7 @@ class Module:
     providers: List[type] = dataclasses.field(default_factory=list)
     exports: List[type] = dataclasses.field(default_factory=list)
     imports: List[type] = dataclasses.field(default_factory=list)
-    is_global: List[type] = dataclasses.field(default=False)
+    is_global: bool = dataclasses.field(default=False)
 
     def __call__(self, cls):
         setattr(cls, ModuleMetadata.CONTROLLERS, self.controllers)
