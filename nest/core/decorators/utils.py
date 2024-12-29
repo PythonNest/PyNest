@@ -66,7 +66,7 @@ def get_non_dependencies_params(cls: Type):
     }
 
 
-def _check_injectable_in_object(param: inspect.Parameter) -> bool:
+def _check_injectable_not_inherited(param: inspect.Parameter) -> bool:
     return (
         param.annotation != param.empty
         and hasattr(param.annotation, "__dict__")
@@ -74,22 +74,22 @@ def _check_injectable_in_object(param: inspect.Parameter) -> bool:
     )
 
 
-def _check_injectable_in_object_and_parents(param: inspect.Parameter) -> bool:
+def _check_injectable_inherited(param: inspect.Parameter) -> bool:
     return param.annotation != param.empty and getattr(
         param.annotation, INJECTABLE_TOKEN, False
     )
 
 
-def parse_dependencies(cls: Type, check_parent: bool = False) -> Dict[str, Type]:
+def parse_dependencies(cls: Type, check_inherited: bool = False) -> Dict[str, Type]:
     """
     Returns:
         mapping of injectable parameters name to there annotation
     """
     signature = inspect.signature(cls.__init__)
     filter_by = (
-        _check_injectable_in_object_and_parents
-        if check_parent
-        else _check_injectable_in_object
+        _check_injectable_inherited
+        if check_inherited
+        else _check_injectable_not_inherited
     )
     params: List[inspect.Parameter] = filter(filter_by, signature.parameters.values())
     return {param.name: param.annotation for param in params}
