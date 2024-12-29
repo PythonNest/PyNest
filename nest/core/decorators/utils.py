@@ -1,6 +1,6 @@
 import ast
 import inspect
-from typing import Callable, List, Dict, Type
+from typing import Callable, List, Dict, Type, Iterable
 
 import click
 
@@ -91,7 +91,7 @@ def parse_dependencies(cls: Type, check_inherited: bool = False) -> Dict[str, Ty
         if check_inherited
         else _check_injectable_not_inherited
     )
-    params: List[inspect.Parameter] = filter(filter_by, signature.parameters.values())
+    params: Iterable[inspect.Parameter] = filter(filter_by, signature.parameters.values())
     return {param.name: param.annotation for param in params}
 
 
