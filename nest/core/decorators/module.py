@@ -1,20 +1,15 @@
 from nest.common.constants import ModuleMetadata
+from typing import List
+import dataclasses
 
 
+@dataclasses.dataclass(frozen=True)
 class Module:
-    def __init__(
-        self,
-        imports=None,
-        controllers=None,
-        providers=None,
-        exports=None,
-        is_global: bool = False,
-    ):
-        self.controllers = controllers or []
-        self.providers = providers or []
-        self.imports = imports or []
-        self.exports = exports
-        self.is_global = is_global
+    controllers: List[type] = dataclasses.field(default_factory=list)
+    providers: List[type] = dataclasses.field(default_factory=list)
+    exports: List[type] = dataclasses.field(default_factory=list)
+    imports: List[type] = dataclasses.field(default_factory=list)
+    is_global: bool = dataclasses.field(default=False)
 
     def __call__(self, cls):
         setattr(cls, ModuleMetadata.CONTROLLERS, self.controllers)
