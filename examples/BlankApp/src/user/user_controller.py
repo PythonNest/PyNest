@@ -1,4 +1,5 @@
 from nest.core import Controller, Depends, Get, Post
+from fastapi import HTTPException
 
 from .user_model import User
 from .user_service import UserService
