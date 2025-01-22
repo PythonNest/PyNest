@@ -18,3 +18,6 @@ class UserService:
     def add_user(self, user: User):
         self.database.append(user)
         return user
+
+    def get_user_by_id(self, user_id: str):
+        return next((user for user in self.database if user.id == user_id), None)

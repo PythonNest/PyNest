@@ -1,49 +1,37 @@
-from abc import ABC, abstractmethod
-from typing import Type, TypeVar
+# nest/core/pynest_factory.py
 
-from fastapi import FastAPI
-
+from typing import Type, TypeVar, Optional
 from nest.core.pynest_application import PyNestApp
 from nest.core.pynest_container import PyNestContainer
+from nest.core.protocols import WebFrameworkAdapterProtocol
+from nest.core.adapters.fastapi.fastapi_adapter import FastAPIAdapter
 
 ModuleType = TypeVar("ModuleType")
 
 
-class AbstractPyNestFactory(ABC):
-    @abstractmethod
-    def create(self, main_module: Type[ModuleType], **kwargs):
-        raise NotImplementedError
-
-
-class PyNestFactory(AbstractPyNestFactory):
+class PyNestFactory:
     """Factory class for creating PyNest applications."""
 
     @staticmethod
-    def create(main_module: Type[ModuleType], **kwargs) -> PyNestApp:
+    def create(
+        main_module: Type[ModuleType],
+        adapter: Optional[WebFrameworkAdapterProtocol] = None,
+        **kwargs
+    ) -> PyNestApp:
         """
-        Create a PyNest application with the specified main module class.
-
-        Args:
-            main_module (ModuleType): The main module for the PyNest application.
-            **kwargs: Additional keyword arguments for the FastAPI server.
-
-        Returns:
-            PyNestApp: The created PyNest application.
+        Create a PyNest application with the specified main module class
+        and a chosen adapter (defaults to FastAPIAdapter if none given).
         """
+        if adapter is None:
+            adapter = FastAPIAdapter()  # Default to FastAPI
+
         container = PyNestContainer()
         container.add_module(main_module)
-        http_server = PyNestFactory._create_server(**kwargs)
-        return PyNestApp(container, http_server)
 
-    @staticmethod
-    def _create_server(**kwargs) -> FastAPI:
-        """
-        Create a FastAPI server.
+        # Create the PyNest application
+        app = PyNestApp(container=container, adapter=adapter)
 
-        Args:
-            **kwargs: Additional keyword arguments for the FastAPI server.
+        # Optionally add middlewares here before running
+        # app.use_middleware(SomeMiddlewareClass, optionA=123)
 
-        Returns:
-            FastAPI: The created FastAPI server.
-        """
-        return FastAPI(**kwargs)
+        return app

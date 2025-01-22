@@ -1,5 +1,3 @@
-from fastapi import Depends
-
 from nest.core.decorators import (
     Controller,
     Delete,

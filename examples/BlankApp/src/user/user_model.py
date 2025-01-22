@@ -1,5 +1,7 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
+from uuid import UUID
 
-
-class User(BaseModel):
+@dataclass
+class User:
+    id: UUID
     name: str
