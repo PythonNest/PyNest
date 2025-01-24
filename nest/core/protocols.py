@@ -19,6 +19,7 @@ from typing import (
 # 1. REQUEST & RESPONSE
 ###############################################################################
 
+
 @runtime_checkable
 class RequestProtocol(Protocol):
     """
@@ -124,11 +125,13 @@ class ResponseProtocol(Protocol):
 # 2. ROUTING & HTTP METHODS
 ###############################################################################
 
+
 @runtime_checkable
 class RouteDefinition(Protocol):
     """
     Represents a single route definition: path, HTTP methods, etc.
     """
+
     path: str
     http_methods: List[str]
     endpoint: Callable[..., Any]
@@ -182,7 +185,6 @@ class FrameworkAdapterProtocol(Protocol):
         Returns the native app object (like FastAPI instance).
         """
         ...
-
 
 
 @runtime_checkable
@@ -257,14 +259,11 @@ class CLIAdapterProtocol(FrameworkAdapterProtocol):
       - register commands into the cli
     """
 
-
     def register_commands(self, container: Container) -> None:
         """
         Register multiple routes at once.
         """
         ...
-
-
 
 
 ###############################################################################
@@ -279,6 +278,7 @@ class RequestAttribute:
     Marker/base class for typed request attributes
     like Param, Query, Header, Cookie, etc.
     """
+
     ...
 
 
@@ -287,6 +287,7 @@ class Param(Generic[T], RequestAttribute):
     Usage:
       def get_item(self, id: Param[int]): ...
     """
+
     pass
 
 
@@ -295,6 +296,7 @@ class Query(Generic[T], RequestAttribute):
     Usage:
       def search(self, q: Query[str]): ...
     """
+
     pass
 
 
@@ -303,6 +305,7 @@ class Header(Generic[T], RequestAttribute):
     Usage:
       def do_something(self, token: Header[str]): ...
     """
+
     pass
 
 
@@ -311,6 +314,7 @@ class Cookie(Generic[T], RequestAttribute):
     Usage:
       def show_info(self, user_id: Cookie[str]): ...
     """
+
     pass
 
 
@@ -319,6 +323,7 @@ class Body(Generic[T], RequestAttribute):
     Usage:
       def create_user(self, data: Body[UserDTO]): ...
     """
+
     pass
 
 
@@ -327,6 +332,7 @@ class Form(Generic[T], RequestAttribute):
     Usage:
       def post_form(self, form_data: Form[LoginForm]): ...
     """
+
     pass
 
 
@@ -335,6 +341,7 @@ class File(Generic[T], RequestAttribute):
     Usage:
       def upload(self, file: File[UploadedFile]): ...
     """
+
     pass
 
 
@@ -344,6 +351,7 @@ class RawRequest(RequestAttribute):
     Usage:
       def debug(self, req: RawRequest): ...
     """
+
     pass
 
 
@@ -353,11 +361,14 @@ class BackgroundTasks(RequestAttribute):
     Usage:
       def debug(self, req: RawRequest): ...
     """
+
     pass
+
 
 ###############################################################################
 # 4. ERROR HANDLING
 ###############################################################################
+
 
 @runtime_checkable
 class HTTPExceptionProtocol(Protocol):
@@ -365,6 +376,7 @@ class HTTPExceptionProtocol(Protocol):
     A standardized interface for raising an HTTP exception or error
     that can be recognized by the underlying framework.
     """
+
     status_code: int
     detail: str
 
@@ -393,6 +405,7 @@ class ExceptionHandlerProtocol(Protocol):
 # 5. MIDDLEWARE & FILTERS
 ###############################################################################
 
+
 @runtime_checkable
 class MiddlewareProtocol(Protocol):
     """
@@ -417,16 +430,17 @@ class FilterProtocol(Protocol):
     Could be integrated as an alternative or layer on top of middleware.
     """
 
-    def before_request(self, request: RequestProtocol) -> None:
-        ...
+    def before_request(self, request: RequestProtocol) -> None: ...
 
-    def after_request(self, request: RequestProtocol, response: ResponseProtocol) -> None:
-        ...
+    def after_request(
+        self, request: RequestProtocol, response: ResponseProtocol
+    ) -> None: ...
 
 
 ###############################################################################
 # 6. SECURITY & AUTH
 ###############################################################################
+
 
 @runtime_checkable
 class AuthGuardProtocol(Protocol):

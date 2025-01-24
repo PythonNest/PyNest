@@ -7,6 +7,7 @@ from nest.core.pynest_container import PyNestContainer
 
 ModuleType = TypeVar("ModuleType")
 
+
 class CLIAppFactory:
 
     def create(self, app_module: ModuleType, **kwargs):

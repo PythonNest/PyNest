@@ -5,9 +5,11 @@ from nest.core.protocols import WebFrameworkAdapterProtocol
 
 ModuleType = TypeVar("ModuleType")
 
+
 def adapter_map(adapter: str) -> WebFrameworkAdapterProtocol:
     if adapter == "fastapi":
         from nest.core.adapters.fastapi.fastapi_adapter import FastAPIAdapter
+
         return FastAPIAdapter()
     else:
         raise ValueError(f"Unknown adapter: {adapter}")
@@ -18,9 +20,7 @@ class PyNestFactory:
 
     @staticmethod
     def create(
-        main_module: Type[ModuleType],
-        adapter: Optional[str] = "fastapi",
-        **kwargs
+        main_module: Type[ModuleType], adapter: Optional[str] = "fastapi", **kwargs
     ) -> PyNestApp:
         """
         Create a PyNest application with the specified main module class

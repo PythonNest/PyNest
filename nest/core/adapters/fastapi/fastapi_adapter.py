@@ -5,7 +5,8 @@ from fastapi.middleware import Middleware
 
 from nest.core.protocols import (
     WebFrameworkAdapterProtocol,
-    RouterProtocol, Container,
+    RouterProtocol,
+    Container,
 )
 
 from nest.core.adapters.fastapi.utils import wrap_instance_method
@@ -25,18 +26,17 @@ class FastAPIRouterAdapter(RouterProtocol):
         self._router = APIRouter(prefix=self._base_path)
 
     def add_route(
-            self,
-            path: str,
-            endpoint: Callable[..., Any],
-            methods: List[str],
-            *,
-            name: Optional[str] = None,
+        self,
+        path: str,
+        endpoint: Callable[..., Any],
+        methods: List[str],
+        *,
+        name: Optional[str] = None,
     ) -> None:
         """
         Register an HTTP route with FastAPI's APIRouter.
         """
         self._router.add_api_route(path, endpoint, methods=methods, name=name)
-
 
     def get_router(self) -> APIRouter:
         """
@@ -48,6 +48,7 @@ class FastAPIRouterAdapter(RouterProtocol):
 ###############################################################################
 # FastAPI Adapter
 ###############################################################################
+
 
 class FastAPIAdapter(WebFrameworkAdapterProtocol):
     """
@@ -81,9 +82,9 @@ class FastAPIAdapter(WebFrameworkAdapterProtocol):
         return self._router_adapter
 
     def add_middleware(
-            self,
-            middleware_cls: Any,
-            **options: Any,
+        self,
+        middleware_cls: Any,
+        **options: Any,
     ) -> None:
         """
         Add middleware to the FastAPI application.
@@ -132,7 +133,9 @@ class FastAPIAdapter(WebFrameworkAdapterProtocol):
                     method = route_definition["method"]
                     original_method = route_definition["endpoint"]
 
-                    final_endpoint = wrap_instance_method(instance, controller_cls, original_method)
+                    final_endpoint = wrap_instance_method(
+                        instance, controller_cls, original_method
+                    )
 
                     self._router_adapter.add_route(
                         path=path,

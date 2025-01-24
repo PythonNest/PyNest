@@ -107,7 +107,10 @@ def collect_route_definitions(cls: Type, base_prefix: str):
 
 def validate_method_decorator(method_function: callable, method_name: str) -> None:
     """Validate that the method has a proper HTTP method decorator."""
-    if not hasattr(method_function, "__route_path__") or not method_function.__route_path__:
+    if (
+        not hasattr(method_function, "__route_path__")
+        or not method_function.__route_path__
+    ):
         raise AssertionError(f"Missing path for method {method_name}")
 
     if not isinstance(method_function.__http_method__, HTTPMethod):

@@ -25,4 +25,3 @@ app = PyNestFactory.create(
     version="1.0.0",
     debug=True,
 )
-

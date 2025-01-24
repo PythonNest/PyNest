@@ -1,9 +1,29 @@
 from typing import Callable, Annotated, get_origin, get_args, Optional, Any, Union
 
-from fastapi import Path, Query, Header, Body, File, UploadFile, Response, Request, BackgroundTasks, Form, Cookie, \
-    Depends
-from nest.core.protocols import Param, Query as QueryParam, Header as HeaderParam, Body as BodyParam, \
-    Cookie as CookieParam, File as FileParam, Form as FormParam, BackgroundTasks as BackgroundTasksParam
+from fastapi import (
+    Path,
+    Query,
+    Header,
+    Body,
+    File,
+    UploadFile,
+    Response,
+    Request,
+    BackgroundTasks,
+    Form,
+    Cookie,
+    Depends,
+)
+from nest.core.protocols import (
+    Param,
+    Query as QueryParam,
+    Header as HeaderParam,
+    Body as BodyParam,
+    Cookie as CookieParam,
+    File as FileParam,
+    Form as FormParam,
+    BackgroundTasks as BackgroundTasksParam,
+)
 import functools
 import inspect
 import typing
@@ -18,9 +38,9 @@ def _provide_bg_tasks(bg: BackgroundTasks) -> BackgroundTasks:
 
 
 def wrap_instance_method(
-        instance,
-        cls,
-        method: Callable,
+    instance,
+    cls,
+    method: Callable,
 ) -> Callable:
     """
     1. Create a new plain function that calls `method(instance, ...)`.

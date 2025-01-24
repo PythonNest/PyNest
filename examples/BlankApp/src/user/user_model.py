@@ -1,7 +1,15 @@
-from dataclasses import dataclass
-from uuid import UUID
+import uuid
+from pydantic import BaseModel
 
-@dataclass
-class User:
-    id: UUID
+
+class UserDTO(BaseModel):
+    id: uuid.UUID
     name: str
+    email: str
+    age: int
+
+
+class UserCreateDTO(BaseModel):
+    name: str
+    email: str
+    age: int
