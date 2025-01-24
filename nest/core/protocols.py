@@ -171,6 +171,20 @@ class RouterProtocol(Protocol):
 
 Container = TypeVar("Container")
 
+
+@runtime_checkable
+class FrameworkAdapterProtocol(Protocol):
+
+    def create_app(self, **kwargs: Any) -> Any:
+        """
+        Create and store the main web application object.
+        **kwargs** can pass parameters (e.g., title, debug, etc.).
+        Returns the native app object (like FastAPI instance).
+        """
+        ...
+
+
+
 @runtime_checkable
 class WebFrameworkAdapterProtocol(Protocol):
     """
@@ -234,8 +248,7 @@ class WebFrameworkAdapterProtocol(Protocol):
         ...
 
 
-@runtime_checkable
-class CLIAdapterProtocol(Protocol):
+class CLIAdapterProtocol(FrameworkAdapterProtocol):
     """
     High-level interface for an CLI adapter.
     The PyNest system can call these methods to:
@@ -244,51 +257,8 @@ class CLIAdapterProtocol(Protocol):
       - register commands into the cli
     """
 
-    def create_app(self, **kwargs: Any) -> Any:
-        """
-        Create and store the main CLI application object.
-        **kwargs** can pass parameters
-        Returns the native app object (like FastAPI instance).
-        """
-        ...
 
-    def get_router(self) -> RouterProtocol:
-        """
-        Return a RouterProtocol for the main router (or a sub-router).
-        """
-        ...
-
-    def add_middleware(
-        self,
-        middleware_cls: Any,
-        **options: Any,
-    ) -> None:
-        """
-        Add a middleware class to the application, with config options.
-        """
-        ...
-
-    def run(self, host: str = "127.0.0.1", port: int = 8000) -> None:
-        """
-        Blockingly run the HTTP server on the given host/port.
-        In production, you might prefer to return an ASGI app
-        and let an external server (e.g., gunicorn) run it.
-        """
-        ...
-
-    async def startup(self) -> None:
-        """
-        Optional: If the framework has an 'on_startup' event, run it.
-        """
-        ...
-
-    async def shutdown(self) -> None:
-        """
-        Optional: If the framework has an 'on_shutdown' event, run it.
-        """
-        ...
-
-    def register_routes(self, container: Container) -> None:
+    def register_commands(self, container: Container) -> None:
         """
         Register multiple routes at once.
         """
@@ -369,6 +339,15 @@ class File(Generic[T], RequestAttribute):
 
 
 class RawRequest(RequestAttribute):
+    """
+    Sometimes you just need the entire request object.
+    Usage:
+      def debug(self, req: RawRequest): ...
+    """
+    pass
+
+
+class BackgroundTasks(RequestAttribute):
     """
     Sometimes you just need the entire request object.
     Usage:

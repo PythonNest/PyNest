@@ -1,11 +1,20 @@
-from typing import Annotated, Callable
+from typing import Callable, Annotated, get_origin, get_args, Optional, Any, Union
 
-from fastapi import Path, Query, Header, Body, File, UploadFile, Response, Request, BackgroundTasks, Form
+from fastapi import Path, Query, Header, Body, File, UploadFile, Response, Request, BackgroundTasks, Form, Cookie, \
+    Depends
 from nest.core.protocols import Param, Query as QueryParam, Header as HeaderParam, Body as BodyParam, \
-    Cookie as CookieParam, File as FileParam, Form as FormParam
+    Cookie as CookieParam, File as FileParam, Form as FormParam, BackgroundTasks as BackgroundTasksParam
 import functools
 import inspect
 import typing
+
+
+def _provide_bg_tasks(bg: BackgroundTasks) -> BackgroundTasks:
+    """
+    A simple dependency function: FastAPI will inject
+    its `BackgroundTasks` object as 'bg' here, and we return it.
+    """
+    return bg
 
 
 def wrap_instance_method(
@@ -43,45 +52,82 @@ def wrap_instance_method(
 
 def rewrite_signature_for_fastapi(func: Callable) -> Callable:
     """
-    A function that modifies the signature to remove "self"
-    and convert Param/Query/Header/Body to FastAPI’s annotated params.
+    Modify the function's signature:
+      - Remove 'self' if it's the first param
+      - Convert Param[T], QueryParam[T], HeaderParam[T], BodyParam[T],
+        CookieParam[T], FormParam[T], FileParam[T] into Annotated[InnerType, fastapi.Param(...)]
+      - Handle nested types like Optional and Union
+      - Leave special FastAPI types (Request, Response, BackgroundTasks, UploadFile) unchanged
     """
     sig = inspect.signature(func)
+    old_params = list(sig.parameters.values())
+
+    # Remove 'self' if it's the first parameter
+    if old_params and old_params[0].name == "self":
+        old_params = old_params[1:]
+
     new_params = []
-
-    old_parameters = list(sig.parameters.values())
-
-    # 1) If the first param is named 'self', skip it entirely from the new signature
-    #    (because we have a BOUND method).
-    if old_parameters and old_parameters[0].name == "self":
-        old_parameters = old_parameters[1:]
-
-    for param in old_parameters:
-        annotation = param.annotation
-
-        if typing.get_origin(annotation) == Param:
-            inner_type = typing.get_args(annotation)[0]
-            new_annotation = Annotated[inner_type, Path()]
+    for param in old_params:
+        new_annotation = transform_annotation(param.annotation)
+        if new_annotation:
             new_params.append(param.replace(annotation=new_annotation))
+            continue
 
-        elif typing.get_origin(annotation) == QueryParam:
-            inner_type = typing.get_args(annotation)[0]
-            new_annotation = Annotated[inner_type, Query()]
-            new_params.append(param.replace(annotation=new_annotation))
-
-        elif typing.get_origin(annotation) == HeaderParam:
-            inner_type = typing.get_args(annotation)[0]
-            new_annotation = Annotated[inner_type, Header()]
-            new_params.append(param.replace(annotation=new_annotation))
-
-        elif typing.get_origin(annotation) == BodyParam:
-            inner_type = typing.get_args(annotation)[0]
-            new_annotation = Annotated[inner_type, Body()]
-            new_params.append(param.replace(annotation=new_annotation))
-        else:
-            # unchanged param
+        # Handle special FastAPI types by keeping them as-is
+        if param.annotation in (Request, Response, BackgroundTasks, UploadFile):
             new_params.append(param)
+            continue
 
+        # Leave unchanged
+        new_params.append(param)
+
+    # Replace the function's signature with the new parameters
     new_sig = sig.replace(parameters=new_params)
     func.__signature__ = new_sig
     return func
+
+
+def transform_annotation(annotation: typing.Any) -> Optional[typing.Any]:
+    """
+    Recursively transform the annotation by replacing custom marker classes
+    with FastAPI's Annotated types with appropriate parameters.
+    """
+    origin = get_origin(annotation)
+    args = get_args(annotation)
+
+    if origin is Annotated:
+        # Already annotated, no further transformation
+        return annotation
+
+    if origin is Union:
+        # Handle Union types (e.g., Optional[X] which is Union[X, NoneType])
+        transformed_args = tuple(transform_annotation(arg) for arg in args)
+        return Union[transformed_args]
+
+    # Handle custom marker classes
+    if origin == Param:
+        inner_type = args[0]
+        return Annotated[inner_type, Path()]
+    elif origin == QueryParam:
+        inner_type = args[0]
+        return Annotated[inner_type, Query()]
+    elif origin == HeaderParam:
+        inner_type = args[0]
+        return Annotated[inner_type, Header()]
+    elif origin == BodyParam:
+        inner_type = args[0]
+        return Annotated[inner_type, Body()]
+    elif origin == CookieParam:
+        inner_type = args[0]
+        return Annotated[inner_type, Cookie()]
+    elif origin == FormParam:
+        inner_type = args[0]
+        return Annotated[inner_type, Form()]
+    elif origin == FileParam:
+        inner_type = args[0]
+        return Annotated[inner_type, File()]
+    if annotation is BackgroundTasksParam:  # or if origin == BackgroundTasksParam
+        return BackgroundTasks
+    else:
+        # Not a custom marker, return None to indicate no transformation
+        return None

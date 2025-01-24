@@ -1,14 +1,13 @@
 import asyncio
 
 import click
+from typing import TypeVar
 
 from nest.core.pynest_container import PyNestContainer
-from nest.core.pynest_factory import AbstractPyNestFactory, ModuleType
 
+ModuleType = TypeVar("ModuleType")
 
-class CLIAppFactory(AbstractPyNestFactory):
-    def __init__(self):
-        super().__init__()
+class CLIAppFactory:
 
     def create(self, app_module: ModuleType, **kwargs):
         container = PyNestContainer()
