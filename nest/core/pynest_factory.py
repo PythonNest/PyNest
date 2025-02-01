@@ -4,7 +4,7 @@ from typing import Type, TypeVar
 from nest.core.pynest_application import PyNestApp
 from nest.core.pynest_container import PyNestContainer
 from nest.engine.proto import App
-from nest.engine.fastapi_engine import FastAPIApp
+from nest.engine.fastapi import FastAPIApp
 
 ModuleType = TypeVar("ModuleType")
 

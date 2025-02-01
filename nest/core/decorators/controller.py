@@ -1,7 +1,7 @@
 from typing import Optional, Type
 
 from nest.engine.proto import Router
-from nest.engine.fastapi_engine import FastAPIRouter
+from nest.engine.fastapi import FastAPIRouter
 from nest.core.decorators.class_based_view import class_based_view as ClassBasedView
 from nest.core.decorators.http_method import HTTPMethod
 from nest.core.decorators.utils import get_instance_variables, parse_dependencies
