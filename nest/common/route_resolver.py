@@ -1,8 +1,8 @@
-from fastapi import APIRouter, FastAPI
+from nest.engine.proto import App, Router
 
 
 class RoutesResolver:
-    def __init__(self, container, app_ref: FastAPI):
+    def __init__(self, container, app_ref: App):
         self.container = container
         self.app_ref = app_ref
 
@@ -12,5 +12,6 @@ class RoutesResolver:
                 self.register_route(controller)
 
     def register_route(self, controller):
-        router: APIRouter = controller.get_router()
+        router: Router = controller.get_router()
         self.app_ref.include_router(router)
+

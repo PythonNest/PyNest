@@ -46,6 +46,7 @@ def test_module():
 @pytest.fixture
 def test_server() -> FastAPI:
     server = PyNestFactory._create_server(
+        app_cls=FastAPI,
         title="Test Server",
         description="This is a test server",
         version="1.0.0",

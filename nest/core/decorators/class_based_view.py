@@ -11,13 +11,14 @@ from typing import (
     List,
     Type,
     TypeVar,
-    Union,
     get_origin,
     get_type_hints,
 )
 
-from fastapi import APIRouter, Depends
-from starlette.routing import Route, WebSocketRoute
+
+from nest.engine.proto import Router, RouteProtocol, Route
+from fastapi import Depends  # TODO: remove in future release
+
 
 T = TypeVar("T")
 K = TypeVar("K", bound=Callable[..., Any])
@@ -25,19 +26,19 @@ K = TypeVar("K", bound=Callable[..., Any])
 CBV_CLASS_KEY = "__cbv_class__"
 
 
-def class_based_view(router: APIRouter, cls: Type[T]) -> Type[T]:
+def class_based_view(router: Router, cls: Type[T]) -> Type[T]:
     """
     Replaces any methods of the provided class `cls` that are endpoints of routes in `router` with updated
     function calls that will properly inject an instance of `cls`.
     """
     _init_cbv(cls)
-    cbv_router = APIRouter()
+    cbv_router = router.__class__()
     function_members = inspect.getmembers(cls, inspect.isfunction)
     functions_set = set(func for _, func in function_members)
     cbv_routes = [
         route
         for route in router.routes
-        if isinstance(route, (Route, WebSocketRoute))
+        if isinstance(route, RouteProtocol)
         and route.endpoint in functions_set
     ]
     for route in cbv_routes:
@@ -95,7 +96,7 @@ def _init_cbv(cls: Type[Any]) -> None:
 
 
 def _update_cbv_route_endpoint_signature(
-    cls: Type[Any], route: Union[Route, WebSocketRoute]
+    cls: Type[Any], route: Route
 ) -> None:
     """
     Fixes the endpoint signature for a cbv route to ensure FastAPI performs dependency injection properly.
