@@ -20,7 +20,7 @@ class PyNestFactory(AbstractPyNestFactory):
     """Factory class for creating PyNest applications."""
 
     @staticmethod
-    def create(main_module: Type[ModuleType], **kwargs) -> PyNestApp:
+    def create(main_module: Type[ModuleType], app_cls: Type[App] = FastAPIApp, **kwargs) -> PyNestApp:
         """
         Create a PyNest application with the specified main module class.
 
@@ -33,11 +33,11 @@ class PyNestFactory(AbstractPyNestFactory):
         """
         container = PyNestContainer()
         container.add_module(main_module)
-        http_server = PyNestFactory._create_server(**kwargs)
+        http_server = PyNestFactory._create_server(app_cls, **kwargs)
         return PyNestApp(container, http_server)
 
     @staticmethod
-    def _create_server(app_cls: Type[App] = FastAPIApp, **kwargs) -> App:
+    def _create_server(app_cls: Type[App], **kwargs) -> App:
         """
         Create a FastAPI server.
 
