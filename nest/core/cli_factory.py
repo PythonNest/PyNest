@@ -3,10 +3,10 @@ import asyncio
 import click
 
 from nest.core.pynest_container import PyNestContainer
-from nest.core.pynest_factory import AbstractPyNestFactory, ModuleType
+from nest.core.pynest_factory import PyNestFactory, ModuleType
 
 
-class CLIAppFactory(AbstractPyNestFactory):
+class CLIAppFactory(PyNestFactory):
     def __init__(self):
         super().__init__()
 
