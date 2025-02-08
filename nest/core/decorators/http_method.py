@@ -1,11 +1,11 @@
-from typing import Callable, List, Union, TypeVar, TypeAlias
+from typing import Callable, List, Union, TypeVar
 from enum import Enum
 import sys
 
 if sys.version_info >= (3, 10):
-    from typing import ParamSpec
+    from typing import ParamSpec, TypeAlias
 else:
-    from typing_extensions import ParamSpec
+    from typing_extensions import ParamSpec, TypeAlias
 
 
 P = ParamSpec("P")
