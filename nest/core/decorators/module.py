@@ -1,5 +1,7 @@
+from typing import Type, TypeVar
 from nest.common.constants import ModuleMetadata
 
+C = TypeVar('C', bound=object)
 
 class Module:
     def __init__(
@@ -16,7 +18,7 @@ class Module:
         self.exports = exports
         self.is_global = is_global
 
-    def __call__(self, cls):
+    def __call__(self, cls: Type[C]) -> Type[C]:
         setattr(cls, ModuleMetadata.CONTROLLERS, self.controllers)
         setattr(cls, ModuleMetadata.PROVIDERS, self.providers)
         setattr(cls, ModuleMetadata.IMPORTS, self.imports)
