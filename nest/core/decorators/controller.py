@@ -1,4 +1,4 @@
-from typing import Optional, Type
+from typing import Optional, Type, TypeVar, Callable
 
 from fastapi.routing import APIRouter
 
@@ -6,8 +6,9 @@ from nest.core.decorators.class_based_view import class_based_view as ClassBased
 from nest.core.decorators.http_method import HTTPMethod
 from nest.core.decorators.utils import get_instance_variables, parse_dependencies
 
+C = TypeVar('C', bound=object)
 
-def Controller(prefix: Optional[str] = None, tag: Optional[str] = None):
+def Controller(prefix: Optional[str] = None, tag: Optional[str] = None) -> Callable[[Type[C]], Type[C]]:
     """
     Decorator that turns a class into a controller, allowing you to define
     routes using FastAPI decorators.
@@ -23,7 +24,7 @@ def Controller(prefix: Optional[str] = None, tag: Optional[str] = None):
     # Default route_prefix to tag_name if route_prefix is not provided
     route_prefix = process_prefix(prefix, tag)
 
-    def wrapper(cls: Type) -> Type[ClassBasedView]:
+    def wrapper(cls: Type[C]) -> Type[C]:
         router = APIRouter(tags=[tag] if tag else None)
 
         # Process class dependencies
