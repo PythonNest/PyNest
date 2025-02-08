@@ -9,9 +9,9 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 if sys.version_info >= (3, 10):
-    from typing import ParamSpec, TypeAlias
+    from typing import ParamSpec
 else:
-    from typing_extensions import ParamSpec, TypeAlias
+    from typing_extensions import ParamSpec
 
 P = ParamSpec("P")
 R = TypeVar("R")
