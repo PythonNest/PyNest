@@ -41,7 +41,7 @@ pip install pynest-api
 ### Start with cli
 
 ```bash
-pynest generate appplication -n my_app_name
+pynest generate application -n my_app_name
 ```
 
 this command will create a new project with the following structure:
