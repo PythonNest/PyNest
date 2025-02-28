@@ -1,10 +1,8 @@
 from typing import Any
-
-from fastapi import FastAPI
-
 from nest.common.route_resolver import RoutesResolver
 from nest.core.pynest_app_context import PyNestApplicationContext
 from nest.core.pynest_container import PyNestContainer
+from nest.engine.proto import App
 
 
 class PyNestApp(PyNestApplicationContext):
@@ -19,13 +17,13 @@ class PyNestApp(PyNestApplicationContext):
     def is_listening(self) -> bool:
         return self._is_listening
 
-    def __init__(self, container: PyNestContainer, http_server: FastAPI):
+    def __init__(self, container: PyNestContainer, http_server: App):
         """
         Initialize the PyNestApp with the given container and HTTP server.
 
         Args:
             container (PyNestContainer): The PyNestContainer container instance.
-            http_server (FastAPI): The FastAPI server instance.
+            http_server (App): The App server instance.
         """
         self.container = container
         self.http_server = http_server
@@ -48,12 +46,12 @@ class PyNestApp(PyNestApplicationContext):
         self.http_server.add_middleware(middleware, **options)
         return self
 
-    def get_server(self) -> FastAPI:
+    def get_server(self) -> App:
         """
-        Get the FastAPI server instance.
+        Get the App server instance.
 
         Returns:
-            FastAPI: The FastAPI server instance.
+            App: The App server instance.
         """
         return self.http_server
 
