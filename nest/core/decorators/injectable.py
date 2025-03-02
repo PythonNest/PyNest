@@ -1,12 +1,14 @@
-from typing import Callable, Optional, Type
+from typing import Callable, Optional, Type, TypeVar
 
 from injector import inject
 
 from nest.common.constants import DEPENDENCIES, INJECTABLE_NAME, INJECTABLE_TOKEN
 from nest.core.decorators.utils import parse_dependencies
 
+C = TypeVar('C', bound=object)
 
-def Injectable(target_class: Optional[Type] = None, *args, **kwargs) -> Callable:
+
+def Injectable(target_class: Optional[Type[C]] = None, *args, **kwargs) -> Callable:
     """
     Decorator to mark a class as injectable and handle its dependencies.
 
@@ -17,7 +19,7 @@ def Injectable(target_class: Optional[Type] = None, *args, **kwargs) -> Callable
         Callable: The decorator function.
     """
 
-    def decorator(decorated_class: Type) -> Type:
+    def decorator(decorated_class: Type[C]) -> Type[C]:
         """
         Inner decorator function to process the class.
 

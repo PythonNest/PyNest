@@ -19,13 +19,12 @@ from typing import (
 from fastapi import APIRouter, Depends
 from starlette.routing import Route, WebSocketRoute
 
-T = TypeVar("T")
-K = TypeVar("K", bound=Callable[..., Any])
+C = TypeVar("C", bound=object)
 
 CBV_CLASS_KEY = "__cbv_class__"
 
 
-def class_based_view(router: APIRouter, cls: Type[T]) -> Type[T]:
+def class_based_view(router: APIRouter, cls: Type[C]) -> Type[C]:
     """
     Replaces any methods of the provided class `cls` that are endpoints of routes in `router` with updated
     function calls that will properly inject an instance of `cls`.
@@ -48,7 +47,7 @@ def class_based_view(router: APIRouter, cls: Type[T]) -> Type[T]:
     return cls
 
 
-def _init_cbv(cls: Type[Any]) -> None:
+def _init_cbv(cls: Type[C]) -> None:
     """
     Idempotently modifies the provided `cls`, performing the following modifications:
     * The `__init__` function is updated to set any class-annotated dependencies as instance attributes

@@ -1,7 +1,9 @@
+from typing import Type, TypeVar
 from nest.common.constants import ModuleMetadata
 from typing import List
 import dataclasses
 
+C = TypeVar('C', bound=object)
 
 @dataclasses.dataclass(frozen=True)
 class Module:
@@ -11,7 +13,7 @@ class Module:
     imports: List[type] = dataclasses.field(default_factory=list)
     is_global: bool = dataclasses.field(default=False)
 
-    def __call__(self, cls):
+    def __call__(self, cls: Type[C]) -> Type[C]:
         setattr(cls, ModuleMetadata.CONTROLLERS, self.controllers)
         setattr(cls, ModuleMetadata.PROVIDERS, self.providers)
         setattr(cls, ModuleMetadata.IMPORTS, self.imports)
