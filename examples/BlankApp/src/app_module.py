@@ -25,5 +25,3 @@ app = PyNestFactory.create(
     version="1.0.0",
     debug=True,
 )
-
-http_server: FastAPI = app.get_server()

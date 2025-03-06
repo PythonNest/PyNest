@@ -2,7 +2,6 @@ from functools import partial
 
 import click
 
-from nest.core import Controller
 from nest.core.decorators.utils import (
     get_instance_variables,
     parse_dependencies,
