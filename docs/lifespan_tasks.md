@@ -26,7 +26,7 @@ from nest.core import PyNestFactory
 
 app = PyNestFactory.create(
     AppModule,
-    description="This is my FastAPI app with lifespan task",
+    description="This is my PyNest app with lifespan task",
     title="My App",
     version="1.0.0",
     debug=True,
