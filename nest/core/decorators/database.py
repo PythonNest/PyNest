@@ -3,12 +3,21 @@ import time
 
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TypeVar, Callable, Union
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+if sys.version_info >= (3, 10):
+    from typing import ParamSpec
+else:
+    from typing_extensions import ParamSpec
 
-def db_request_handler(func):
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def db_request_handler(func: Callable[[P], R]) -> Callable[[object, P], Union[R, HTTPException]]:
     """
     Decorator that handles database requests, including error handling and session management.
 
@@ -19,7 +28,7 @@ def db_request_handler(func):
         function: The decorated function.
     """
 
-    def wrapper(self, *args, **kwargs):
+    def wrapper(self, *args: P.args, **kwargs: P.kwargs) -> Union[R, HTTPException]:
         try:
             s = time.time()
             result = func(self, *args, **kwargs)
@@ -40,7 +49,7 @@ def db_request_handler(func):
     return wrapper
 
 
-def async_db_request_handler(func):
+def async_db_request_handler(func: Callable[[P], R]) -> Callable[[P], R]:
     """
     Asynchronous decorator that handles database requests, including error handling,
     session management, and logging for async functions.
@@ -52,7 +61,7 @@ def async_db_request_handler(func):
         function: The decorated async function.
     """
 
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         try:
             start_time = time.time()
             result = await func(*args, **kwargs)  # Awaiting the async function
