@@ -26,7 +26,7 @@ class ModulesContainer(dict):
         return True if self.get(token) is not None else False
 
 
-class Module:
+class NestModule:
     def __init__(self, metatype: Type[object], container):
         self._id = str(uuid.uuid4())
         self._metatype = metatype

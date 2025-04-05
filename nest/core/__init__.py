@@ -1,5 +1,3 @@
-from fastapi import Depends
-
 from nest.core.decorators import (
     Controller,
     Delete,
@@ -10,6 +8,17 @@ from nest.core.decorators import (
     Patch,
     Post,
     Put,
+)
+from nest.core.protocols import (
+    Param,
+    Query,
+    Header,
+    Body,
+    Cookie,
+    RequestProtocol,
+    ResponseProtocol,
+    File,
+    Form,
 )
 from nest.core.pynest_application import PyNestApp
 from nest.core.pynest_container import PyNestContainer
