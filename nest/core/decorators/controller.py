@@ -1,7 +1,7 @@
 from typing import Optional, Type
 
-from fastapi.routing import APIRouter
-
+from nest.engine.proto import Router
+from nest.engine.fastapi import FastAPIRouter
 from nest.core.decorators.class_based_view import class_based_view as ClassBasedView
 from nest.core.decorators.http_method import HTTPMethod
 from nest.core.decorators.utils import get_instance_variables, parse_dependencies
@@ -24,7 +24,9 @@ def Controller(prefix: Optional[str] = None, tag: Optional[str] = None):
     route_prefix = process_prefix(prefix, tag)
 
     def wrapper(cls: Type) -> Type[ClassBasedView]:
-        router = APIRouter(tags=[tag] if tag else None)
+        tags = [tag] if tag else None
+        # TODO: replace with factory
+        router: Router = FastAPIRouter(tags=tags)
 
         # Process class dependencies
         process_dependencies(cls)
@@ -86,7 +88,7 @@ def ensure_init_method(cls: Type) -> None:
         pass
 
 
-def add_routes(cls: Type, router: APIRouter, route_prefix: str) -> None:
+def add_routes(cls: Type, router: Router, route_prefix: str) -> None:
     """Add routes from class methods to the router."""
     for method_name, method_function in cls.__dict__.items():
         if callable(method_function) and hasattr(method_function, "__http_method__"):
@@ -127,7 +129,7 @@ def configure_method_route(method_function: callable, route_prefix: str) -> None
         method_function.__route_path__ = method_function.__route_path__.rstrip("/")
 
 
-def add_route_to_router(router: APIRouter, method_function: callable) -> None:
+def add_route_to_router(router: Router, method_function: callable) -> None:
     """Add the configured route to the router."""
     route_kwargs = {
         "path": method_function.__route_path__,
