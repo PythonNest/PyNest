@@ -6,7 +6,7 @@ from fastapi import Depends
 from nest.core.decorators.class_based_view import class_based_view as ClassBasedView
 from nest.core.decorators.http_method import HTTPMethod
 from nest.core.decorators.utils import get_instance_variables, parse_dependencies
-from nest.core.guards import BaseGuard
+from nest.core.decorators.guards import BaseGuard
 
 
 def Controller(prefix: Optional[str] = None, tag: Optional[str] = None):
