@@ -11,6 +11,7 @@ from nest.core.decorators import (
     Post,
     Put,
 )
+from nest.core.guards import BaseGuard, UseGuards
 from nest.core.pynest_application import PyNestApp
 from nest.core.pynest_container import PyNestContainer
 from nest.core.pynest_factory import PyNestFactory
