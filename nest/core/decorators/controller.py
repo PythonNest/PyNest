@@ -138,7 +138,9 @@ def _collect_guards(cls: Type, method: callable) -> List[BaseGuard]:
     return guards
 
 
-def add_route_to_router(router: APIRouter, method_function: callable, cls: Type) -> None:
+def add_route_to_router(
+    router: APIRouter, method_function: callable, cls: Type
+) -> None:
     """Add the configured route to the router."""
     route_kwargs = {
         "path": method_function.__route_path__,
@@ -154,7 +156,7 @@ def add_route_to_router(router: APIRouter, method_function: callable, cls: Type)
     if guards:
         dependencies = route_kwargs.get("dependencies", [])
         for guard in guards:
-            dependencies.append(Depends(guard()))
+            dependencies.append(Depends(guard.as_dependency()))
         route_kwargs["dependencies"] = dependencies
 
     router.add_api_route(**route_kwargs)

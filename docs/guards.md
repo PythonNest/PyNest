@@ -1,6 +1,6 @@
 # Guards and Authentication
 
-PyNest now supports route guards similar to NestJS. Guards are classes that implement custom authorization logic. Use the `UseGuards` decorator to attach one or more guards to a controller or to specific routes.
+PyNest now supports route guards similar to NestJS. Guards are classes that implement custom authorization logic. Use the `UseGuards` decorator to attach one or more guards to a controller or to specific routes.  If a guard defines a FastAPI security scheme via the ``security_scheme`` attribute, the generated OpenAPI schema will mark the route as protected and the interactive docs will allow entering credentials.
 
 ```python
 from fastapi import Request
@@ -23,26 +23,31 @@ When the guard returns `False`, a `403 Forbidden` response is sent automatically
 
 ## JWT Authentication Example
 
-You can use third-party libraries like `pyjwt` to validate tokens inside a guard.
+You can use third-party libraries like `pyjwt` together with FastAPI's security utilities.
 
 ```python
 import jwt
 from fastapi import Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from nest.core import BaseGuard
 
 class JWTGuard(BaseGuard):
-    def can_activate(self, request: Request) -> bool:
-        auth = request.headers.get("Authorization", "")
-        token = auth.replace("Bearer ", "")
+    security_scheme = HTTPBearer()
+
+    def can_activate(
+        self, request: Request, credentials: HTTPAuthorizationCredentials
+    ) -> bool:
         try:
-            payload = jwt.decode(token, "your-secret", algorithms=["HS256"])
+            payload = jwt.decode(
+                credentials.credentials, "your-secret", algorithms=["HS256"]
+            )
         except jwt.PyJWTError:
             return False
         request.state.user = payload.get("sub")
         return True
 ```
 
-Attach the guard with `@UseGuards(JWTGuard)` on controllers or routes to secure them.
+Attach the guard with `@UseGuards(JWTGuard)` on controllers or routes to secure them. Because ``JWTGuard`` specifies a ``security_scheme`` the route will display a lock icon in the docs and allow entering a token.
 
 ## Controller vs. Route Guards
 
@@ -101,4 +106,11 @@ class AsyncGuard(BaseGuard):
 ```
 
 PyNest awaits the result automatically.
+
+## OpenAPI Integration
+
+When a guard sets the ``security_scheme`` attribute, the generated OpenAPI schema
+includes the corresponding security requirement. The docs page will show a lock
+icon next to the route and present an input box for the token or credentials.
+This works with any ``fastapi.security`` scheme (e.g. ``HTTPBearer``, ``OAuth2PasswordBearer``).
 
