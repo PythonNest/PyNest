@@ -1,10 +1,12 @@
-from typing import Optional, Type
+from typing import Optional, Type, List
 
 from fastapi.routing import APIRouter
+from fastapi import Depends
 
 from nest.core.decorators.class_based_view import class_based_view as ClassBasedView
 from nest.core.decorators.http_method import HTTPMethod
 from nest.core.decorators.utils import get_instance_variables, parse_dependencies
+from nest.core.decorators.guards import BaseGuard
 
 
 def Controller(prefix: Optional[str] = None, tag: Optional[str] = None):
@@ -92,7 +94,7 @@ def add_routes(cls: Type, router: APIRouter, route_prefix: str) -> None:
         if callable(method_function) and hasattr(method_function, "__http_method__"):
             validate_method_decorator(method_function, method_name)
             configure_method_route(method_function, route_prefix)
-            add_route_to_router(router, method_function)
+            add_route_to_router(router, method_function, cls)
 
 
 def validate_method_decorator(method_function: callable, method_name: str) -> None:
@@ -127,7 +129,18 @@ def configure_method_route(method_function: callable, route_prefix: str) -> None
         method_function.__route_path__ = method_function.__route_path__.rstrip("/")
 
 
-def add_route_to_router(router: APIRouter, method_function: callable) -> None:
+def _collect_guards(cls: Type, method: callable) -> List[BaseGuard]:
+    guards: List[BaseGuard] = []
+    for guard in getattr(cls, "__guards__", []):
+        guards.append(guard)
+    for guard in getattr(method, "__guards__", []):
+        guards.append(guard)
+    return guards
+
+
+def add_route_to_router(
+    router: APIRouter, method_function: callable, cls: Type
+) -> None:
     """Add the configured route to the router."""
     route_kwargs = {
         "path": method_function.__route_path__,
@@ -138,5 +151,12 @@ def add_route_to_router(router: APIRouter, method_function: callable) -> None:
 
     if hasattr(method_function, "status_code"):
         route_kwargs["status_code"] = method_function.status_code
+
+    guards = _collect_guards(cls, method_function)
+    if guards:
+        dependencies = route_kwargs.get("dependencies", [])
+        for guard in guards:
+            dependencies.append(guard.as_dependency())
+        route_kwargs["dependencies"] = dependencies
 
     router.add_api_route(**route_kwargs)
