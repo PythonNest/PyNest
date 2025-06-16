@@ -1,4 +1,4 @@
-from fastapi import Request, HTTPException, status, Security
+from fastapi import Request, HTTPException, status, Security, Depends
 from fastapi.security.base import SecurityBase
 from typing import Optional
 import inspect
@@ -266,11 +266,10 @@ class BaseGuard:
         **Internal Implementation Details:**
         
         - If no security_scheme: Creates a simple dependency that validates the request
-        - If security_scheme exists: Creates a dependency that uses FastAPI's Security()
-          to extract credentials and pass them to the guard
+        - If security_scheme exists: Creates a dependency with Security parameter for OpenAPI
           
         The returned dependency will:
-        - Appear in OpenAPI schema (if security_scheme is set)
+        - Appear in OpenAPI schema (if security_scheme is set)  
         - Extract credentials automatically (if security_scheme is set)
         - Execute guard logic and raise 403 on failure
         """
@@ -280,16 +279,20 @@ class BaseGuard:
                 guard = cls()
                 await guard(request)
 
-            return dependency
+            return Depends(dependency)
 
-        # Security scheme configured - use FastAPI Security dependency
+        # Security scheme configured - create function with Security parameter
+        # This allows FastAPI to detect the security requirement for OpenAPI
         security_scheme = cls.security_scheme
 
-        async def dependency(request: Request, credentials=Security(security_scheme)):
+        async def security_dependency(
+            request: Request,
+            credentials=Security(security_scheme)
+        ):
             guard = cls()
             await guard(request, credentials)
 
-        return dependency
+        return Depends(security_dependency)
 
 
 def UseGuards(*guards):

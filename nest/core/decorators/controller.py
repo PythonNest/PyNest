@@ -156,7 +156,7 @@ def add_route_to_router(
     if guards:
         dependencies = route_kwargs.get("dependencies", [])
         for guard in guards:
-            dependencies.append(Depends(guard.as_dependency()))
+            dependencies.append(guard.as_dependency())
         route_kwargs["dependencies"] = dependencies
 
     router.add_api_route(**route_kwargs)
