@@ -1,5 +1,6 @@
 from fastapi import Request, HTTPException, status, Security
 from fastapi.security.base import SecurityBase
+from typing import Optional
 import inspect
 
 
@@ -194,7 +195,7 @@ class BaseGuard:
     - Enable interactive authentication testing
     """
 
-    security_scheme: SecurityBase | None = None
+    security_scheme: Optional[SecurityBase] = None
 
     def can_activate(self, request: Request, credentials=None) -> bool:
         """Determine if the request should be allowed to proceed.
