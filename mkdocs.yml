@@ -49,6 +49,14 @@ extra_css:
   - styles/extra.css
 
 nav:
+
+  - Introduction: introduction.md
+  - Getting Started: getting_started.md
+  - CLI Usage: cli.md
+  - Modules: modules.md
+  - Controllers: controllers.md
+  - Providers: providers.md
+  - Exception Handling: pynest_exceptions_guide.md
   - Overview:
     - Introduction: introduction.md
     - Getting Started: getting_started.md
