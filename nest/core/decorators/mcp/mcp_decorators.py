@@ -1,3 +1,5 @@
+from typing import Optional
+
 from nest.core.decorators.utils import get_instance_variables, parse_dependencies
 
 
@@ -22,7 +24,7 @@ def McpController():
     return decorator
 
 
-def McpTool(name: str | None = None, **kwargs):
+def McpTool(name: Optional[str] = None, **kwargs):
     def decorator(func):
         metadata = {"name": name}
         metadata.update(kwargs)
@@ -44,7 +46,7 @@ def McpResource(uri: str, **kwargs):
     return decorator
 
 
-def McpPrompt(name: str | None = None, **kwargs):
+def McpPrompt(name: Optional[str] = None, **kwargs):
     def decorator(func):
         metadata = {"name": name}
         metadata.update(kwargs)

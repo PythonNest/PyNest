@@ -5,8 +5,6 @@ import uuid
 from typing import Any, List, Type
 from uuid import uuid4
 
-from nest.core import Module
-
 
 class ModulesContainer(dict):
     def __init__(self):
@@ -104,10 +102,10 @@ class Module:
     def distance(self, value):
         self._distance = value
 
-    def add_import(self, module_ref: Module):
+    def add_import(self, module_ref: "Module"):
         self._imports.add(module_ref)
 
-    def add_imports(self, module_ref: List[Module]):
+    def add_imports(self, module_ref: List["Module"]):
         for module in module_ref:
             self.add_import(module)
 
