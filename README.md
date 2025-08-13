@@ -186,3 +186,54 @@ PyNest is [MIT licensed](LICENSE).
 ## Credits
 
 PyNest is inspired by [NestJS](https://nestjs.com/).
+
+## MCP servers with FastMCP
+
+Build MCP servers that reuse the same modules, services, and controllers as your FastAPI and CLI apps.
+
+Install optional dependency:
+
+```bash
+pip install pynest-api[mcp]
+```
+
+Define an MCP controller with tools, resources, and prompts:
+
+```python
+from nest.core import Module, Injectable, McpController, McpTool, McpResource, McpPrompt
+from nest.core import MCPFactory
+
+@Injectable
+class MathService:
+    def add(self, a: int, b: int) -> int:
+        return a + b
+
+@McpController()
+class MathController:
+    def __init__(self, math: MathService):
+        self.math = math
+
+    @McpTool("add")
+    def add_tool(self, a: int, b: int) -> int:
+        return self.math.add(a, b)
+
+    @McpResource("greeting://{name}")
+    def greeting(self, name: str) -> str:
+        return f"Hello, {name}!"
+
+    @McpPrompt("summarize")
+    def summarize(self, text: str) -> str:
+        return f"Summarize: {text}"
+
+@Module(controllers=[MathController], providers=[MathService])
+class AppModule:
+    pass
+
+# Create MCP app
+mcp_app = MCPFactory.create(AppModule, name="Demo MCP")
+server = mcp_app.get_server()
+# Run with desired transport, e.g. stdio
+server.run(transport="stdio")
+```
+
+You can keep your FastAPI app alongside it using `PyNestFactory.create(AppModule)` and your CLI with `CLIAppFactory().create(AppModule)`.
