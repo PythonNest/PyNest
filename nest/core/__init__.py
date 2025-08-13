@@ -15,3 +15,15 @@ from nest.core.decorators.guards import BaseGuard, UseGuards
 from nest.core.pynest_application import PyNestApp
 from nest.core.pynest_container import PyNestContainer
 from nest.core.pynest_factory import PyNestFactory
+
+# MCP application and factory (safe: fastmcp is lazily imported when used)
+from nest.core.pynest_mcp_application import PyNestMCPApp
+from nest.core.mcp_factory import MCPFactory
+
+# MCP decorators
+from nest.core.decorators.mcp import (
+    McpController,
+    McpTool,
+    McpResource,
+    McpPrompt,
+)
