@@ -1,10 +1,13 @@
 from typing import Any
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
 from nest.common.route_resolver import RoutesResolver
 from nest.core.pynest_app_context import PyNestApplicationContext
 from nest.core.pynest_container import PyNestContainer
+from nest.core.apscheduler import start_scheduler, stop_scheduler
+from nest.core.decorators.scheduler import activate_scheduled_methods_for_instance
 
 
 class PyNestApp(PyNestApplicationContext):
@@ -33,6 +36,51 @@ class PyNestApp(PyNestApplicationContext):
         self.routes_resolver = RoutesResolver(self.container, self.http_server)
         self.select_context_module()
         self.register_routes()
+        
+        # Activate scheduled methods for all instantiated services
+        self._activate_scheduled_methods()
+        
+        # Setup lifecycle events for scheduler
+        self._setup_scheduler_lifecycle()
+
+    def _setup_scheduler_lifecycle(self):
+        """
+        Sets up lifecycle events to start and stop the scheduler.
+        """
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            # Startup
+            start_scheduler()
+            yield
+            # Shutdown
+            stop_scheduler()
+        
+        self.http_server.router.lifespan_context = lifespan
+
+    def _activate_scheduled_methods(self):
+        """
+        Activate scheduled methods for all instantiated services in the container.
+        """
+        try:
+            # Get all modules from the container
+            for module in self.container.modules.values():
+                # Get all providers from each module
+                for provider_name, provider_class in module.providers.items():
+                    try:
+                        # Get the instance from the container
+                        instance = self.container.get_instance(provider_class)
+                        if instance is not None:
+                            activate_scheduled_methods_for_instance(instance)
+                    except Exception as e:
+                        # Log the error for this specific provider but continue
+                        import logging
+                        logger = logging.getLogger(__name__)
+                        logger.debug(f"Could not activate scheduled methods for {provider_name}: {e}")
+        except Exception as e:
+            # Log the error but don't fail the application startup
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error activating scheduled methods: {e}")
 
     def use(self, middleware: type, **options: Any) -> "PyNestApp":
         """

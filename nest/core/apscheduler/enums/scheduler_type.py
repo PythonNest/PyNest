@@ -4,7 +4,6 @@ class SchedulerTypes(Enum):
     """ 
     An enumeration of scheduler types.
     """
-    CRON = 'cron',
+    CRON = 'cron'
     DATE = 'date'
-    INTERVAL = 'interval',
-    
+    INTERVAL = 'interval'
