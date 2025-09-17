@@ -38,10 +38,10 @@ pyyaml = "^6.0.2"
 fastapi = "^0.115.4"
 pydantic = "^2.9.2"
 uvicorn = "^0.32.0"
-APScheduler= "^3.10.4"
-pytz= "^2024.2"
-six= "^1.16.0"
-tzlocal= "^5.2"
+APScheduler = "^3.10.4"
+pytz = "^2024.2"
+six = "^1.16.0"
+tzlocal = "^5.2"
 
 
 # Optional dependencies
