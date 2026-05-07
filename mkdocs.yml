@@ -57,6 +57,7 @@ nav:
     - Controllers: controllers.md
     - Providers: providers.md
     - Guards: guards.md
+    - Exception Filters: exception_filters.md
   - Dependency Injection: dependency_injection.md
   - Deployment:
     - Docker: docker.md
