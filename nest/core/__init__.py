@@ -1,6 +1,7 @@
 from fastapi import Depends
 
 from nest.core.decorators import (
+    Catch,
     Controller,
     Delete,
     Get,
@@ -10,6 +11,7 @@ from nest.core.decorators import (
     Patch,
     Post,
     Put,
+    UseFilters,
 )
 from nest.core.decorators.guards import BaseGuard, UseGuards
 from nest.core.pynest_application import PyNestApp
