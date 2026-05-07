@@ -12,50 +12,54 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: "3.9"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.9.7"
+          enable-cache: true
 
       - name: Install dependencies
-        run: |
-          pip install poetry
-          poetry install
+        run: uv sync --no-dev --group test
 
       - name: Test CLI Commands
         run: |
           app_name="${{ matrix.app_type }}App"
           case "${{ matrix.app_type }}" in
             "Blank")
-              poetry run pynest generate application -n "$app_name"
+              uv run pynest generate application -n "$app_name"
               ;;
             "SyncORM")
-              poetry run pynest generate application -n "$app_name" -db sqlite
+              uv run pynest generate application -n "$app_name" -db sqlite
               ;;
             "AsyncORM")
-              poetry run pynest generate application -n "$app_name" -db sqlite --is-async
+              uv run pynest generate application -n "$app_name" -db sqlite --is-async
               ;;
             "MongoDB")
-              poetry run pynest generate application -n "$app_name" -db mongodb
+              uv run pynest generate application -n "$app_name" -db mongodb
               ;;
             "PostgresSync")
-              poetry run pynest generate application -n "$app_name" -db postgresql
+              uv run pynest generate application -n "$app_name" -db postgresql
               ;;
             "PostgresAsync")
-              poetry run pynest generate application -n "$app_name" -db postgresql --is-async
+              uv run pynest generate application -n "$app_name" -db postgresql --is-async
               ;;
             "MySQLSync")
-              poetry run pynest generate application -n "$app_name" -db mysql
+              uv run pynest generate application -n "$app_name" -db mysql
               ;;
             "MySQLAsync")
-              poetry run pynest generate application -n "$app_name" -db mysql --is-async
+              uv run pynest generate application -n "$app_name" -db mysql --is-async
               ;;
           esac
-          
+
           cd "$app_name"
-          poetry run pynest generate resource -n user
+          uv run pynest generate resource -n user
 
       - name: Verify Boilerplate
         run: |
@@ -66,7 +70,7 @@ jobs:
             echo "Directory $app_name does not exist."
             exit 1
           fi
-          
+
           if [ -d "$app_name/src/user" ]; then
             echo "Directory $app_name/src/user exists."
           else
@@ -74,12 +78,10 @@ jobs:
             exit 1
           fi
 
-          # List of expected files
           declare -a files=("main.py" "requirements.txt" "README.md")
           declare -a src_level_files=("app_module.py" "app_service.py" "app_controller.py")
           declare -a module_files=("user_controller.py" "user_service.py" "user_module.py" "user_model.py")
 
-          # Check each file in the list of files
           for file in "${files[@]}"; do
             if [ -f "$app_name/$file" ]; then
               echo "$file exists in $app_name."
@@ -88,8 +90,7 @@ jobs:
               exit 1
             fi
           done
-          
-          # Check each file in the list of files
+
           for file in "${src_level_files[@]}"; do
             if [ -f "$app_name/src/$file" ]; then
               echo "$file exists in $app_name."
@@ -99,7 +100,6 @@ jobs:
             fi
           done
 
-          # Check each file in the list of module_files
           for file in "${module_files[@]}"; do
             if [ -f "$app_name/src/user/$file" ]; then
               echo "$file exists in $app_name."

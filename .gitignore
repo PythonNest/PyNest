@@ -5,11 +5,12 @@ __pycache__/
 *.pyd
 
 # Dependency directories
+.venv/
 venv/
 env/
 envs/
 .env
-poetry.lock
+uv.lock
 requirements.txt
 
 # Compiled source
@@ -34,6 +35,7 @@ requirements.txt
 # Compiled files
 dist/
 build/
+site/
 *.egg-info/
 
 # Testing

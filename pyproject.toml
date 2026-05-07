@@ -1,21 +1,20 @@
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
 
-
-[tool.poetry]
+[project]
 name = "pynest-api"
 version = "0.4.0"
 description = "PyNest is a FastAPI Abstraction for building microservices, influenced by NestJS."
-authors = ["itay.dar <itay.dar@lemonade.com>"]
-readme = "README.md"
-homepage = "https://github.com/PythonNest/PyNest"
-documentation = "https://pythonnest.github.io/PyNest/"
-packages = [
-    { include = "nest" }
+authors = [
+    { name = "itay.dar", email = "itay2803@gmail.com" },
 ]
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -25,59 +24,71 @@ classifiers = [
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+dependencies = [
+    "click>=8.1.7,<9.0.0",
+    "injector>=0.22.0,<0.23.0",
+    "astor>=0.8.1,<0.9.0",
+    "pyyaml>=6.0.2,<7.0.0",
+    "fastapi>=0.115.4,<0.116.0",
+    "pydantic>=2.9.2,<3.0.0",
+    "uvicorn>=0.32.0,<0.33.0",
+    "black>=24.10.0,<25.0.0",
+]
 
+[project.optional-dependencies]
+postgres = [
+    "sqlalchemy>=2.0.36,<3.0.0",
+    "asyncpg>=0.30.0,<0.31.0",
+    "psycopg2>=2.9.3,<3.0.0",
+    "alembic>=1.13.3,<2.0.0",
+    "greenlet>=3.1.1,<4.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+]
+mongo = [
+    "beanie>=1.27.0,<2.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+]
+test = [
+    "pytest>=7.0.1,<8.0.0",
+]
 
+[dependency-groups]
+test = [
+    "pytest>=7.0.1,<8.0.0",
+    "sqlalchemy>=2.0.36,<3.0.0",
+    "motor>=3.2.0,<4.0.0",
+    "beanie>=1.27.0,<2.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+    "aiosqlite>=0.19.0,<1.0.0",
+]
+docs = [
+    "mkdocs-material>=9.5.43,<10.0.0",
+    "mkdocstrings-python>=1.12.2,<2.0.0",
+]
+build = [
+    "build>=1.2.2.post1,<2.0.0",
+    "twine>=6.2.0,<7.0.0",
+    "git-changelog>=2.5.2,<3.0.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-# Core dependencies
-click = "^8.1.7"
-injector = "^0.22.0"
-astor = "^0.8.1"
-pyyaml = "^6.0.2"
-fastapi = "^0.115.4"
-pydantic = "^2.9.2"
-uvicorn = "^0.32.0"
+[project.urls]
+Homepage = "https://github.com/PythonNest/PyNest"
+Documentation = "https://pythonnest.github.io/PyNest/"
 
+[project.scripts]
+pynest = "nest.cli.cli:nest_cli"
 
-# Optional dependencies
-sqlalchemy = { version = "^2.0.36", optional = true }
-asyncpg = { version = "^0.30.0", optional = true }
-psycopg2 = { version = "^2.9.3", optional = true }
-alembic = { version = "^1.13.3", optional = true }
-beanie = { version = "^1.27.0", optional = true }
-python-dotenv = { version = "^1.0.1", optional = true }
-greenlet = { version = "^3.1.1", optional = true }
-black = "^24.10.0"
+[tool.hatch.build.targets.wheel]
+packages = ["nest"]
 
-
-
-[tool.poetry.extras]
-postgres = ["sqlalchemy", "asyncpg", "psycopg2", "alembic", "greenlet", "python-dotenv"]
-mongo = ["beanie", "python-dotenv"]
-test = ["pytest"]
-
-[tool.poetry.group.build.dependencies]
-setuptools = "^75.3.0"
-wheel = "^0.44.0"
-build = "^1.2.2.post1"
-twine = "^5.1.1"
-git-changelog = "^2.5.2"
-
-[tool.poetry.group.test.dependencies]
-pytest = "^7.0.1"
-fastapi = "^0.115.4"
-sqlalchemy = "^2.0.36"
-motor = "^3.2.0"
-beanie = "^1.27.0"
-pydantic = "^2.9.2"
-python-dotenv = "^1.0.1"
-uvicorn = "^0.32.0"
-
-[tool.poetry.group.docs.dependencies]
-mkdocs-material = "^9.5.43"
-mkdocstrings-python = "^1.12.2"
-
+[tool.hatch.build.targets.sdist]
+include = [
+    "nest",
+    "tests",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]
 
 [tool.black]
 force-exclude = '''
@@ -100,12 +111,3 @@ exclude = [
     "/*venv*"
 ]
 ignore_missing_imports = true
-
-[tool.poetry.urls]
-Homepage = "https://github.com/PythonNest/PyNest"
-Documentation = "https://pythonnest.github.io/PyNest/"
-
-[tool.poetry.scripts]
-pynest = "nest.cli.cli:nest_cli"
-
-
