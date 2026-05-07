@@ -12,17 +12,21 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: "3.9"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.9.7"
+          enable-cache: true
 
       - name: Install dependencies
-        run: |
-          pip install poetry
-          poetry install
+        run: uv sync --no-dev --group test
 
       - name: Start Application
         run: |
@@ -38,15 +42,14 @@ jobs:
           fi
 
           if [ "${{ matrix.app_type }}" == "Blank" ]; then
-            poetry run pynest generate application -n "$app_name"
+            uv run pynest generate application -n "$app_name"
           else
-            poetry run pynest generate application -n "$app_name" -db sqlite $is_async
-            poetry add aiosqlite
+            uv run pynest generate application -n "$app_name" -db sqlite $is_async
           fi
 
           cd "$app_name"
-          poetry run pynest generate resource -n user
-          poetry run uvicorn "src.app_module:http_server" --host "0.0.0.0" --port 8000 --reload &
+          uv run pynest generate resource -n user
+          uv run uvicorn "src.app_module:http_server" --host "0.0.0.0" --port 8000 --reload &
 
       - name: Wait for the server to start
         run: sleep 10

@@ -179,6 +179,31 @@ or open a new one if you have an idea for a new feature or improvement.
 
 This would bring a huge impact to the project and the community.
 
+### Development
+
+This repository uses [uv](https://docs.astral.sh/uv/) for local development, testing, building, and release automation.
+As a library project, `uv.lock` is intentionally ignored and not committed.
+
+```bash
+uv sync --no-dev --group test
+uv run pytest tests
+```
+
+Build and validate the package before publishing:
+
+```bash
+uv sync --no-dev --group build
+uv build --sdist --wheel
+uv run twine check dist/*
+```
+
+Docs can be built with:
+
+```bash
+uv sync --no-dev --group docs
+uv run mkdocs build --clean
+```
+
 ## License
 
 PyNest is [MIT licensed](LICENSE).
