@@ -1,51 +1,47 @@
-from typing import Callable, Optional, Type
+from __future__ import annotations
+
+from typing import Callable, Optional, Type, Union
 
 from injector import inject
 
-from nest.common.constants import DEPENDENCIES, INJECTABLE_NAME, INJECTABLE_TOKEN
-from nest.core.decorators.utils import parse_dependencies
+from nest.common.constants import INJECTABLE_TOKEN
+from nest.common.provider import Scope
 
 
-def Injectable(target_class: Optional[Type] = None, *args, **kwargs) -> Callable:
+def Injectable(
+    target_class: Optional[Type] = None,
+    *,
+    scope: Scope = Scope.SINGLETON,
+) -> Union[Type, Callable]:
     """
-    Decorator to mark a class as injectable and handle its dependencies.
+    Mark a class as injectable so the PyNest container can wire its dependencies.
 
-    Args:
-        target_class (Type, optional): The class to be decorated.
+    Usage:
+        @Injectable
+        class MyService: ...
 
-    Returns:
-        Callable: The decorator function.
+        @Injectable(scope=Scope.TRANSIENT)
+        class MyService: ...
     """
 
-    def decorator(decorated_class: Type) -> Type:
-        """
-        Inner decorator function to process the class.
+    def decorator(cls: Type) -> Type:
+        # Apply injector's @inject so constructor params are resolved by type annotation.
+        # Only apply when the class defines its own __init__ with annotated parameters,
+        # to avoid failures on Python 3.14+ for classes with no custom __init__.
+        own_init = cls.__dict__.get("__init__")
+        if own_init is not None and getattr(own_init, "__annotations__", None):
+            inject(cls)
 
-        Args:
-            decorated_class (Type): The class to be processed.
+        # Store metadata flags — never set dependency values as class attributes
+        setattr(cls, INJECTABLE_TOKEN, True)
+        setattr(cls, "__injectable_scope__", scope)
+        setattr(cls, "__injectable_name__", cls.__name__)
 
-        Returns:
-            Type: The processed class with dependencies injected.
-        """
-
-        if "__init__" not in decorated_class.__dict__:
-
-            def init_method(self, *args, **kwargs):
-                pass
-
-            decorated_class.__init__ = init_method
-
-        dependencies = parse_dependencies(decorated_class)
-
-        setattr(decorated_class, DEPENDENCIES, dependencies)
-        setattr(decorated_class, INJECTABLE_TOKEN, True)
-        setattr(decorated_class, INJECTABLE_NAME, decorated_class.__name__)
-
-        inject(decorated_class)
-
-        return decorated_class
+        return cls
 
     if target_class is not None:
+        # Called as @Injectable (no parentheses)
         return decorator(target_class)
 
+    # Called as @Injectable(scope=...) with arguments
     return decorator
