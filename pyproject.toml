@@ -55,6 +55,7 @@ test = [
 [dependency-groups]
 test = [
     "pytest>=7.0.1,<8.0.0",
+    "httpx>=0.27.0,<1.0.0",
     "sqlalchemy>=2.0.36,<3.0.0",
     "motor>=3.2.0,<4.0.0",
     "beanie>=1.27.0,<2.0.0",
