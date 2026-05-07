@@ -1,4 +1,5 @@
 from nest.core.decorators.controller import Controller
+from nest.core.decorators.filters import Catch, UseFilters
 from nest.core.decorators.http_code import HttpCode
 from nest.core.decorators.http_method import Delete, Get, Patch, Post, Put
 from nest.core.decorators.injectable import Injectable
