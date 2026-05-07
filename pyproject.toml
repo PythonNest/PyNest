@@ -7,7 +7,7 @@ name = "pynest-api"
 version = "0.4.0"
 description = "PyNest is a FastAPI Abstraction for building microservices, influenced by NestJS."
 authors = [
-    { name = "itay.dar", email = "itay.dar@lemonade.com" },
+    { name = "itay.dar", email = "itay2803@gmail.com" },
 ]
 readme = "README.md"
 requires-python = ">=3.9"
