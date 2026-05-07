@@ -16,7 +16,7 @@ from typing import (
     get_type_hints,
 )
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from starlette.routing import Route, WebSocketRoute
 
 T = TypeVar("T")
@@ -43,6 +43,7 @@ def class_based_view(router: APIRouter, cls: Type[T]) -> Type[T]:
     for route in cbv_routes:
         router.routes.remove(route)
         _update_cbv_route_endpoint_signature(cls, route)
+        _wrap_route_with_filters(cls, route)
         cbv_router.routes.append(route)
     router.include_router(cbv_router)
     return cls
@@ -111,3 +112,59 @@ def _update_cbv_route_endpoint_signature(
     ]
     new_signature = old_signature.replace(parameters=new_parameters)
     setattr(route.endpoint, "__signature__", new_signature)
+
+
+def _wrap_route_with_filters(cls: Type[Any], route: Union[Route, WebSocketRoute]) -> None:
+    """Wrap a route endpoint with controller/route-level exception filter logic.
+
+    Called after _update_cbv_route_endpoint_signature so the wrapper inherits
+    the correct CBV __signature__ (with self as Depends(cls)).
+    """
+    from nest.common.exceptions import ArgumentsHost
+
+    route_filters = list(getattr(route.endpoint, "__filters__", []))
+    controller_filters = list(getattr(cls, "__filters__", []))
+    if not route_filters and not controller_filters:
+        return
+
+    original_endpoint = route.endpoint
+    cbv_signature = getattr(original_endpoint, "__signature__", inspect.signature(original_endpoint))
+
+    # Inject `request: Request` into the wrapper signature so FastAPI provides it.
+    existing_params = list(cbv_signature.parameters.values())
+    has_request = any(p.name == "request" for p in existing_params)
+    if not has_request:
+        request_param = inspect.Parameter(
+            "request",
+            inspect.Parameter.KEYWORD_ONLY,
+            annotation=Request,
+        )
+        wrapper_signature = cbv_signature.replace(parameters=existing_params + [request_param])
+    else:
+        wrapper_signature = cbv_signature
+
+    orig_param_names = {p.name for p in existing_params}
+
+    async def filter_wrapper(*args, **kwargs):
+        request = kwargs.get("request")
+        call_kwargs = {k: v for k, v in kwargs.items() if k in orig_param_names}
+        try:
+            result = original_endpoint(*args, **call_kwargs)
+            if inspect.isawaitable(result):
+                result = await result
+            return result
+        except Exception as exc:
+            host = ArgumentsHost(request=request)
+            for raw_filter in route_filters + controller_filters:
+                f = raw_filter() if isinstance(raw_filter, type) else raw_filter
+                caught = getattr(f, "__caught_exceptions__", ())
+                if not caught or isinstance(exc, caught):
+                    result = f.catch(exc, host)
+                    if inspect.isawaitable(result):
+                        return await result
+                    return result
+            raise
+
+    filter_wrapper.__name__ = getattr(original_endpoint, "__name__", "filter_wrapper")
+    filter_wrapper.__signature__ = wrapper_signature
+    route.endpoint = filter_wrapper
