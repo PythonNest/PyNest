@@ -11,6 +11,7 @@ from nest.common.exceptions import (
     UnknownModuleException,
 )
 from nest.common.module import (
+    CompiledModule,
     Module,
     ModuleCompiler,
     ModuleFactory,
@@ -95,7 +96,7 @@ class PyNestContainer:
             return {"module_ref": self.modules.get(token), "inserted": False}
         return {"module_ref": self.register_module(module_factory), "inserted": True}
 
-    def register_module(self, module_factory: ModuleFactory) -> Module:
+    def register_module(self, module_factory) -> Module:
         """
         Register a module in the container.
 
@@ -104,18 +105,33 @@ class PyNestContainer:
         associated with the module, and logs the detection of the module.
 
         Args:
-            module_factory (ModuleFactory): The factory object that contains the type and metadata
-                                            for creating the module.
+            module_factory: Either a CompiledModule or legacy ModuleFactory containing module info.
 
         Returns:
             Module: The module reference that has been registered in the container.
 
         """
-        module_ref = Module(module_factory.type, self)
+        if isinstance(module_factory, CompiledModule):
+            metatype = module_factory.metatype
+            # Build legacy metadata dict from CompiledModule fields for backward compat
+            dynamic_metadata = {
+                "imports": module_factory.imports,
+                "providers": [
+                    desc.use_class for desc in module_factory.provider_descriptors
+                    if desc.use_class is not None
+                ],
+                "controllers": module_factory.controllers,
+                "exports": module_factory.exports,
+            }
+        else:
+            metatype = module_factory.type
+            dynamic_metadata = module_factory.dynamic_metadata
+
+        module_ref = Module(metatype, self)
         module_ref.token = module_factory.token
         self._modules[module_factory.token] = module_ref
 
-        self.add_metadata(module_factory.token, module_factory.dynamic_metadata)
+        self.add_metadata(module_factory.token, dynamic_metadata)
         self.add_import(module_factory.token)
         self.add_providers(
             self._get_providers(module_factory.token), module_factory.token
@@ -125,7 +141,7 @@ class PyNestContainer:
         )
 
         self.logger.info(
-            click.style(module_factory.type.__name__ + " Detected ", fg="green")
+            click.style(metatype.__name__ + " Detected ", fg="green")
         )
 
         return module_ref

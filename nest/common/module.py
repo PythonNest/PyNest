@@ -2,10 +2,19 @@ import hashlib
 import random
 import string
 import uuid
+from dataclasses import dataclass, field
 from typing import Any, List, Type
 from uuid import uuid4
 
-from nest.core import Module
+@dataclass
+class CompiledModule:
+    """The result of compiling a @Module-decorated class. Immutable snapshot used by the container."""
+    token: str
+    metatype: Type
+    imports: List[Type] = field(default_factory=list)
+    controllers: List[Type] = field(default_factory=list)
+    exports: List[Any] = field(default_factory=list)
+    provider_descriptors: List[Any] = field(default_factory=list)
 
 
 class ModulesContainer(dict):
@@ -187,18 +196,34 @@ class ModuleCompiler:
     def __init__(self, module_token_factory: ModuleTokenFactory = ModuleTokenFactory()):
         self.module_token_factory = module_token_factory
 
-    def compile(self, metatype: Type[Any]):
-        metadata = self.extract_metadata(metatype)
-        module_type = metadata["type"]
-        dynamic_metadata = metadata["dynamic_metadata"]
-        token = self.module_token_factory.create(module_type, dynamic_metadata)
-        return ModuleFactory(module_type, token, dynamic_metadata)
-
-    def extract_metadata(self, metatype) -> dict:
-        metadata = {"type": metatype, "dynamic_metadata": {}}
+    def compile(self, metatype: Type[Any]) -> CompiledModule:
+        from nest.common.provider import normalize_provider  # local import avoids circular
 
         if not self.has_module_metadata(metatype):
-            raise Exception(f"{metatype.__name__} as no metadata found")
+            raise Exception(f"{metatype.__name__} has no metadata found")
+
+        raw_providers = getattr(metatype, "providers", []) or []
+        controllers = getattr(metatype, "controllers", []) or []
+        imports = getattr(metatype, "imports", []) or []
+        exports = getattr(metatype, "exports", []) or []
+
+        provider_descriptors = [normalize_provider(p) for p in raw_providers]
+        token = self.module_token_factory.create(metatype)
+
+        return CompiledModule(
+            token=token,
+            metatype=metatype,
+            imports=list(imports),
+            controllers=list(controllers),
+            exports=list(exports),
+            provider_descriptors=provider_descriptors,
+        )
+
+    def extract_metadata(self, metatype) -> dict:
+        # Kept for backward compat with PyNestApplicationContext.select()
+        metadata = {"type": metatype, "dynamic_metadata": {}}
+        if not self.has_module_metadata(metatype):
+            raise Exception(f"{metatype.__name__} has no metadata found")
         for props in ["imports", "providers", "controllers", "exports"]:
             metadata["dynamic_metadata"][props] = getattr(metatype, props, [])
         return metadata
