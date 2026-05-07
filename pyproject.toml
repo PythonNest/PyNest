@@ -79,6 +79,10 @@ mkdocs-material = "^9.5.43"
 mkdocstrings-python = "^1.12.2"
 
 
+
+[tool.poetry.group.dev.dependencies]
+httpx = "^0.28.1"
+
 [tool.black]
 force-exclude = '''
 /(

@@ -1,16 +1,91 @@
+from __future__ import annotations
+
+import inspect
+from typing import TYPE_CHECKING
+
 from fastapi import APIRouter, FastAPI
+
+if TYPE_CHECKING:
+    from nest.core.pynest_container import PyNestContainer
 
 
 class RoutesResolver:
-    def __init__(self, container, app_ref: FastAPI):
+    """
+    Walks the module graph, resolves controller instances from the container,
+    and registers their bound methods as FastAPI route endpoints.
+    """
+
+    def __init__(self, container: "PyNestContainer", app_ref: FastAPI) -> None:
         self.container = container
         self.app_ref = app_ref
 
-    def register_routes(self):
-        for module in self.container.modules.values():
-            for controller in module.controllers.values():
-                self.register_route(controller)
+    def register_routes(self) -> None:
+        seen: set = set()
+        for module_ref in self.container.modules.values():
+            for controller_class in module_ref.compiled.controllers:
+                if controller_class in seen:
+                    continue
+                seen.add(controller_class)
+                self._register_controller(controller_class)
 
-    def register_route(self, controller):
-        router: APIRouter = controller.get_router()
+    def _register_controller(self, controller_class: type) -> None:
+        instance = self.container.get_controller_instance(controller_class)
+        tag = getattr(controller_class, "__controller_tag__", None)
+        prefix = getattr(controller_class, "__route_prefix__", None) or ""
+
+        router = APIRouter(tags=[tag] if tag else None)
+
+        for method_name, unbound in inspect.getmembers(controller_class, predicate=callable):
+            if not hasattr(unbound, "__http_method__"):
+                continue
+            bound = getattr(instance, method_name)
+            self._add_route(router, bound, unbound, controller_class, prefix)
+
         self.app_ref.include_router(router)
+
+    def _add_route(
+        self,
+        router: APIRouter,
+        bound_method,
+        original_method,
+        cls: type,
+        prefix: str,
+    ) -> None:
+        from nest.core.decorators.controller import _collect_guards
+        from nest.core.decorators.http_method import HTTPMethod
+
+        path = getattr(original_method, "__route_path__", "/")
+        http_method = getattr(original_method, "__http_method__", None)
+        extra_kwargs = getattr(original_method, "__kwargs__", {})
+
+        if not isinstance(http_method, HTTPMethod):
+            return
+
+        full_path = _join_paths(prefix, path)
+
+        route_kwargs = {
+            "path": full_path,
+            "endpoint": bound_method,
+            "methods": [http_method.value],
+            **extra_kwargs,
+        }
+
+        if hasattr(original_method, "status_code"):
+            route_kwargs["status_code"] = original_method.status_code
+
+        guards = _collect_guards(cls, original_method)
+        if guards:
+            route_kwargs["dependencies"] = [g.as_dependency() for g in guards]
+
+        router.add_api_route(**route_kwargs)
+
+
+def _join_paths(prefix: str, path: str) -> str:
+    prefix = prefix or ""
+    path = path or "/"
+    if not path.startswith("/"):
+        path = "/" + path
+    combined = prefix.rstrip("/") + path
+    if combined.endswith("/") and combined != "/":
+        combined = combined.rstrip("/")
+    return combined or "/"
