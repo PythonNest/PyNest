@@ -117,6 +117,12 @@ class GenerateService:
             path = Path.cwd() / "src"
         with open(f"{path}/{name}_module.py", "w") as f:
             f.write(template.generate_empty_module_file())
+        app_module_path = Path(path) / "app_module.py"
+        if app_module_path.exists():
+            template.append_module_to_app(
+                path_to_app_py=str(app_module_path),
+                module_import_path=f"src.{name}_module",
+            )
 
     def generate_app(self, app_name: str, db_type: str, is_async: bool, is_cli: bool):
         """

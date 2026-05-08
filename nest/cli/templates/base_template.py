@@ -303,10 +303,12 @@ class AppService:
 
         return tree
 
-    def append_module_to_app(self, path_to_app_py: str):
+    def append_module_to_app(self, path_to_app_py: str, module_import_path: str = None):
+        if module_import_path is None:
+            module_import_path = f"src.{self.module_name}.{self.module_name}_module"
         tree = self.append_import(
             file_path=path_to_app_py,
-            module_path=f"src.{self.module_name}.{self.module_name}_module",
+            module_path=module_import_path,
             class_name=self.class_name,
             import_exception="from nest.core import App",
         )
@@ -383,7 +385,8 @@ class {self.capitalized_module_name}Service:
     def generate_empty_module_file(self) -> str:
         return f"""from nest.core import Module
 
-@Module()
+
+@Module(imports=[], controllers=[], providers=[])
 class {self.capitalized_module_name}Module:
-    ...
-        """
+    pass
+"""
