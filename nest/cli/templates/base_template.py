@@ -126,7 +126,7 @@ class {self.capitalized_module_name}Module:
 from .app_service import AppService
 
 
-@Controller("/")
+@Controller("/", tag="app")
 class AppController:
 
     def __init__(self, service: AppService):
