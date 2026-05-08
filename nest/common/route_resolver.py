@@ -3,7 +3,7 @@ from __future__ import annotations
 import inspect
 from typing import TYPE_CHECKING
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Request
 
 if TYPE_CHECKING:
     from nest.core.pynest_container import PyNestContainer
@@ -77,7 +77,59 @@ class RoutesResolver:
         if guards:
             route_kwargs["dependencies"] = [g.as_dependency() for g in guards]
 
+        route_filters = list(getattr(original_method, "__filters__", []))
+        controller_filters = list(getattr(cls, "__filters__", []))
+        if route_filters or controller_filters:
+            route_kwargs["endpoint"] = _wrap_with_filters(
+                bound_method, route_filters + controller_filters
+            )
+
         router.add_api_route(**route_kwargs)
+
+
+def _wrap_with_filters(endpoint, filters) -> callable:
+    """Wrap a bound-method endpoint with exception filter logic."""
+    from nest.common.exceptions import ArgumentsHost
+
+    original_sig = inspect.signature(endpoint)
+    existing_params = list(original_sig.parameters.values())
+    has_request = any(p.name == "request" for p in existing_params)
+
+    if not has_request:
+        request_param = inspect.Parameter(
+            "request",
+            inspect.Parameter.KEYWORD_ONLY,
+            annotation=Request,
+        )
+        wrapper_sig = original_sig.replace(parameters=existing_params + [request_param])
+    else:
+        wrapper_sig = original_sig
+
+    orig_param_names = {p.name for p in existing_params}
+
+    async def filter_wrapper(*args, **kwargs):
+        request = kwargs.get("request")
+        call_kwargs = {k: v for k, v in kwargs.items() if k in orig_param_names}
+        try:
+            result = endpoint(*args, **call_kwargs)
+            if inspect.isawaitable(result):
+                result = await result
+            return result
+        except Exception as exc:
+            host = ArgumentsHost(request=request)
+            for raw_filter in filters:
+                f = raw_filter() if isinstance(raw_filter, type) else raw_filter
+                caught = getattr(f, "__caught_exceptions__", ())
+                if not caught or isinstance(exc, caught):
+                    result = f.catch(exc, host)
+                    if inspect.isawaitable(result):
+                        return await result
+                    return result
+            raise
+
+    filter_wrapper.__name__ = getattr(endpoint, "__name__", "filter_wrapper")
+    filter_wrapper.__signature__ = wrapper_sig
+    return filter_wrapper
 
 
 def _join_paths(prefix: str, path: str) -> str:

@@ -2,14 +2,11 @@ name: Release Package
 
 on:
   workflow_dispatch:
-    permissions:
-      users:
-        - ItayTheDar
     inputs:
       increment_version:
-        description: 'Increment version by major, minor, or patch'
+        description: "Increment version by major, minor, or patch"
         required: true
-        default: 'patch'
+        default: "patch"
         type: choice
         options:
           - major
@@ -17,7 +14,6 @@ on:
           - patch
 
 env:
-  VERSION_FILE_PATH: pyproject.toml
   CHANGELOG_FILE_PATH: CHANGELOG.md
 
 jobs:
@@ -32,69 +28,84 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.RELEASE_GIT_TOKEN }}
 
       - name: Install Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install Poetry
-        run: |
-          pip install poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.9.7"
+          enable-cache: true
 
-      - name: Set version using Poetry
+      - name: Set version
         run: |
-          # Extract the current version
-          CURRENT_VERSION=$(poetry version -s)
+          CURRENT_VERSION=$(uv version --short)
           echo "Current version: $CURRENT_VERSION"
-          
-          # Increment version
-          case ${{ inputs.increment_version }} in
-            major)
-              NEW_VERSION=$(poetry version major | awk '{print $NF}')
-              ;;
-            minor)
-              NEW_VERSION=$(poetry version minor | awk '{print $NF}')
-              ;;
-            patch)
-              NEW_VERSION=$(poetry version patch | awk '{print $NF}')
-              ;;
-            *)
-              echo "Invalid input for increment_version"
-              exit 1
-              ;;
-          esac
+
+          uv version --bump "${{ inputs.increment_version }}" --frozen
+          NEW_VERSION=$(uv version --short)
           echo "New version: $NEW_VERSION"
-          echo "RELEASE_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
+
+          NEW_VERSION="$NEW_VERSION" python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          version = os.environ["NEW_VERSION"]
+          path = Path("nest/__init__.py")
+          text = path.read_text()
+          updated = re.sub(
+              r'^__version__ = "[^"]+"$',
+              f'__version__ = "{version}"',
+              text,
+              flags=re.MULTILINE,
+          )
+          if updated == text:
+              raise SystemExit("Could not update nest/__init__.py version")
+          path.write_text(updated)
+          PY
 
       - name: Install build dependencies
-        run: |
-          poetry install --with build
-      
-      - name: Update CHANGELOG.md
-        run: poetry run git-changelog . -o $CHANGELOG_FILE_PATH
+        run: uv sync --no-dev --group build
 
-      - name: Build package with Poetry
-        run: |
-          poetry build
+      - name: Update CHANGELOG.md
+        run: uv run git-changelog . -o "$CHANGELOG_FILE_PATH"
+
+      - name: Build package
+        run: uv build --sdist --wheel
+
+      - name: Check package metadata
+        run: uv run twine check dist/*
+
+      - name: Smoke test wheel
+        run: uv run --isolated --no-project --with dist/*.whl python -c "import nest; from nest.cli.cli import nest_cli; print(nest.__version__)"
+
+      - name: Smoke test source distribution
+        run: uv run --isolated --no-project --with dist/*.tar.gz python -c "import nest; from nest.cli.cli import nest_cli; print(nest.__version__)"
 
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github@actions.com"
-          git add $CHANGELOG_FILE_PATH pyproject.toml
-          git commit -m "Increment version to $NEW_VERSION"
+          git add "$CHANGELOG_FILE_PATH" pyproject.toml nest/__init__.py
+          git commit -m "Increment version to $RELEASE_VERSION"
           git push
 
       - name: Publish package to PyPI
-        run: |
-          poetry publish --username ${{ secrets.PYPI_API_USER }} --password ${{ secrets.PYPI_API_TOKEN }}
+        env:
+          UV_PUBLISH_USERNAME: ${{ secrets.PYPI_API_USER }}
+          UV_PUBLISH_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: uv publish
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: v${{ env.RELEASE_VERSION }}
           tag_name: v${{ env.RELEASE_VERSION }}
