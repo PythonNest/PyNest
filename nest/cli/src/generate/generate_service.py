@@ -114,10 +114,15 @@ class GenerateService:
         """
         template = self.get_template(name)
         if path is None:
-            path = Path.cwd() / "src"
-        with open(f"{path}/{name}_module.py", "w") as f:
+            src_path = template.find_target_folder(Path.cwd(), "src")
+            if src_path is None:
+                raise Exception("src folder not found")
+            path = Path(src_path)
+        else:
+            path = Path(path)
+        with open(path / f"{name}_module.py", "w") as f:
             f.write(template.generate_empty_module_file())
-        app_module_path = Path(path) / "app_module.py"
+        app_module_path = path / "app_module.py"
         if app_module_path.exists():
             template.append_module_to_app(
                 path_to_app_py=str(app_module_path),
