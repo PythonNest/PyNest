@@ -1,5 +1,6 @@
 from fastapi import Depends
 
+from nest.common.provider import InjectionToken, Scope
 from nest.core.decorators import (
     Controller,
     Delete,
