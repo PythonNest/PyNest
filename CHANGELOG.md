@@ -8,10 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 <!-- insertion marker -->
 ## Unreleased
 
-<small>[Compare with latest](https://github.com/PythonNest/PyNest/compare/44cfa3388619453b0fac619802060ebafb3f4074...HEAD)</small>
-
-### Added
-
-- Add guard support (#107) ([44cfa33](https://github.com/PythonNest/PyNest/commit/44cfa3388619453b0fac619802060ebafb3f4074) by Itay Dar).
+<small>[Compare with latest](https://github.com/PythonNest/PyNest/compare/f0b90b65d118df041f87a78d0bb0d6d66126a2e6...HEAD)</small>
 
 <!-- insertion marker -->
