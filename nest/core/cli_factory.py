@@ -16,7 +16,7 @@ class CLIAppFactory(AbstractPyNestFactory):
 
         cli_app = click.Group("main")
         for module in container.modules.values():
-            for controller in module.controllers.values():
+            for controller in module.compiled.controllers:
                 for command in controller._cli_group.commands.values():
                     original_callback = command.callback
                     if asyncio.iscoroutinefunction(original_callback):
