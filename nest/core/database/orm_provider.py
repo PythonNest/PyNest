@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from contextlib import asynccontextmanager
-from typing import Any, Dict
+from contextlib import asynccontextmanager, contextmanager
+from typing import Any, Dict, Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -82,11 +82,28 @@ class OrmProvider(BaseOrmProvider):
         self.Base.metadata.drop_all(bind=self.engine)
 
     def get_db(self) -> Session:
+        """Return a new session. Caller is responsible for closing it."""
+        return self.session()
+
+    @contextmanager
+    def get_session(self) -> Generator[Session, None, None]:
+        """Context manager that provides a fresh session per call.
+
+        Rolls back on exception, always closes on exit.  Use this in service
+        methods instead of storing a session on the instance.
+
+        Example::
+
+            with self.config.get_session() as session:
+                session.add(entity)
+                session.commit()
+        """
         db = self.session()
         try:
-            return db
-        except Exception as e:
-            raise e
+            yield db
+        except Exception:
+            db.rollback()
+            raise
         finally:
             db.close()
 

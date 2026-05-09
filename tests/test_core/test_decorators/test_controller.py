@@ -1,51 +1,102 @@
 import pytest
-
-from nest.core import Controller, Delete, Get, Injectable, Patch, Post, Put
-
-
-@Controller(prefix="api/v1/user", tag="test")
-class TestController:
-    def __init__(self): ...
-
-    @Get("/get_all_users")
-    def get_endpoint(self):
-        return {"message": "GET endpoint"}
-
-    @Post("/create_user")
-    def post_endpoint(self):
-        return {"message": "POST endpoint"}
-
-    @Delete("/delete_user")
-    def delete_endpoint(self):
-        return {"message": "DELETE endpoint"}
-
-    @Put("/update_user")
-    def put_endpoint(self):
-        return {"message": "PUT endpoint"}
-
-    @Patch("/patch_user")
-    def patch_endpoint(self):
-        return {"message": "PATCH endpoint"}
+from nest.core.decorators.controller import Controller
+from nest.core.decorators.injectable import Injectable
+from nest.core.decorators.http_method import Get, Post
 
 
-@pytest.fixture
-def test_controller():
-    return TestController()
+@Injectable
+class TestService:
+    def hello(self):
+        return "hello"
 
 
-@pytest.mark.parametrize(
-    "function, endpoint, expected_message",
-    [
-        ("get_endpoint", "get_all_users", "GET endpoint"),
-        ("post_endpoint", "create_user", "POST endpoint"),
-        ("delete_endpoint", "delete_user", "DELETE endpoint"),
-        ("put_endpoint", "update_user", "PUT endpoint"),
-        ("patch_endpoint", "patch_user", "PATCH endpoint"),
-    ],
-)
-def test_endpoints(test_controller, function, endpoint, expected_message):
-    attribute = getattr(test_controller, function)
-    assert attribute.__route_path__ == "/api/v1/user/" + endpoint
-    assert attribute.__kwargs__ == {}
-    assert attribute.__http_method__.value == function.split("_")[0].upper()
-    assert attribute() == {"message": f"{function.split('_')[0].upper()} endpoint"}
+def test_controller_marks_class():
+    @Controller("/items")
+    class ItemController:
+        def __init__(self, svc: TestService):
+            self.svc = svc
+
+    assert ItemController.__is_controller__ is True
+
+
+def test_controller_stores_prefix():
+    @Controller("/items")
+    class ItemController:
+        pass
+
+    assert ItemController.__route_prefix__ == "/items"
+
+
+def test_controller_stores_tag():
+    @Controller("/items", tag="items")
+    class ItemController:
+        pass
+
+    assert ItemController.__controller_tag__ == "items"
+
+
+def test_controller_adds_leading_slash():
+    @Controller("users")
+    class UserController:
+        pass
+
+    assert UserController.__route_prefix__ == "/users"
+
+
+def test_controller_strips_trailing_slash():
+    @Controller("/users/")
+    class UserController:
+        pass
+
+    assert UserController.__route_prefix__ == "/users"
+
+
+def test_controller_does_not_delete_init():
+    @Controller("/items")
+    class ItemController:
+        def __init__(self, svc: TestService):
+            self.svc = svc
+
+    # __init__ must still exist on the class — the injector needs it
+    assert callable(getattr(ItemController, "__init__", None))
+
+
+def test_controller_does_not_set_class_attributes_for_deps():
+    @Controller("/items")
+    class ItemController:
+        def __init__(self, svc: TestService):
+            self.svc = svc
+
+    # Dep must NOT be a class attribute — injector handles instance creation
+    assert "svc" not in ItemController.__dict__
+
+
+def test_controller_returns_original_class():
+    @Controller("/items")
+    class ItemController:
+        pass
+
+    assert isinstance(ItemController, type)
+
+
+def test_controller_http_methods_retain_metadata():
+    @Controller("/items")
+    class ItemController:
+        @Get("/")
+        def list_items(self):
+            return []
+
+        @Post("/")
+        def create_item(self):
+            return {}
+
+    assert hasattr(ItemController.list_items, "__http_method__")
+    assert hasattr(ItemController.create_item, "__http_method__")
+
+
+def test_controller_with_no_prefix():
+    @Controller()
+    class RootController:
+        pass
+
+    assert RootController.__route_prefix__ is None

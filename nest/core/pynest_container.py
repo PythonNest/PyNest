@@ -1,56 +1,49 @@
+from __future__ import annotations
+
+import inspect
 import logging
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Type, Union
 
-import click
-from injector import Injector, UnknownProvider, singleton
+from nest.common.exceptions import CircularDependencyException
+from nest.common.module import CompiledModule, ModuleCompiler, ModuleTokenFactory
+from nest.common.provider import InjectionToken, ProviderDescriptor
+from nest.core.dependency_graph import DependencyGraph
+from nest.core.encapsulation import validate_module_encapsulation
+from nest.core.injector_module import build_injector, _to_key
 
-from nest.common.constants import DEPENDENCIES, INJECTABLE_TOKEN
-from nest.common.exceptions import (
-    CircularDependencyException,
-    NoneInjectableException,
-    UnknownModuleException,
-)
-from nest.common.module import (
-    Module,
-    ModuleCompiler,
-    ModuleFactory,
-    ModulesContainer,
-    ModuleTokenFactory,
-)
 
-TController = type("TController", (), {})
-TProvider = type("TProvider", (), {})
+class ModuleRef:
+    """Internal container representation of a registered module."""
+
+    def __init__(self, token: str, metatype: Type, compiled: CompiledModule) -> None:
+        self.token = token
+        self.metatype = metatype
+        self.compiled = compiled
+
+    @property
+    def name(self) -> str:
+        return self.metatype.__name__
 
 
 class PyNestContainer:
     """
-    A singleton container class for managing modules, providers, and dependencies
-    in a PyNest application.
+    IoC container managing the module graph, provider bindings, and instance lifecycle.
+    NOT a singleton — one fresh instance per application, created by PyNestFactory.
     """
 
-    _instance = None
-    _dependencies = None
+    def __init__(self) -> None:
+        self._logger = logging.getLogger("pynest.container")
+        self._injector = None
+        self._modules: Dict[str, ModuleRef] = {}
+        self._all_descriptors: List[ProviderDescriptor] = []
+        self._controller_classes: List[Type] = []
+        self._module_token_factory = ModuleTokenFactory()
+        self._module_compiler = ModuleCompiler(self._module_token_factory)
 
-    def __new__(cls):
-        """Create a singleton instance of PyNestContainer."""
-        if cls._instance is None:
-            cls._instance = super(PyNestContainer, cls).__new__(cls)
-        return cls._instance
-
-    def __init__(self):
-        """Initialize the PyNestContainer."""
-        if not hasattr(self, "_initialized"):  # Prevent reinitialization
-            self.logger = logging.getLogger("pynest")
-            self._injector = Injector()
-            self._global_modules = set()
-            self._modules = ModulesContainer()
-            self._module_token_factory = ModuleTokenFactory()
-            self._module_compiler = ModuleCompiler(self._module_token_factory)
-            self._modules_metadata = {}
-            self._initialized = True
+    # ── Public API ─────────────────────────────────────────────────────────────
 
     @property
-    def modules(self):
+    def modules(self) -> Dict[str, ModuleRef]:
         return self._modules
 
     @property
@@ -58,175 +51,120 @@ class PyNestContainer:
         return self._module_token_factory
 
     @property
-    def modules_metadata(self):
-        return self._modules_metadata
-
-    @property
     def module_compiler(self):
         return self._module_compiler
 
-    def get_instance(
-        self,
-        dependency: TProvider,
-        provider: Optional[Union[TProvider, TController]] = None,
-    ):
-        try:
-            self._injector.binder.bind(dependency, scope=singleton)
-            instance = self._injector.get(dependency)
-            self.logger.info(click.style(dependency.__name__ + " Detected ", fg="blue"))
-        except UnknownProvider:
-            raise Exception(f"Unknown provider {provider}")
-        return instance
+    def add_module(self, module_class: Type) -> dict:
+        """Compile and register a module and all its imports recursively."""
+        compiled = self._module_compiler.compile(module_class)
+        token = compiled.token
 
-    def add_module(self, metaclass) -> dict:
+        if token in self._modules:
+            return {"module_ref": self._modules[token], "inserted": False}
+
+        # Register imported modules first (depth-first)
+        for imported in compiled.imports:
+            self.add_module(imported)
+
+        module_ref = ModuleRef(token=token, metatype=module_class, compiled=compiled)
+        self._modules[token] = module_ref
+        self._all_descriptors.extend(compiled.provider_descriptors)
+        self._controller_classes.extend(compiled.controllers)
+
+        self._logger.info(f"Module registered: {module_class.__name__}")
+        return {"module_ref": module_ref, "inserted": True}
+
+    def build(self) -> None:
         """
-        Add a module to the container.
-
-        Args:
-            metaclass: The metaclass of the module to be added.
-
-        Returns:
-            dict: A dictionary containing the module reference and a
-            boolean flag indicating if it was newly inserted.
+        Validate the dependency graph and build the injector.
+        Must be called once after all add_module() calls, before any get() calls.
         """
-        module_factory = self._module_compiler.compile(metaclass)
-        token = module_factory.token
-        if self._modules.has(token):
-            return {"module_ref": self.modules.get(token), "inserted": False}
-        return {"module_ref": self.register_module(module_factory), "inserted": True}
+        self._validate_dependency_graph()
+        validate_module_encapsulation(self._modules)
 
-    def register_module(self, module_factory: ModuleFactory) -> Module:
-        """
-        Register a module in the container.
+        # Controller classes need singleton bindings too so the injector can resolve them
+        all_descriptors = self._all_descriptors + self._make_controller_descriptors()
+        self._injector = build_injector(all_descriptors)
+        self._logger.info("Container built successfully")
 
-        This method creates a module reference from the provided module factory, registers
-        the module within the container, adds metadata, imports, providers, and controllers
-        associated with the module, and logs the detection of the module.
+    def get(self, token: Union[Type, InjectionToken, str]) -> Any:
+        """Retrieve a fully-wired instance from the container."""
+        if self._injector is None:
+            raise RuntimeError(
+                "Container not built. Call container.build() before resolving providers."
+            )
+        return self._injector.get(_to_key(token))
 
-        Args:
-            module_factory (ModuleFactory): The factory object that contains the type and metadata
-                                            for creating the module.
+    def get_controller_instance(self, controller_class: Type) -> Any:
+        """Get a controller instance with all its service dependencies injected."""
+        return self.get(controller_class)
 
-        Returns:
-            Module: The module reference that has been registered in the container.
+    def clear(self) -> None:
+        """Reset container state. Useful in tests."""
+        self._injector = None
+        self._modules.clear()
+        self._all_descriptors.clear()
+        self._controller_classes.clear()
 
-        """
-        module_ref = Module(module_factory.type, self)
-        module_ref.token = module_factory.token
-        self._modules[module_factory.token] = module_ref
+    # ── Internal ───────────────────────────────────────────────────────────────
 
-        self.add_metadata(module_factory.token, module_factory.dynamic_metadata)
-        self.add_import(module_factory.token)
-        self.add_providers(
-            self._get_providers(module_factory.token), module_factory.token
-        )
-        self.add_controllers(
-            self._get_controllers(module_factory.token), module_factory.token
-        )
+    def _make_controller_descriptors(self) -> List[ProviderDescriptor]:
+        from nest.common.provider import Scope
+        return [
+            ProviderDescriptor(provide=cls, use_class=cls, scope=Scope.SINGLETON)
+            for cls in self._controller_classes
+        ]
 
-        self.logger.info(
-            click.style(module_factory.type.__name__ + " Detected ", fg="green")
-        )
+    def _validate_dependency_graph(self) -> None:
+        """Build a DAG from all class providers and raise CircularDependencyException on cycles."""
+        import sys
 
-        return module_ref
+        graph = DependencyGraph()
 
-    def add_metadata(self, token: str, module_metadata) -> None:
-        """Add metadata for a module."""
-        if module_metadata:
-            self._modules_metadata[token] = module_metadata
+        # Build a name→class lookup from all registered providers so forward refs can be resolved
+        provider_classes = {
+            desc.use_class.__name__: desc.use_class
+            for desc in self._all_descriptors
+            if desc.use_class is not None
+        }
 
-    def add_import(self, token: str):
-        """Add imports for a module."""
-        if not self.modules.has(token):
-            return
-        module_metadata = self._modules_metadata.get(token)
-        module_ref: Module = self.modules.get(token)
-        imports_mod: List[Any] = module_metadata.get("imports")
-        self.add_modules(imports_mod)
-        module_ref.add_imports(imports_mod)
-
-    def add_modules(self, modules: List[Any]) -> None:
-        """Add multiple modules to the container."""
-        if modules:
-            for module in modules:
-                self.add_module(module)
-
-    def add_providers(self, providers: List[Any], module_token: str) -> None:
-        """Add multiple providers to a module."""
-        for provider in providers:
-            self.add_provider(module_token, provider)
-
-    def add_provider(self, token: str, provider):
-        """Add a provider to a module."""
-        module_ref: Module = self.modules[token]
-        if not provider:
-            raise CircularDependencyException(module_ref.metatype)
-
-        if not module_ref:
-            raise UnknownModuleException()
-
-        if not hasattr(provider, INJECTABLE_TOKEN):
-            error_message = f"""
-            {click.style(provider.__name__, fg='red')} is not injectable. 
-            To make {provider.__name__} injectable, apply the {click.style("@Injectable decorator", fg='green')}
-            to the class definition, or remove {click.style(provider.__name__, fg='red')} from the provider array
-            of the Module class. Please check your code and ensure that the decorator is correctly applied to the
-            class.
-            """
-            raise NoneInjectableException(error_message)
-
-        for dependency_name, dependency_instance in getattr(
-            provider, DEPENDENCIES
-        ).items():
+        for desc in self._all_descriptors:
+            if desc.use_class is None:
+                continue
+            target = desc.use_class
+            graph.add_node(target)
             try:
-                instance = self.get_instance(dependency_instance, provider)
-                setattr(provider, dependency_name, instance)
-            except Exception as e:
-                self.logger.error(e)
-                raise e
+                sig = inspect.signature(target.__init__)
+            except (ValueError, TypeError):
+                continue
 
-        module_ref.add_provider(provider)
+            # Resolve type hints, handling string forward references
+            try:
+                hints = {}
+                for param_name, param in sig.parameters.items():
+                    if param_name == "self":
+                        continue
+                    ann = param.annotation
+                    if ann is param.empty:
+                        continue
+                    if isinstance(ann, str):
+                        # Try to resolve the string annotation against known providers
+                        resolved = provider_classes.get(ann)
+                        if resolved is not None:
+                            hints[param_name] = resolved
+                    elif isinstance(ann, type):
+                        hints[param_name] = ann
+            except Exception:
+                continue
 
-    def _get_providers(self, token: str) -> List[Any]:
-        """Get providers from the module metadata."""
-        return self.modules_metadata[token]["providers"]
+            for dep_type in hints.values():
+                graph.add_dependency(target, dep_type)
 
-    def add_controllers(self, controllers: List[Any], module_token: str) -> None:
-        """Add multiple controllers to a module."""
-        for controller in controllers:
-            self._add_controller(module_token, controller)
-
-    def _add_controller(self, token: str, controller: TController) -> None:
-        """Add a controller to a module."""
-        if not self.modules.has(token):
-            raise UnknownModuleException()
-        module_ref: Module = self.modules[token]
-        module_ref.add_controller(controller)
-        if hasattr(controller, DEPENDENCIES):
-            for provider_name, provider_type in getattr(
-                controller, DEPENDENCIES
-            ).items():
-                instance = self.get_instance(provider_type, controller)
-                setattr(controller, provider_name, instance)
-
-    def _get_controllers(self, token: str) -> List[Any]:
-        """Get controllers from the module metadata."""
-        return self.modules_metadata[token]["controllers"]
-
-    def clear(self):
-        """Clear all modules from the container."""
-        self.modules.clear()
-
-    # UNUSED: This function is currently not used but retained for potential future use.
-    def add_related_module(self, related_module, token: str) -> None:
-        if not self.modules.has(token):
-            return
-        module_ref = self.modules.get(token)
-        compile_related_module = self.module_compiler.compile(related_module)
-        related = self.modules.get(compile_related_module.token)
-        module_ref.add_import(related)
-
-    # UNUSED: This function is currently not used but retained for potential future use.
-    # It retrieves a module from the container by its key.
-    def get_module_by_key(self, module_key: str) -> Module:
-        return self._modules[module_key]
+        cycles = graph.detect_cycles()
+        if cycles:
+            chain = " → ".join(
+                getattr(n, "__name__", repr(n)) for n in cycles[0]
+            )
+            raise CircularDependencyException(
+                f"Circular dependency detected: {chain}"
+            )

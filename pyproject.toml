@@ -91,6 +91,10 @@ include = [
     "pyproject.toml",
 ]
 
+
+[tool.poetry.group.dev.dependencies]
+httpx = "^0.28.1"
+
 [tool.black]
 force-exclude = '''
 /(

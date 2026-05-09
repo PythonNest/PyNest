@@ -114,9 +114,38 @@ class GenerateService:
         """
         template = self.get_template(name)
         if path is None:
-            path = Path.cwd() / "src"
-        with open(f"{path}/{name}_module.py", "w") as f:
+            src_path = template.find_target_folder(Path.cwd(), "src")
+            if src_path is None:
+                raise Exception("src folder not found")
+            path = Path(src_path)
+        else:
+            path = Path(path)
+        module_file = path / f"{name}_module.py"
+        with open(module_file, "w") as f:
             f.write(template.generate_empty_module_file())
+        click.echo(
+            click.style(f"CREATE src/{name}_module.py", fg="green")
+        )
+        app_module_path = path / "app_module.py"
+        if app_module_path.exists():
+            template.append_module_to_app(
+                path_to_app_py=str(app_module_path),
+                module_import_path=f"src.{name}_module",
+            )
+            click.echo(
+                click.style(
+                    f"UPDATE src/app_module.py  (registered {template.class_name})",
+                    fg="yellow",
+                )
+            )
+        click.echo(
+            click.style(
+                f"\nHint: {template.class_name} is an empty skeleton. "
+                f"Add controllers/providers manually, or use "
+                f"'pynest generate resource -n {name}' for a full CRUD scaffold.",
+                fg="cyan",
+            )
+        )
 
     def generate_app(self, app_name: str, db_type: str, is_async: bool, is_cli: bool):
         """

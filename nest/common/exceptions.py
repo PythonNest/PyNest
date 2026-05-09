@@ -6,16 +6,29 @@ if TYPE_CHECKING:
 
 
 class CircularDependencyException(Exception):
-    def __init__(self, message="Circular dependency detected"):
+    """Raised when a circular dependency is detected in the provider graph at build time."""
+
+    def __init__(self, message: str = "Circular dependency detected"):
         super().__init__(message)
 
 
 class UnknownModuleException(Exception):
+    """Raised when a module cannot be found in the container."""
     pass
 
 
 class NoneInjectableException(Exception):
-    def __init__(self, message="None Injectable Classe Detected"):
+    """Raised when a class without @Injectable is listed as a provider."""
+
+    def __init__(self, message: str = "Non-injectable class detected"):
+        super().__init__(message)
+
+
+class ProviderNotExportedException(Exception):
+    """Raised when a class depends on a provider that lives in another module
+    which either isn't imported, or doesn't export that provider."""
+
+    def __init__(self, message: str = "Provider not visible across module boundary"):
         super().__init__(message)
 
 

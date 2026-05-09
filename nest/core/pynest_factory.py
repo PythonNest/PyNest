@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Type, TypeVar
 
@@ -16,34 +18,26 @@ class AbstractPyNestFactory(ABC):
 
 
 class PyNestFactory(AbstractPyNestFactory):
-    """Factory class for creating PyNest applications."""
+    """Factory that creates a fully-wired PyNest application from a root module."""
 
     @staticmethod
     def create(main_module: Type[ModuleType], **kwargs) -> PyNestApp:
         """
-        Create a PyNest application with the specified main module class.
+        Build and return a PyNestApp.
 
-        Args:
-            main_module (ModuleType): The main module for the PyNest application.
-            **kwargs: Additional keyword arguments for the FastAPI server.
-
-        Returns:
-            PyNestApp: The created PyNest application.
+        1. Creates a fresh container (NOT a singleton)
+        2. Adds the root module (recursively registers all imported modules)
+        3. Validates the dependency graph and builds the injector
+        4. Creates the FastAPI HTTP server
+        5. Registers all routes via RoutesResolver
         """
         container = PyNestContainer()
         container.add_module(main_module)
-        http_server = PyNestFactory._create_server(**kwargs)
+        container.build()
+
+        http_server = FastAPI(**kwargs)
         return PyNestApp(container, http_server)
 
     @staticmethod
     def _create_server(**kwargs) -> FastAPI:
-        """
-        Create a FastAPI server.
-
-        Args:
-            **kwargs: Additional keyword arguments for the FastAPI server.
-
-        Returns:
-            FastAPI: The created FastAPI server.
-        """
         return FastAPI(**kwargs)
