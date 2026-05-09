@@ -8,6 +8,7 @@ from nest.common.exceptions import CircularDependencyException
 from nest.common.module import CompiledModule, ModuleCompiler, ModuleTokenFactory
 from nest.common.provider import InjectionToken, ProviderDescriptor
 from nest.core.dependency_graph import DependencyGraph
+from nest.core.encapsulation import validate_module_encapsulation
 from nest.core.injector_module import build_injector, _to_key
 
 
@@ -79,6 +80,7 @@ class PyNestContainer:
         Must be called once after all add_module() calls, before any get() calls.
         """
         self._validate_dependency_graph()
+        validate_module_encapsulation(self._modules)
 
         # Controller classes need singleton bindings too so the injector can resolve them
         all_descriptors = self._all_descriptors + self._make_controller_descriptors()

@@ -24,6 +24,14 @@ class NoneInjectableException(Exception):
         super().__init__(message)
 
 
+class ProviderNotExportedException(Exception):
+    """Raised when a class depends on a provider that lives in another module
+    which either isn't imported, or doesn't export that provider."""
+
+    def __init__(self, message: str = "Provider not visible across module boundary"):
+        super().__init__(message)
+
+
 class HttpException(Exception):
     def __init__(self, message: str = "Internal Server Error", status_code: int = 500):
         self.message = message

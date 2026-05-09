@@ -24,7 +24,7 @@ class AppModule:
     pass
 
 
-@Module(providers=[RepoService])
+@Module(providers=[RepoService], exports=[RepoService])
 class RepoModule:
     pass
 
