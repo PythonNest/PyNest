@@ -103,20 +103,21 @@ class {self.capitalized_module_name}Service:
 
     def __init__(self):
         self.config = config
-        self.session = self.config.get_db()
-    
+
     @db_request_handler
     def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
-        new_{self.module_name} = {self.capitalized_module_name}Entity(
-            **{self.module_name}.dict()
-        )
-        self.session.add(new_{self.module_name})
-        self.session.commit()
-        return new_{self.module_name}.id
+        with self.config.get_session() as session:
+            new_{self.module_name} = {self.capitalized_module_name}Entity(
+                **{self.module_name}.dict()
+            )
+            session.add(new_{self.module_name})
+            session.commit()
+            return new_{self.module_name}.id
 
     @db_request_handler
     def get_{self.module_name}(self):
-        return self.session.query({self.capitalized_module_name}Entity).all()
+        with self.config.get_session() as session:
+            return session.query({self.capitalized_module_name}Entity).all()
 
 """
 
