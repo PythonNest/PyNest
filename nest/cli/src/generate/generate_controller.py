@@ -27,6 +27,10 @@ class GenerateController:
     def generate_service(self, name: SharedOptions.NAME, path: SharedOptions.PATH):
         self.generate_service.generate_service(name, path)
 
+    @CliCommand("gateway", help="Generate a new nest WebSocket gateway")
+    def generate_gateway(self, name: SharedOptions.NAME, path: SharedOptions.PATH):
+        self.generate_service.generate_gateway(name, path)
+
     @CliCommand("module", help="Generate a new nest module")
     def generate_module(self, name: SharedOptions.NAME):
         self.generate_service.generate_module(name)

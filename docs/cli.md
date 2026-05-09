@@ -138,6 +138,26 @@ pynest generate service --name users
 
 This will create a new service named `users` in the default path.
 
+**Gateway**
+
+Generate a new WebSocket gateway file.
+
+```bash
+pynest generate gateway --name <gateway_name>
+```
+
+**Options**
+
+* `--name`, `-n`: The name of the new gateway. (Required)
+* `--path`, `-p`: The path where the gateway should be created. (Optional)
+
+**Example**
+```bash
+pynest generate gateway --name chat
+```
+
+This creates `chat_gateway.py` with a starter `@WebSocketGateway(namespace="/chat")` class and a `ping` message handler. Add the generated gateway to a module's `providers` list to mount it.
+
 
 ## Best Practices 🌟
 
