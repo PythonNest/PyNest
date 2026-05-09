@@ -243,6 +243,31 @@ class AdminController:
 
 In this example `AdminGuard` protects all routes while `PublicOnlyGuard` is applied only to the `login` route.
 
+## WebSocket Guards
+
+`@UseGuards` also works on WebSocket gateways and individual `@SubscribeMessage` handlers. WebSocket guards receive an execution context instead of a FastAPI `Request`.
+
+```python
+from nest.core import BaseGuard, UseGuards
+from nest.websockets import SubscribeMessage, WebSocketGateway
+
+
+class WsTokenGuard(BaseGuard):
+    async def can_activate(self, context):
+        ws = context.switch_to_ws()
+        return ws.get_client().headers.get("x-token") == "secret"
+
+
+@WebSocketGateway(namespace="/private")
+@UseGuards(WsTokenGuard)
+class PrivateGateway:
+    @SubscribeMessage("secret")
+    async def secret(self):
+        return {"event": "secret_ack", "data": {}}
+```
+
+Use `context.switch_to_ws().get_client()` for the active socket, `get_data()` for the message body, `get_event()` for the event name, and `get_server()` for the gateway server.
+
 ## Combining Multiple Guards
 
 `UseGuards` accepts any number of guard classes. All specified guards must return `True` in order for the request to proceed.
@@ -562,4 +587,3 @@ class EnterpriseController:
 | Multi-Auth | Any | Flexible authentication | ✅ |
 
 PyNest guards provide a powerful, flexible, and standards-compliant way to secure your APIs while maintaining excellent developer experience and automatic documentation generation.
-

@@ -16,6 +16,10 @@ PyNest follows the modular architecture of NestJS, which allows for easy separat
 
 PyNest supports dependency injection, which makes it easy to manage dependencies and write testable code. You can easily inject services and providers into your controllers using decorators.
 
+### WebSocket Gateways
+
+PyNest supports native FastAPI WebSocket gateways for real-time APIs. Gateways are registered as providers, participate in dependency injection, and can use lifecycle hooks, guards, rooms, and event handlers. See [WebSocket Gateways](websockets.md) for the full guide.
+
 ### Decorators 🏷️
 
 PyNest makes extensive use of decorators to define routes, middleware, and other application components. This helps keep the code concise and easy to read.

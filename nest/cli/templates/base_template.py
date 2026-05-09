@@ -382,6 +382,17 @@ class {self.capitalized_module_name}Service:
     ...
         """
 
+    def generate_empty_gateway_file(self) -> str:
+        return f"""from nest.websockets import MessageBody, SubscribeMessage, WebSocketGateway
+
+
+@WebSocketGateway(namespace="/{self.module_name}")
+class {self.capitalized_module_name}Gateway:
+    @SubscribeMessage("ping")
+    async def ping(self, data=MessageBody()):
+        return {{"event": "pong", "data": data}}
+"""
+
     def generate_empty_module_file(self) -> str:
         return f"""from nest.core import Module
 

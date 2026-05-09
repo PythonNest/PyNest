@@ -143,6 +143,15 @@ python main.py
 
 You should see the Uvicorn server starting, and you can access your API at <http://localhost:8000>.
 
+## Next Steps
+
+After the first HTTP endpoint is running, you can add more framework features:
+
+* [Modules](modules.md) for organizing application boundaries.
+* [Providers](providers.md) for injectable business logic.
+* [Guards](guards.md) for authorization.
+* [WebSocket Gateways](websockets.md) for real-time event APIs.
+
 ---
 <nav class="md-footer-nav">
   <a href="/PyNest/introduction" class="md-footer-nav__link">

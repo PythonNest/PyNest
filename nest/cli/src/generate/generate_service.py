@@ -97,6 +97,19 @@ class GenerateService:
         with open(f"{path}/{name}_service.py", "w") as f:
             f.write(template.generate_empty_service_file())
 
+    def generate_gateway(self, name: str, path: str = None):
+        """
+        Create a new nest WebSocket gateway.
+
+        :param name: The name of the gateway
+        :param path: The path where the gateway file will be created
+        """
+        template = self.get_template(name)
+        if path is None:
+            path = Path.cwd()
+        with open(f"{path}/{name}_gateway.py", "w") as f:
+            f.write(template.generate_empty_gateway_file())
+
     def generate_module(self, name: str, path: str = None):
         """
         Create a new nest module
