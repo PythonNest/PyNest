@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pynest-api"
-version = "0.5.0"
+version = "0.6.0"
 description = "PyNest is a FastAPI Abstraction for building microservices, influenced by NestJS."
 authors = [
     { name = "itay.dar", email = "itay2803@gmail.com" },

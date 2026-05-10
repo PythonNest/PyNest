@@ -8,6 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 <!-- insertion marker -->
 ## Unreleased
 
-<small>[Compare with latest](https://github.com/PythonNest/PyNest/compare/c8107d952acb7fd26baeae7070b6d6f6b831afd2...HEAD)</small>
+<small>[Compare with latest](https://github.com/PythonNest/PyNest/compare/edf2ee333b2312cf9e873595e54819af86561b55...HEAD)</small>
 
 <!-- insertion marker -->
