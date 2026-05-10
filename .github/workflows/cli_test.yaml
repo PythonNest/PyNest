@@ -60,6 +60,7 @@ jobs:
 
           cd "$app_name"
           uv run pynest generate resource -n user
+          uv run pynest generate gateway -n chat -p src
 
       - name: Verify Boilerplate
         run: |
@@ -108,5 +109,17 @@ jobs:
               exit 1
             fi
           done
+
+          gateway_file="$app_name/src/chat_gateway.py"
+          if [ -f "$gateway_file" ]; then
+            echo "$gateway_file exists."
+          else
+            echo "$gateway_file does not exist."
+            exit 1
+          fi
+          if ! grep -q '@WebSocketGateway(namespace="/chat")' "$gateway_file"; then
+            echo "$gateway_file is missing the expected @WebSocketGateway decorator."
+            exit 1
+          fi
 
           echo "Boilerplate for ${{ matrix.app_type }} generated successfully."
