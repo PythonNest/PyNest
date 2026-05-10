@@ -4,6 +4,7 @@ import inspect
 from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, FastAPI, Request
+from nest.common.decorators import has_param_decorators, wrap_param_decorators
 
 if TYPE_CHECKING:
     from nest.core.pynest_container import PyNestContainer
@@ -94,6 +95,9 @@ class RoutesResolver:
             **extra_kwargs,
         }
 
+        if has_param_decorators(bound_method):
+            route_kwargs["endpoint"] = wrap_param_decorators(bound_method)
+
         if hasattr(original_method, "status_code"):
             route_kwargs["status_code"] = original_method.status_code
 
@@ -105,7 +109,7 @@ class RoutesResolver:
         controller_filters = list(getattr(cls, "__filters__", []))
         if route_filters or controller_filters:
             route_kwargs["endpoint"] = _wrap_with_filters(
-                bound_method, route_filters + controller_filters
+                route_kwargs["endpoint"], route_filters + controller_filters
             )
 
         router.add_api_route(**route_kwargs)
