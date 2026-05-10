@@ -147,6 +147,11 @@ Each module contains a collection of related controllers, services, and provider
 PyNest supports dependency injection, which makes it easy to manage dependencies and write testable code. You can easily
 inject services and providers into your controllers using decorators.
 
+### WebSocket Gateways
+
+PyNest supports native FastAPI WebSocket gateways for real-time APIs. Gateways are registered as providers, participate
+in dependency injection, and can use event handlers, lifecycle hooks, guards, rooms, and token streaming patterns.
+
 ### Decorators
 
 PyNest makes extensive use of decorators to define routes, middleware, and other application components. This helps keep

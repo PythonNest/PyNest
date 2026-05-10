@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, FastAPI, Request
 
@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 class RoutesResolver:
     """
-    Walks the module graph, resolves controller instances from the container,
-    and registers their bound methods as FastAPI route endpoints.
+    Walks the module graph, resolves controller and gateway instances from the
+    container, and registers their bound methods on the FastAPI app.
     """
 
     def __init__(self, container: "PyNestContainer", app_ref: FastAPI) -> None:
@@ -20,13 +20,27 @@ class RoutesResolver:
         self.app_ref = app_ref
 
     def register_routes(self) -> None:
-        seen: set = set()
+        seen_controllers: set = set()
+        seen_gateways: set = set()
+
         for module_ref in self.container.modules.values():
             for controller_class in module_ref.compiled.controllers:
-                if controller_class in seen:
+                if controller_class in seen_controllers:
                     continue
-                seen.add(controller_class)
+                seen_controllers.add(controller_class)
                 self._register_controller(controller_class)
+
+            for provider in module_ref.compiled.provider_descriptors:
+                gateway_class = provider.use_class
+                if gateway_class is None or not hasattr(
+                    gateway_class, "__websocket_gateway__"
+                ):
+                    continue
+                if gateway_class in seen_gateways:
+                    continue
+                seen_gateways.add(gateway_class)
+                gateway_instance = self.container.get(provider.provide)
+                self._register_gateway(gateway_class, gateway_instance)
 
     def _register_controller(self, controller_class: type) -> None:
         instance = self.container.get_controller_instance(controller_class)
@@ -35,13 +49,23 @@ class RoutesResolver:
 
         router = APIRouter(tags=[tag] if tag else None)
 
-        for method_name, unbound in inspect.getmembers(controller_class, predicate=callable):
+        for method_name, unbound in inspect.getmembers(
+            controller_class, predicate=callable
+        ):
             if not hasattr(unbound, "__http_method__"):
                 continue
             bound = getattr(instance, method_name)
             self._add_route(router, bound, unbound, controller_class, prefix)
 
         self.app_ref.include_router(router)
+
+    def _register_gateway(self, gateway_class: type, gateway_instance: Any) -> None:
+        from nest.websockets.gateway import NativeWebSocketGateway
+
+        NativeWebSocketGateway(
+            gateway=gateway_instance,
+            metadata=getattr(gateway_class, "__websocket_gateway__"),
+        ).register(self.app_ref)
 
     def _add_route(
         self,
