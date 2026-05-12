@@ -55,6 +55,7 @@ nav:
     - CLI Usage: cli.md
     - Modules: modules.md
     - Controllers: controllers.md
+    - Parameter Decorators: param_decorators.md
     - Providers: providers.md
     - Guards: guards.md
     - Exception Filters: exception_filters.md
