@@ -24,3 +24,10 @@ from nest.common.decorators import (
     Res,
     createParamDecorator,
 )
+from nest.common.interfaces import (
+    BeforeApplicationShutdown,
+    OnApplicationBootstrap,
+    OnApplicationShutdown,
+    OnModuleDestroy,
+    OnModuleInit,
+)

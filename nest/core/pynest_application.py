@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import asyncio
 import inspect
-from typing import Any
+import signal as signal_module
+from contextlib import asynccontextmanager
+from typing import Any, Iterable, Optional
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -18,6 +21,9 @@ class PyNestApp:
     def __init__(self, container: PyNestContainer, http_server: FastAPI) -> None:
         self.container = container
         self.http_server = http_server
+        self._closed = False
+        self._closing = False
+        self._install_lifespan_shutdown()
         routes_resolver = RoutesResolver(self.container, self.http_server)
         routes_resolver.register_routes()
 
@@ -32,6 +38,31 @@ class PyNestApp:
         """Add ASGI middleware to the FastAPI server."""
         self.http_server.add_middleware(middleware, **options)
         return self
+
+    def enable_shutdown_hooks(
+        self, signals: Optional[Iterable[signal_module.Signals]] = None
+    ) -> "PyNestApp":
+        """Register process signal handlers that trigger graceful shutdown."""
+        shutdown_signals = tuple(
+            signals or (signal_module.SIGTERM, signal_module.SIGINT)
+        )
+        for shutdown_signal in shutdown_signals:
+            signal_module.signal(
+                shutdown_signal, self._make_signal_handler(shutdown_signal)
+            )
+        return self
+
+    async def close(self, signal: Optional[str] = None) -> None:
+        """Run graceful application shutdown lifecycle hooks once."""
+        if self._closed or self._closing:
+            return
+
+        self._closing = True
+        try:
+            await self.container.shutdown_lifecycle(signal)
+            self._closed = True
+        finally:
+            self._closing = False
 
     def use_global_filters(self, *filters) -> "PyNestApp":
         """Register one or more exception filters that apply to every route.
@@ -73,3 +104,38 @@ class PyNestApp:
             return result
 
         self.http_server.add_exception_handler(exc_type, handler)
+
+    def _make_signal_handler(self, shutdown_signal: signal_module.Signals):
+        def handler(signum, frame):
+            self._close_from_signal(self._signal_name(signum or shutdown_signal))
+
+        return handler
+
+    def _close_from_signal(self, signal_name: str) -> None:
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(self.close(signal_name))
+            return
+
+        loop.create_task(self.close(signal_name))
+
+    @staticmethod
+    def _signal_name(signum) -> str:
+        try:
+            return signal_module.Signals(signum).name
+        except ValueError:
+            return str(signum)
+
+    def _install_lifespan_shutdown(self) -> None:
+        original_lifespan_context = self.http_server.router.lifespan_context
+
+        @asynccontextmanager
+        async def lifespan_context(app: FastAPI):
+            async with original_lifespan_context(app) as state:
+                try:
+                    yield state
+                finally:
+                    await self.close()
+
+        self.http_server.router.lifespan_context = lifespan_context

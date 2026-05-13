@@ -5,11 +5,26 @@ import logging
 from typing import Any, Dict, List, Optional, Type, Union
 
 from nest.common.exceptions import CircularDependencyException
+from nest.common.interfaces import (
+    BeforeApplicationShutdown,
+    OnApplicationBootstrap,
+    OnApplicationShutdown,
+    OnModuleDestroy,
+    OnModuleInit,
+)
 from nest.common.module import CompiledModule, ModuleCompiler, ModuleTokenFactory
 from nest.common.provider import InjectionToken, ProviderDescriptor
 from nest.core.dependency_graph import DependencyGraph
 from nest.core.encapsulation import validate_module_encapsulation
 from nest.core.injector_module import build_injector, _to_key
+
+_LIFECYCLE_METHOD_NAMES = (
+    "on_module_init",
+    "on_application_bootstrap",
+    "before_application_shutdown",
+    "on_module_destroy",
+    "on_application_shutdown",
+)
 
 
 class ModuleRef:
@@ -37,6 +52,9 @@ class PyNestContainer:
         self._modules: Dict[str, ModuleRef] = {}
         self._all_descriptors: List[ProviderDescriptor] = []
         self._controller_classes: List[Type] = []
+        self._module_instances: Dict[str, Any] = {}
+        self._lifecycle_initialized = False
+        self._lifecycle_shutdown = False
         self._module_token_factory = ModuleTokenFactory()
         self._module_compiler = ModuleCompiler(self._module_token_factory)
 
@@ -105,11 +123,73 @@ class PyNestContainer:
         self._modules.clear()
         self._all_descriptors.clear()
         self._controller_classes.clear()
+        self._module_instances.clear()
+        self._lifecycle_initialized = False
+        self._lifecycle_shutdown = False
+
+    async def initialize_lifecycle(self) -> None:
+        """Run module init and application bootstrap hooks once."""
+        if self._injector is None:
+            raise RuntimeError(
+                "Container not built. Call container.build() before lifecycle hooks."
+            )
+        if self._lifecycle_initialized:
+            return
+
+        for module_ref in self._modules.values():
+            await self._call_hooks(
+                self._get_module_lifecycle_instances(module_ref),
+                OnModuleInit,
+                "on_module_init",
+            )
+
+        await self._call_hooks(
+            self._get_all_lifecycle_instances(),
+            OnApplicationBootstrap,
+            "on_application_bootstrap",
+        )
+        self._lifecycle_initialized = True
+
+    async def shutdown_lifecycle(self, signal: Optional[str] = None) -> None:
+        """Run application shutdown hooks once in graceful shutdown order."""
+        if self._injector is None:
+            raise RuntimeError(
+                "Container not built. Call container.build() before lifecycle hooks."
+            )
+        if self._lifecycle_shutdown:
+            return
+
+        modules = list(self._modules.values())
+        for module_ref in reversed(modules):
+            await self._call_hooks(
+                self._get_module_lifecycle_instances(module_ref),
+                BeforeApplicationShutdown,
+                "before_application_shutdown",
+                signal,
+            )
+
+        for module_ref in reversed(modules):
+            await self._call_hooks(
+                self._get_module_lifecycle_instances(module_ref),
+                OnModuleDestroy,
+                "on_module_destroy",
+            )
+
+        for module_ref in reversed(modules):
+            await self._call_hooks(
+                self._get_module_lifecycle_instances(module_ref),
+                OnApplicationShutdown,
+                "on_application_shutdown",
+                signal,
+            )
+
+        self._lifecycle_shutdown = True
 
     # ── Internal ───────────────────────────────────────────────────────────────
 
     def _make_controller_descriptors(self) -> List[ProviderDescriptor]:
         from nest.common.provider import Scope
+
         return [
             ProviderDescriptor(provide=cls, use_class=cls, scope=Scope.SINGLETON)
             for cls in self._controller_classes
@@ -117,8 +197,6 @@ class PyNestContainer:
 
     def _validate_dependency_graph(self) -> None:
         """Build a DAG from all class providers and raise CircularDependencyException on cycles."""
-        import sys
-
         graph = DependencyGraph()
 
         # Build a name→class lookup from all registered providers so forward refs can be resolved
@@ -162,9 +240,90 @@ class PyNestContainer:
 
         cycles = graph.detect_cycles()
         if cycles:
-            chain = " → ".join(
-                getattr(n, "__name__", repr(n)) for n in cycles[0]
-            )
-            raise CircularDependencyException(
-                f"Circular dependency detected: {chain}"
-            )
+            chain = " → ".join(getattr(n, "__name__", repr(n)) for n in cycles[0])
+            raise CircularDependencyException(f"Circular dependency detected: {chain}")
+
+    def _get_all_lifecycle_instances(self) -> List[Any]:
+        instances: List[Any] = []
+        seen: set[int] = set()
+        for module_ref in self._modules.values():
+            for instance in self._get_module_lifecycle_instances(module_ref):
+                instance_id = id(instance)
+                if instance_id in seen:
+                    continue
+                seen.add(instance_id)
+                instances.append(instance)
+        return instances
+
+    def _get_module_lifecycle_instances(self, module_ref: ModuleRef) -> List[Any]:
+        instances: List[Any] = []
+        seen: set[int] = set()
+
+        for desc in module_ref.compiled.provider_descriptors:
+            instance = self.get(desc.provide)
+            instance_id = id(instance)
+            if instance_id in seen:
+                continue
+            seen.add(instance_id)
+            instances.append(instance)
+
+        module_instance = self._get_module_instance(module_ref)
+        if module_instance is not None and id(module_instance) not in seen:
+            instances.append(module_instance)
+
+        return instances
+
+    def _get_module_instance(self, module_ref: ModuleRef) -> Optional[Any]:
+        if module_ref.token in self._module_instances:
+            return self._module_instances[module_ref.token]
+
+        if not any(
+            callable(getattr(module_ref.metatype, name, None))
+            for name in _LIFECYCLE_METHOD_NAMES
+        ):
+            return None
+
+        instance = self._instantiate_module(module_ref.metatype)
+        self._module_instances[module_ref.token] = instance
+        return instance
+
+    def _instantiate_module(self, module_class: Type) -> Any:
+        try:
+            signature = inspect.signature(module_class.__init__)
+        except (TypeError, ValueError):
+            return module_class()
+
+        kwargs = {}
+        for param in list(signature.parameters.values())[1:]:
+            if param.kind in (
+                inspect.Parameter.VAR_POSITIONAL,
+                inspect.Parameter.VAR_KEYWORD,
+            ):
+                continue
+            if param.annotation is not inspect.Parameter.empty:
+                kwargs[param.name] = self.get(param.annotation)
+            elif param.default is inspect.Parameter.empty:
+                raise RuntimeError(
+                    f"Cannot instantiate module {module_class.__name__}: "
+                    f"constructor parameter {param.name!r} has no type annotation"
+                )
+
+        return module_class(**kwargs)
+
+    async def _call_hooks(
+        self, instances: List[Any], protocol: Type, method_name: str, *args: Any
+    ) -> None:
+        calls = [
+            self._call_hook(instance, method_name, *args)
+            for instance in instances
+            if isinstance(instance, protocol)
+        ]
+        if calls:
+            import asyncio
+
+            await asyncio.gather(*calls)
+
+    async def _call_hook(self, instance: Any, method_name: str, *args: Any) -> None:
+        result = getattr(instance, method_name)(*args)
+        if inspect.isawaitable(result):
+            await result
