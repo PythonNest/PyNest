@@ -138,6 +138,9 @@ and their descriptions:
     - `--json`: Output structured JSON only.
     - `--dry-run`: Show the plan without writing files.
 
+Generated dependency files use granular PyNest extras. For example, an async SQLite HTTP app depends on
+`pynest-api[http,sqlite-async]`, which installs the HTTP stack and the SQLite async ORM stack together.
+
 ### `add` command group
 
 - **Description**: Add boilerplate code to an existing PyNest application.

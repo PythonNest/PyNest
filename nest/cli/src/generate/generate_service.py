@@ -12,6 +12,15 @@ from nest.cli.src.generate.generation_result import GenerationError, GenerationR
 VALID_DATABASES = ("none", "postgresql", "mysql", "sqlite", "mongodb")
 RELATIONAL_DATABASES = ("postgresql", "mysql", "sqlite")
 VALID_PRESETS = ("api", "cli")
+DATABASE_EXTRAS = {
+    ("sqlite", False): "sqlite",
+    ("sqlite", True): "sqlite-async",
+    ("postgresql", False): "postgresql",
+    ("postgresql", True): "postgresql-async",
+    ("mysql", False): "mysql",
+    ("mysql", True): "mysql-async",
+    ("mongodb", False): "mongodb",
+}
 
 
 @Injectable
@@ -321,7 +330,7 @@ class GenerateService:
             dry_run=dry_run,
             force=force,
         )
-        requirements_content = template.requirements_file()
+        requirements_content = self._requirements_file(preset, database, is_async)
         if package_manager == "uv":
             self._track_file(
                 root_path / "pyproject.toml",
@@ -838,6 +847,26 @@ pynest add resource users
 pynest add gateway chat
 ```
 """
+
+    @staticmethod
+    def _requirements_file(preset: str, database: str, is_async: bool) -> str:
+        return f"{GenerateService._pynest_dependency(preset, database, is_async)}\n"
+
+    @staticmethod
+    def _pynest_dependency(preset: str, database: str, is_async: bool) -> str:
+        extras = []
+        if preset == "cli":
+            extras.append("cli")
+        else:
+            extras.append("http")
+
+        database_extra = DATABASE_EXTRAS.get((database, is_async))
+        if database_extra:
+            extras.append(database_extra)
+
+        if not extras:
+            return "pynest-api"
+        return f"pynest-api[{','.join(extras)}]"
 
     @staticmethod
     def _pyproject_file(app_name: str, requirements_content: str) -> str:

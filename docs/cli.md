@@ -70,6 +70,13 @@ Database apps also include `src/config.py`, `.env.example`, and database-specifi
 
 PyNest uses `uv` by default and writes `pyproject.toml`. Use `--package-manager requirements` only when you need a legacy `requirements.txt` workflow.
 
+Generated dependency files use granular PyNest extras so the selected app stack resolves as one dependency:
+
+- Blank HTTP app: `pynest-api[http]`
+- Async SQLite HTTP app: `pynest-api[http,sqlite-async]`
+- Sync PostgreSQL HTTP app: `pynest-api[http,postgresql]`
+- CLI app: `pynest-api[cli]`
+
 Prompt mode also asks for package management:
 
 ```text

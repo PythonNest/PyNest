@@ -20,6 +20,7 @@ def test_new_command_creates_app_with_json_output():
         payload = json.loads(result.output)
         metadata = yaml.safe_load(Path("sample/.pynest.yaml").read_text())
         readme = Path("sample/README.md").read_text()
+        pyproject = Path("sample/pyproject.toml").read_text()
 
         assert payload["status"] == "created"
         assert payload["operation"] == "new"
@@ -35,6 +36,8 @@ def test_new_command_creates_app_with_json_output():
         assert Path("sample/src/app_module.py").exists()
         assert "uv sync" in readme
         assert "pip install -r requirements.txt" not in readme
+        assert '"pynest-api[http,sqlite-async]",' in pyproject
+        assert "aiosqlite" not in pyproject
         assert metadata == {
             "version": 1,
             "preset": "api",
@@ -80,6 +83,7 @@ def test_new_command_defaults_to_uv_package_manager():
         assert "uv sync" in payload["next_steps"]
         assert Path("sample/pyproject.toml").exists()
         assert "uv sync" in Path("sample/README.md").read_text()
+        assert '"pynest-api[http]",' in Path("sample/pyproject.toml").read_text()
 
 
 def test_new_command_can_still_create_requirements_file_explicitly():
@@ -106,6 +110,36 @@ def test_new_command_can_still_create_requirements_file_explicitly():
         assert "sample/pyproject.toml" not in payload["files_created"]
         assert "pip install -r requirements.txt" in payload["next_steps"]
         assert "pip install -r requirements.txt" in Path("sample/README.md").read_text()
+        assert "pynest-api[http]" in Path("sample/requirements.txt").read_text()
+
+
+def test_new_command_generates_granular_extras_for_each_database_flavor():
+    runner = CliRunner()
+
+    cases = [
+        (["--database", "sqlite"], "pynest-api[http,sqlite]"),
+        (["--database", "sqlite", "--async"], "pynest-api[http,sqlite-async]"),
+        (["--database", "postgresql"], "pynest-api[http,postgresql]"),
+        (
+            ["--database", "postgresql", "--async"],
+            "pynest-api[http,postgresql-async]",
+        ),
+        (["--database", "mysql"], "pynest-api[http,mysql]"),
+        (["--database", "mysql", "--async"], "pynest-api[http,mysql-async]"),
+        (["--database", "mongodb"], "pynest-api[http,mongodb]"),
+        (["--preset", "cli"], "pynest-api[cli]"),
+    ]
+
+    with runner.isolated_filesystem():
+        for index, (args, dependency) in enumerate(cases):
+            app_name = f"app_{index}"
+            result = runner.invoke(
+                nest_cli,
+                ["new", app_name, *args, "--yes", "--json"],
+            )
+
+            assert result.exit_code == 0, result.output
+            assert f'"{dependency}",' in Path(app_name, "pyproject.toml").read_text()
 
 
 def test_new_command_invalid_database_json_error():
