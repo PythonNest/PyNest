@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+import threading
 from abc import ABC, abstractmethod
 from typing import Type, TypeVar
 
@@ -34,6 +36,7 @@ class PyNestFactory(AbstractPyNestFactory):
         container = PyNestContainer()
         container.add_module(main_module)
         container.build()
+        PyNestFactory._run_async(container.initialize_lifecycle())
 
         http_server = FastAPI(**kwargs)
         return PyNestApp(container, http_server)
@@ -41,3 +44,25 @@ class PyNestFactory(AbstractPyNestFactory):
     @staticmethod
     def _create_server(**kwargs) -> FastAPI:
         return FastAPI(**kwargs)
+
+    @staticmethod
+    def _run_async(coro):
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(coro)
+
+        result = {}
+
+        def runner():
+            try:
+                result["value"] = asyncio.run(coro)
+            except BaseException as exc:
+                result["error"] = exc
+
+        thread = threading.Thread(target=runner)
+        thread.start()
+        thread.join()
+        if "error" in result:
+            raise result["error"]
+        return result.get("value")
