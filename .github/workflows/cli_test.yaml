@@ -30,37 +30,38 @@ jobs:
 
       - name: Test CLI Commands
         run: |
+          pynest_cmd="$GITHUB_WORKSPACE/.venv/bin/pynest"
           app_name="${{ matrix.app_type }}App"
           case "${{ matrix.app_type }}" in
             "Blank")
-              uv run pynest generate application -n "$app_name"
+              "$pynest_cmd" generate application -n "$app_name"
               ;;
             "SyncORM")
-              uv run pynest generate application -n "$app_name" -db sqlite
+              "$pynest_cmd" generate application -n "$app_name" -db sqlite
               ;;
             "AsyncORM")
-              uv run pynest generate application -n "$app_name" -db sqlite --is-async
+              "$pynest_cmd" generate application -n "$app_name" -db sqlite --is-async
               ;;
             "MongoDB")
-              uv run pynest generate application -n "$app_name" -db mongodb
+              "$pynest_cmd" generate application -n "$app_name" -db mongodb
               ;;
             "PostgresSync")
-              uv run pynest generate application -n "$app_name" -db postgresql
+              "$pynest_cmd" generate application -n "$app_name" -db postgresql
               ;;
             "PostgresAsync")
-              uv run pynest generate application -n "$app_name" -db postgresql --is-async
+              "$pynest_cmd" generate application -n "$app_name" -db postgresql --is-async
               ;;
             "MySQLSync")
-              uv run pynest generate application -n "$app_name" -db mysql
+              "$pynest_cmd" generate application -n "$app_name" -db mysql
               ;;
             "MySQLAsync")
-              uv run pynest generate application -n "$app_name" -db mysql --is-async
+              "$pynest_cmd" generate application -n "$app_name" -db mysql --is-async
               ;;
           esac
 
           cd "$app_name"
-          uv run pynest generate resource -n user
-          uv run pynest generate gateway -n chat -p src
+          "$pynest_cmd" generate resource -n user
+          "$pynest_cmd" generate gateway -n chat -p src
 
       - name: Verify Boilerplate
         run: |
@@ -79,7 +80,7 @@ jobs:
             exit 1
           fi
 
-          declare -a files=("main.py" "requirements.txt" "README.md")
+          declare -a files=("main.py" "pyproject.toml" "README.md" ".pynest.yaml")
           declare -a src_level_files=("app_module.py" "app_service.py" "app_controller.py")
           declare -a module_files=("user_controller.py" "user_service.py" "user_module.py" "user_model.py")
 
@@ -110,45 +111,44 @@ jobs:
             fi
           done
 
-          gateway_file="$app_name/src/chat_gateway.py"
+          gateway_file="$app_name/src/chat/chat_gateway.py"
+          gateway_module_file="$app_name/src/chat/chat_module.py"
           if [ -f "$gateway_file" ]; then
             echo "$gateway_file exists."
           else
             echo "$gateway_file does not exist."
             exit 1
           fi
+          if [ -f "$gateway_module_file" ]; then
+            echo "$gateway_module_file exists."
+          else
+            echo "$gateway_module_file does not exist."
+            exit 1
+          fi
           if ! grep -q '@WebSocketGateway(namespace="/chat")' "$gateway_file"; then
             echo "$gateway_file is missing the expected @WebSocketGateway decorator."
             exit 1
           fi
-
+          if ! grep -q 'providers=\[ChatGateway\]' "$gateway_module_file"; then
+            echo "$gateway_module_file is missing ChatGateway registration."
+            exit 1
+          fi
           echo "Boilerplate for ${{ matrix.app_type }} generated successfully."
 
       - name: Ping generated WebSocket app
         if: matrix.app_type == 'Blank'
         run: |
           cd "${{ matrix.app_type }}App"
-          uv run python - <<'PY'
+          uv run --project "$GITHUB_WORKSPACE" python - <<'PY'
           import asyncio
-          import importlib.util
           import json
           import socket
 
           import uvicorn
           import websockets
 
-          from nest.core import Module, PyNestContainer, PyNestFactory
-
-          spec = importlib.util.spec_from_file_location(
-              "chat_gateway", "src/chat_gateway.py"
-          )
-          mod = importlib.util.module_from_spec(spec)
-          spec.loader.exec_module(mod)
-          ChatGateway = mod.ChatGateway
-
-          @Module(providers=[ChatGateway])
-          class App:
-              pass
+          from nest.core import PyNestContainer, PyNestFactory
+          from src.chat.chat_module import ChatModule
 
           def free_port():
               with socket.socket() as sock:
@@ -157,7 +157,7 @@ jobs:
 
           async def main():
               PyNestContainer._instance = None
-              app = PyNestFactory.create(App).get_server()
+              app = PyNestFactory.create(ChatModule).get_server()
               port = free_port()
               config = uvicorn.Config(
                   app, host="127.0.0.1", port=port,

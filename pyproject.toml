@@ -36,6 +36,49 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+http = [
+    "fastapi>=0.115.4,<0.116.0",
+    "uvicorn>=0.32.0,<0.33.0",
+]
+cli = [
+    "click>=8.1.7,<9.0.0",
+]
+sqlite = [
+    "sqlalchemy>=2.0.36,<3.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+]
+sqlite-async = [
+    "sqlalchemy>=2.0.36,<3.0.0",
+    "aiosqlite>=0.19.0,<1.0.0",
+    "greenlet>=3.1.1,<4.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+]
+postgresql = [
+    "sqlalchemy>=2.0.36,<3.0.0",
+    "psycopg2>=2.9.3,<3.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+]
+postgresql-async = [
+    "sqlalchemy>=2.0.36,<3.0.0",
+    "asyncpg>=0.30.0,<0.31.0",
+    "greenlet>=3.1.1,<4.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+]
+mysql = [
+    "sqlalchemy>=2.0.36,<3.0.0",
+    "mysql-connector-python==8.2.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+]
+mysql-async = [
+    "sqlalchemy>=2.0.36,<3.0.0",
+    "aiomysql==0.2.0",
+    "greenlet>=3.1.1,<4.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+]
+mongodb = [
+    "beanie>=1.27.0,<2.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+]
 postgres = [
     "sqlalchemy>=2.0.36,<3.0.0",
     "asyncpg>=0.30.0,<0.31.0",

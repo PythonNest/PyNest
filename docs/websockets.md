@@ -475,7 +475,7 @@ Frames:
 
 ## CLI Generation
 
-Generate a gateway file:
+From an existing PyNest app (with `src/app_module.py` and `.pynest.yaml`):
 
 ```bash
 pynest generate gateway --name chat
@@ -487,13 +487,9 @@ or:
 pynest generate gateway -n chat
 ```
 
-The command creates `chat_gateway.py` in the current directory. Use `--path` to choose a directory:
+This creates a small package under `src/chat/` (`__init__.py`, `chat_gateway.py`, `chat_module.py` with `ChatGateway` in `providers`) and appends `ChatModule` to `imports` in `src/app_module.py`. Use `--path` to point at the **project root** (the folder that contains `src/`), not only the gateway file directory.
 
-```bash
-pynest generate gateway -n chat --path src/chat
-```
-
-Generated file:
+The generated gateway matches the earlier Quick Start shape:
 
 ```python
 from nest.websockets import MessageBody, SubscribeMessage, WebSocketGateway
@@ -506,17 +502,7 @@ class ChatGateway:
         return {"event": "pong", "data": data}
 ```
 
-Register the generated gateway in the module where it belongs:
-
-```python
-from nest.core import Module
-from .chat_gateway import ChatGateway
-
-
-@Module(providers=[ChatGateway])
-class ChatModule:
-    pass
-```
+The generated `chat_module.py` registers that class; you normally only edit the gateway (or add services next to it in the same package).
 
 ## Testing Gateways
 

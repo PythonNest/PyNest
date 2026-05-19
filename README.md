@@ -41,19 +41,21 @@ pip install pynest-api
 ### Start with cli
 
 ```bash
-pynest generate application -n my_app_name
+pynest new my_app_name
 ```
 
 this command will create a new project with the following structure:
 
 ```text
-├── app.py
+├── .pynest.yaml
 ├── main.py
-├── requirements.txt
-├── .gitignore
+├── pyproject.toml
 ├── README.md
 ├── src
 │    ├── __init__.py
+│    ├── app_module.py
+│    ├── app_controller.py
+│    ├── app_service.py
 ```
 
 once you have created your app, get into the folder and run the following command:
@@ -65,7 +67,8 @@ cd my_app_name
 run the server with the following command:
 
 ```bash
-uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
+uv sync
+python main.py
 ```
 
 Now you can visit [OpenAPI](http://localhost:8000/docs) in your browser to see the default API documentation.
@@ -75,7 +78,7 @@ Now you can visit [OpenAPI](http://localhost:8000/docs) in your browser to see t
 To add a new module to your application, you can use the pynest generate module command:
 
 ```bash
-pynest generate resource -n users
+pynest add resource users
 ```
 
 This will create a new resource called ```users``` in your application with the following structure under the ```src```
@@ -108,15 +111,58 @@ and their descriptions:
 
 #### `generate application` Subcommand
 
-- **Description**: Create a new nest app.
+- **Description**: Create a new nest app. This command is still supported for compatibility; prefer `pynest new`.
 - **Options**:
     - `--app-name`/`-n`: The name of the nest app (required).
     - `--db-type`/`-db`: The type of the database (optional). You can specify PostgreSQL, MySQL, SQLite, or MongoDB.
     - `--is-async`: Whether the project should be asynchronous (optional, default is False).
+    - `--package-manager`: Use `uv` by default, or `requirements` when explicitly requested.
+    - `--json`: Output structured JSON for agents and scripts.
+    - `--dry-run`: Show the generation plan without writing files.
+
+#### `new` Subcommand
+
+- **Description**: Create a new PyNest application. It supports guided prompts for humans and one-shot flags for agents.
+- **Examples**:
+    - Guided human flow: `pynest new --prompt`
+    - Default API app: `pynest new my_app_name`
+    - Agent-friendly JSON flow: `pynest new my_app_name --preset api --database sqlite --async --yes --json`
+- **Options**:
+    - `--preset`: `api` or `cli` (default: `api`).
+    - `--database`: `none`, `sqlite`, `postgresql`, `mysql`, or `mongodb` (default: `none`).
+    - `--async`: Use async database access for relational databases.
+    - `--path`: Parent directory for the new app.
+    - `--package-manager`: `uv` or `requirements` (default: `uv`).
+    - `--prompt`: Force guided prompts.
+    - `--yes`: Accept defaults and skip prompts.
+    - `--json`: Output structured JSON only.
+    - `--dry-run`: Show the plan without writing files.
+
+Generated dependency files use granular PyNest extras. For example, an async SQLite HTTP app depends on
+`pynest-api[http,sqlite-async]`, which installs the HTTP stack and the SQLite async ORM stack together.
+
+### `add` command group
+
+- **Description**: Add boilerplate code to an existing PyNest application.
+
+#### `resource` Subcommand
+
+- **Description**: Add a new module with controller, service, model, and module files. Database apps also get an entity file.
+- **Options**:
+    - `NAME`: The resource name.
+    - `--path`: Target app or source directory.
+    - `--json`: Output structured JSON.
+    - `--dry-run`: Show the plan without writing files.
+
+Example:
+
+```bash
+pynest add resource users
+```
 
 ### `generate` command group
 
-- **Description**: Group command for generating boilerplate code.
+- **Description**: Compatibility command group for older PyNest projects and scripts.
 
 #### `resource` Subcommand
 
@@ -127,13 +173,16 @@ and their descriptions:
 #### CLI Examples
 
 * create a blank nest application -
-  `pynest generate application -n my_app_name`
+  `pynest new my_app_name`
 
 * create a nest application with postgres database and async connection -
-  `pynest generate application -n my_app_name -db postgresql --is-async`
+  `pynest new my_app_name --database postgresql --async`
 
 * create new module -
-  `pynest generate resource -n users`
+  `pynest add resource users`
+
+* run a project health check -
+  `pynest doctor`
 
 ## Key Features
 
