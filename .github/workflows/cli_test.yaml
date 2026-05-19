@@ -111,15 +111,26 @@ jobs:
             fi
           done
 
-          gateway_file="$app_name/src/chat_gateway.py"
+          gateway_file="$app_name/src/chat/chat_gateway.py"
+          gateway_module_file="$app_name/src/chat/chat_module.py"
           if [ -f "$gateway_file" ]; then
             echo "$gateway_file exists."
           else
             echo "$gateway_file does not exist."
             exit 1
           fi
+          if [ -f "$gateway_module_file" ]; then
+            echo "$gateway_module_file exists."
+          else
+            echo "$gateway_module_file does not exist."
+            exit 1
+          fi
           if ! grep -q '@WebSocketGateway(namespace="/chat")' "$gateway_file"; then
             echo "$gateway_file is missing the expected @WebSocketGateway decorator."
+            exit 1
+          fi
+          if ! grep -q 'providers=\[ChatGateway\]' "$gateway_module_file"; then
+            echo "$gateway_module_file is missing ChatGateway registration."
             exit 1
           fi
           echo "Boilerplate for ${{ matrix.app_type }} generated successfully."
@@ -130,25 +141,14 @@ jobs:
           cd "${{ matrix.app_type }}App"
           uv run --project "$GITHUB_WORKSPACE" python - <<'PY'
           import asyncio
-          import importlib.util
           import json
           import socket
 
           import uvicorn
           import websockets
 
-          from nest.core import Module, PyNestContainer, PyNestFactory
-
-          spec = importlib.util.spec_from_file_location(
-              "chat_gateway", "src/chat_gateway.py"
-          )
-          mod = importlib.util.module_from_spec(spec)
-          spec.loader.exec_module(mod)
-          ChatGateway = mod.ChatGateway
-
-          @Module(providers=[ChatGateway])
-          class App:
-              pass
+          from nest.core import PyNestContainer, PyNestFactory
+          from src.chat.chat_module import ChatModule
 
           def free_port():
               with socket.socket() as sock:
@@ -157,7 +157,7 @@ jobs:
 
           async def main():
               PyNestContainer._instance = None
-              app = PyNestFactory.create(App).get_server()
+              app = PyNestFactory.create(ChatModule).get_server()
               port = free_port()
               config = uvicorn.Config(
                   app, host="127.0.0.1", port=port,
