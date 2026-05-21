@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 def db_request_handler(func):
     """
     Decorator that wraps ORM service methods with timing, logging, and HTTP error
-    conversion.  Session lifecycle (open / commit / rollback / close) is the
-    responsibility of each service method — use config.get_session() there.
+    conversion. Session lifecycle (open / commit / rollback / close) is the
+    responsibility of each service method; use DatabaseService.session() there.
     """
 
     def wrapper(self, *args, **kwargs):
@@ -32,7 +32,7 @@ def db_request_handler(func):
 def async_db_request_handler(func):
     """
     Async version of db_request_handler.  Session lifecycle is the caller's
-    responsibility (pass session via Depends or use config.get_session()).
+    responsibility; use DatabaseService.session() in the service method.
     """
 
     async def wrapper(*args, **kwargs):
