@@ -57,6 +57,7 @@ class PyNestContainer:
         self._lifecycle_shutdown = False
         self._module_token_factory = ModuleTokenFactory()
         self._module_compiler = ModuleCompiler(self._module_token_factory)
+        self._database_root_registered = False
 
     # ── Public API ─────────────────────────────────────────────────────────────
 
@@ -74,6 +75,14 @@ class PyNestContainer:
 
     def add_module(self, module_class: Type) -> dict:
         """Compile and register a module and all its imports recursively."""
+        if getattr(module_class, "__pynest_database_root__", False):
+            if self._database_root_registered:
+                raise RuntimeError(
+                    "Only one DatabaseModule.for_root() can be registered per "
+                    "application. Named database connections are not supported yet."
+                )
+            self._database_root_registered = True
+
         compiled = self._module_compiler.compile(module_class)
         token = compiled.token
 
@@ -126,6 +135,7 @@ class PyNestContainer:
         self._module_instances.clear()
         self._lifecycle_initialized = False
         self._lifecycle_shutdown = False
+        self._database_root_registered = False
 
     async def initialize_lifecycle(self) -> None:
         """Run module init and application bootstrap hooks once."""

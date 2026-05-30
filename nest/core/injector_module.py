@@ -32,8 +32,7 @@ class PyNestInjectorModule(InjectorModule):
 
     def __init__(self, descriptors: List[ProviderDescriptor]) -> None:
         self._descriptors = [
-            d for d in descriptors
-            if d.use_factory is None and d.use_existing is None
+            d for d in descriptors if d.use_factory is None and d.use_existing is None
         ]
 
     def configure(self, binder) -> None:
@@ -59,8 +58,14 @@ def build_injector(descriptors: List[ProviderDescriptor]) -> Injector:
     from injector import InstanceProvider
 
     injector = Injector([PyNestInjectorModule(descriptors)])
+    provider_counts = {}
+    last_provider_index = {}
+    for index, desc in enumerate(descriptors):
+        key = _to_key(desc.provide)
+        provider_counts[key] = provider_counts.get(key, 0) + 1
+        last_provider_index[key] = index
 
-    for desc in descriptors:
+    for index, desc in enumerate(descriptors):
         key = _to_key(desc.provide)
 
         if desc.use_factory is not None:
@@ -72,5 +77,23 @@ def build_injector(descriptors: List[ProviderDescriptor]) -> Injector:
             # Resolve the aliased key to get the same (singleton) instance
             existing_instance = injector.get(_to_key(desc.use_existing))
             injector.binder.bind(key, to=InstanceProvider(existing_instance))
+
+        elif (
+            desc.use_value is not None
+            and provider_counts[key] > 1
+            and last_provider_index[key] == index
+        ):
+            injector.binder.bind(key, to=InstanceProvider(desc.use_value))
+
+        elif (
+            desc.use_class is not None
+            and provider_counts[key] > 1
+            and last_provider_index[key] == index
+        ):
+            injector.binder.bind(
+                key,
+                to=desc.use_class,
+                scope=_injector_scope(desc.scope),
+            )
 
     return injector
