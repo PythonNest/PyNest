@@ -12,22 +12,23 @@ class SQLiteTemplate(ORMTemplate, ABC):
         )
 
     def config_file(self):
-        return """from nest.core.database.orm_provider import OrmProvider
-import os
+        return """import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-config = OrmProvider(
-    db_type="sqlite",
-    config_params=dict(
-        db_name=os.getenv("SQLITE_DB_NAME", "default_nest_db"),
-    )
+DATABASE_CONFIG = dict(
+    driver="sqlite",
+    database=os.getenv("SQLITE_DB_NAME", "default_nest_db"),
+    create_all=True,
 )
 """
 
     def requirements_file(self):
-        return f"""pynest-api"""
+        return f"""pynest-api
+sqlalchemy>=2.0.36,<3.0.0
+python-dotenv>=1.0.1,<2.0.0
+"""
 
     def docker_file(self):
         return """FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11
@@ -45,23 +46,26 @@ class AsyncSQLiteTemplate(AsyncORMTemplate, ABC):
         )
 
     def config_file(self):
-        return """from nest.core.database.orm_provider import AsyncOrmProvider
-import os
+        return """import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-config = AsyncOrmProvider(
-    db_type="sqlite",
-    config_params=dict(
-        db_name=os.getenv("SQLITE_DB_NAME", "default_nest_db"),
-    )
-)
+DATABASE_CONFIG = {
+    "driver": "sqlite",
+    "database": os.getenv("SQLITE_DB_NAME", "default_nest_db"),
+    "async_mode": True,
+    "create_all": True,
+}
 """
 
     def requirements_file(self):
         return f"""pynest-api
-aiosqlite==0.19.0"""
+sqlalchemy>=2.0.36,<3.0.0
+aiosqlite==0.19.0
+greenlet>=3.1.1,<4.0.0
+python-dotenv>=1.0.1,<2.0.0
+"""
 
     def docker_file(self):
         return """FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11

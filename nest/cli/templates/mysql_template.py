@@ -12,27 +12,27 @@ class MySQLTemplate(ORMTemplate, ABC):
         )
 
     def config_file(self):
-        return """from nest.core.database.orm_provider import OrmProvider
-import os
+        return """import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-config = OrmProvider(
-    db_type="mysql",
-    config_params=dict(
-        host=os.getenv("MYSQL_HOST"),
-        db_name=os.getenv("MYSQL_DB_NAME"),
-        user=os.getenv("MYSQL_USER"),
-        password=os.getenv("MYSQL_PASSWORD"),
-        port=int(os.getenv("MYSQL_PORT")),
-    )
+DATABASE_CONFIG = dict(
+    driver="mysql",
+    host=os.getenv("MYSQL_HOST"),
+    database=os.getenv("MYSQL_DB_NAME"),
+    user=os.getenv("MYSQL_USER"),
+    password=os.getenv("MYSQL_PASSWORD"),
+    port=int(os.getenv("MYSQL_PORT", 3306)),
+    create_all=True,
 )
 """
 
     def requirements_file(self):
         return f"""pynest-api
+sqlalchemy>=2.0.36,<3.0.0
 mysql-connector-python==8.2.0
+python-dotenv>=1.0.1,<2.0.0
 """
 
 
@@ -44,25 +44,27 @@ class AsyncMySQLTemplate(AsyncORMTemplate, ABC):
         )
 
     def config_file(self):
-        return """from nest.core.database.orm_provider import AsyncOrmProvider
-import os
+        return """import os
 from dotenv import load_dotenv
     
 load_dotenv()
     
-config = AsyncOrmProvider(
-    db_type="mysql",
-    config_params=dict(
-        host=os.getenv("MYSQL_HOST"),
-        db_name=os.getenv("MYSQL_DB_NAME"),
-        user=os.getenv("MYSQL_USER"),
-        password=os.getenv("MYSQL_PASSWORD"),
-        port=int(os.getenv("MYSQL_PORT")),
-    )
-)
+DATABASE_CONFIG = {
+    "driver": "mysql",
+    "host": os.getenv("MYSQL_HOST"),
+    "database": os.getenv("MYSQL_DB_NAME"),
+    "user": os.getenv("MYSQL_USER"),
+    "password": os.getenv("MYSQL_PASSWORD"),
+    "port": int(os.getenv("MYSQL_PORT", 3306)),
+    "async_mode": True,
+    "create_all": True,
+}
 """
 
     def requirements_file(self):
         return f"""pynest-api
+sqlalchemy>=2.0.36,<3.0.0
 aiomysql==0.2.0
+greenlet>=3.1.1,<4.0.0
+python-dotenv>=1.0.1,<2.0.0
 """

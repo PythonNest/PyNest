@@ -14,12 +14,17 @@ class ORMTemplate(BaseTemplate, ABC):
 
     def app_file(self):
         return f"""from nest.core import PyNestFactory, Module
-from .config import config
+from nest.core.database import DatabaseModule
+from .config import DATABASE_CONFIG
 from .app_controller import AppController
 from .app_service import AppService
 
 
-@Module(imports=[], controllers=[AppController], providers=[AppService])
+@Module(
+    imports=[DatabaseModule.for_root(**DATABASE_CONFIG)],
+    controllers=[AppController],
+    providers=[AppService],
+)
 class AppModule:
     pass
 
@@ -33,10 +38,6 @@ app = PyNestFactory.create(
 )
 
 http_server = app.get_server()
-
-@http_server.on_event("startup")
-def startup():
-    config.create_all()
 """
 
     @abstractmethod
@@ -78,11 +79,11 @@ class {self.capitalized_module_name}(BaseModel):
 """
 
     def entity_file(self):
-        return f"""from src.config import config
+        return f"""from nest.core.database import Base
 from sqlalchemy import Column, Integer, String, Float
     
     
-class {self.capitalized_module_name}(config.Base):
+class {self.capitalized_module_name}(Base):
     __tablename__ = "{self.module_name}"
     
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -93,20 +94,20 @@ class {self.capitalized_module_name}(config.Base):
     def service_file(self):
         return f"""from .{self.module_name}_model import {self.capitalized_module_name}
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
-from src.config import config
 from nest.core.decorators.database import db_request_handler
 from nest.core import Injectable
+from nest.core.database import DatabaseService
 
 
 @Injectable
 class {self.capitalized_module_name}Service:
 
-    def __init__(self):
-        self.config = config
+    def __init__(self, db: DatabaseService):
+        self.db = db
 
     @db_request_handler
     def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
-        with self.config.get_session() as session:
+        with self.db.session() as session:
             new_{self.module_name} = {self.capitalized_module_name}Entity(
                 **{self.module_name}.dict()
             )
@@ -116,7 +117,7 @@ class {self.capitalized_module_name}Service:
 
     @db_request_handler
     def get_{self.module_name}(self):
-        with self.config.get_session() as session:
+        with self.db.session() as session:
             return session.query({self.capitalized_module_name}Entity).all()
 
 """
@@ -208,12 +209,17 @@ config:
 class AsyncORMTemplate(ORMTemplate, ABC):
     def app_file(self):
         return f"""from nest.core import PyNestFactory, Module
-from .config import config
+from nest.core.database import DatabaseModule
+from .config import DATABASE_CONFIG
 from .app_controller import AppController
 from .app_service import AppService
 
 
-@Module(imports=[], controllers=[AppController], providers=[AppService])
+@Module(
+    imports=[DatabaseModule.for_root(**DATABASE_CONFIG)],
+    controllers=[AppController],
+    providers=[AppService],
+)
 class AppModule:
     pass
 
@@ -227,10 +233,6 @@ app = PyNestFactory.create(
 )
 
 http_server = app.get_server()
-
-@http_server.on_event("startup")
-async def startup():
-    await config.create_all()
     
 """
 
@@ -243,12 +245,12 @@ async def startup():
         pass
 
     def entity_file(self):
-        return f"""from src.config import config
+        return f"""from nest.core.database import Base
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 
-class {self.capitalized_module_name}(config.Base):
+class {self.capitalized_module_name}(Base):
     __tablename__ = "{self.module_name}"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -261,34 +263,36 @@ class {self.capitalized_module_name}(config.Base):
 from .{self.module_name}_entity import {self.capitalized_module_name} as {self.capitalized_module_name}Entity
 from nest.core.decorators.database import async_db_request_handler
 from nest.core import Injectable
+from nest.core.database import DatabaseService
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 @Injectable
 class {self.capitalized_module_name}Service:
 
-    @async_db_request_handler
-    async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}, session: AsyncSession):
-        new_{self.module_name} = {self.capitalized_module_name}Entity(
-            **{self.module_name}.dict()
-        )
-        session.add(new_{self.module_name})
-        await session.commit()
-        return new_{self.module_name}.id
+    def __init__(self, db: DatabaseService):
+        self.db = db
 
     @async_db_request_handler
-    async def get_{self.module_name}(self, session: AsyncSession):
-        query = select({self.capitalized_module_name}Entity)
-        result = await session.execute(query)
-        return result.scalars().all()
+    async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
+        async with self.db.session() as session:
+            new_{self.module_name} = {self.capitalized_module_name}Entity(
+                **{self.module_name}.dict()
+            )
+            session.add(new_{self.module_name})
+            await session.commit()
+            return new_{self.module_name}.id
+
+    @async_db_request_handler
+    async def get_{self.module_name}(self):
+        async with self.db.session() as session:
+            query = select({self.capitalized_module_name}Entity)
+            result = await session.execute(query)
+            return result.scalars().all()
 """
 
     def controller_file(self):
-        return f"""from nest.core import Controller, Get, Post, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from src.config import config
-
+        return f"""from nest.core import Controller, Get, Post
 
 from .{self.module_name}_service import {self.capitalized_module_name}Service
 from .{self.module_name}_model import {self.capitalized_module_name}
@@ -301,12 +305,12 @@ class {self.capitalized_module_name}Controller:
         self.{self.module_name}_service = {self.module_name}_service
 
     @Get("/")
-    async def get_{self.module_name}(self, session: AsyncSession = Depends(config.get_db)):
-        return await self.{self.module_name}_service.get_{self.module_name}(session)
+    async def get_{self.module_name}(self):
+        return await self.{self.module_name}_service.get_{self.module_name}()
 
     @Post("/")
-    async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}, session: AsyncSession = Depends(config.get_db)):
-        return await self.{self.module_name}_service.add_{self.module_name}({self.module_name}, session)
+    async def add_{self.module_name}(self, {self.module_name}: {self.capitalized_module_name}):
+        return await self.{self.module_name}_service.add_{self.module_name}({self.module_name})
  """
 
     def settings_file(self):
