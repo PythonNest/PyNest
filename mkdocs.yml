@@ -60,6 +60,11 @@ nav:
     - Guards: guards.md
     - Exception Filters: exception_filters.md
     - WebSockets: websockets.md
+  - Engine:
+    - Overview: engine/overview.md
+    - FastAPI Adapter: engine/fastapi_adapter.md
+    - Writing an Adapter: engine/writing_an_adapter.md
+    - Migration to 0.7: engine/migration_0.7.md
   - Dependency Injection: dependency_injection.md
   - Deployment:
     - Docker: docker.md

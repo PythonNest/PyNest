@@ -1,15 +1,16 @@
-from enum import Enum
+"""
+HTTP method decorators (@Get, @Post, etc.) and HTTPMethod enum re-export.
+
+The canonical HttpMethod enum now lives in ``nest.engine.types``; the old
+``HTTPMethod`` name is preserved here as a backward-compat alias so any
+existing imports continue to work.
+"""
+from __future__ import annotations
+
 from typing import Any, Callable, List, Union
 
-
-class HTTPMethod(Enum):
-    GET = "GET"
-    POST = "POST"
-    DELETE = "DELETE"
-    PUT = "PUT"
-    PATCH = "PATCH"
-    HEAD = "HEAD"
-    OPTIONS = "OPTIONS"
+# Re-export from canonical location for backward compatibility.
+from nest.engine.types import HttpMethod as HTTPMethod  # noqa: N814
 
 
 def route(http_method: HTTPMethod, route_path: Union[str, List[str]] = "/", **kwargs):

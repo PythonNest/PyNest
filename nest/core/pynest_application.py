@@ -4,39 +4,63 @@ import asyncio
 import inspect
 import signal as signal_module
 from contextlib import asynccontextmanager
-from typing import Any, Iterable, Optional
+from typing import Any, Iterable, Optional, Union
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from nest.common.route_resolver import RoutesResolver
 from nest.core.pynest_container import PyNestContainer
+from nest.engine.http_adapter import AbstractHttpAdapter
 
 
 class PyNestApp:
     """
-    Main PyNest application. Wraps a built container and a FastAPI HTTP server.
+    Main PyNest application. Wraps a built container and an HTTP engine adapter.
+
+    The adapter (default FastAPIAdapter) hides the underlying web framework.
+    Backward-compat shims are provided so existing code that referenced
+    ``app.http_server`` / ``app.get_server()`` still works.
     """
 
-    def __init__(self, container: PyNestContainer, http_server: FastAPI) -> None:
+    def __init__(
+        self,
+        container: PyNestContainer,
+        adapter_or_server: Union[AbstractHttpAdapter, FastAPI],
+    ) -> None:
         self.container = container
-        self.http_server = http_server
+
+        # Backward-compat: callers used to pass a FastAPI instance here.
+        # Wrap it in a FastAPIAdapter so the rest of the code is uniform.
+        if isinstance(adapter_or_server, AbstractHttpAdapter):
+            self.adapter = adapter_or_server
+        else:
+            from nest.engines.fastapi import FastAPIAdapter
+            self.adapter = FastAPIAdapter(instance=adapter_or_server)
+
         self._closed = False
         self._closing = False
         self._install_lifespan_shutdown()
-        routes_resolver = RoutesResolver(self.container, self.http_server)
+        routes_resolver = RoutesResolver(self.container, self.adapter)
         routes_resolver.register_routes()
 
+    # ── public API ──────────────────────────────────────────────────────
+
+    @property
+    def http_server(self) -> FastAPI:
+        """Deprecated — prefer ``app.adapter.get_http_server()``. Kept for 0.6 compatibility."""
+        return self.adapter.get_http_server()
+
     def get_server(self) -> FastAPI:
-        return self.http_server
+        return self.adapter.get_http_server()
 
     def get_http_server(self) -> FastAPI:
         """Alias for get_server() — kept for backward compatibility."""
-        return self.http_server
+        return self.adapter.get_http_server()
 
     def use(self, middleware: type, **options: Any) -> "PyNestApp":
-        """Add ASGI middleware to the FastAPI server."""
-        self.http_server.add_middleware(middleware, **options)
+        """Add ASGI middleware via the engine adapter."""
+        self.adapter.use(middleware, **options)
         return self
 
     def enable_shutdown_hooks(
@@ -65,22 +89,7 @@ class PyNestApp:
             self._closing = False
 
     def use_global_filters(self, *filters) -> "PyNestApp":
-        """Register one or more exception filters that apply to every route.
-
-        Filters are tried in the order provided. Each filter must be an
-        instance of an ExceptionFilter subclass decorated with @Catch.
-
-        Args:
-            *filters: ExceptionFilter instances to register globally.
-
-        Returns:
-            PyNestApp: The current instance (allows method chaining).
-
-        Example::
-
-            app = PyNestFactory.create(AppModule)
-            app.use_global_filters(AllExceptionsFilter())
-        """
+        """Register exception filters that apply to every route."""
         for f in filters:
             caught = getattr(f, "__caught_exceptions__", None)
             if caught is None:
@@ -91,6 +100,8 @@ class PyNestApp:
             for exc_type in exc_types:
                 self._register_global_handler(exc_type, f)
         return self
+
+    # ── internals ──────────────────────────────────────────────────────
 
     def _register_global_handler(self, exc_type: type, filter_instance) -> None:
         async def handler(request: Request, exc: Exception):
@@ -103,7 +114,7 @@ class PyNestApp:
                 )
             return result
 
-        self.http_server.add_exception_handler(exc_type, handler)
+        self.adapter.register_exception_handler(exc_type, handler)
 
     def _make_signal_handler(self, shutdown_signal: signal_module.Signals):
         def handler(signum, frame):
@@ -128,14 +139,18 @@ class PyNestApp:
             return str(signum)
 
     def _install_lifespan_shutdown(self) -> None:
-        original_lifespan_context = self.http_server.router.lifespan_context
+        """Patch the engine's lifespan so PyNestApp.close runs on app shutdown."""
+        http_server = self.adapter.get_http_server()
+        # FastAPI-specific lifespan patching; future engines can override via adapter.
+        if hasattr(http_server, "router") and hasattr(http_server.router, "lifespan_context"):
+            original_lifespan_context = http_server.router.lifespan_context
 
-        @asynccontextmanager
-        async def lifespan_context(app: FastAPI):
-            async with original_lifespan_context(app) as state:
-                try:
-                    yield state
-                finally:
-                    await self.close()
+            @asynccontextmanager
+            async def lifespan_context(app):
+                async with original_lifespan_context(app) as state:
+                    try:
+                        yield state
+                    finally:
+                        await self.close()
 
-        self.http_server.router.lifespan_context = lifespan_context
+            http_server.router.lifespan_context = lifespan_context

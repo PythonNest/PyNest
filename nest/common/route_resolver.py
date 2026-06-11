@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Union
 
-from fastapi import APIRouter, FastAPI, Request
-from nest.common.decorators import has_param_decorators, wrap_param_decorators
+from fastapi import FastAPI
+
+from nest.engine.http_adapter import AbstractHttpAdapter
+from nest.engine.params import ParamSpec
+from nest.engine.route_spec import RouteSpec
+from nest.engine.types import HttpMethod
 
 if TYPE_CHECKING:
     from nest.core.pynest_container import PyNestContainer
@@ -13,12 +17,30 @@ if TYPE_CHECKING:
 class RoutesResolver:
     """
     Walks the module graph, resolves controller and gateway instances from the
-    container, and registers their bound methods on the FastAPI app.
+    container, and registers their bound methods via the engine adapter.
+
+    Builds a RouteSpec for each route and calls ``adapter.add_route(spec)``,
+    so the engine-specific translation (FastAPI Depends/Body/Query, Litestar
+    Parameter, etc.) lives entirely inside the adapter.
     """
 
-    def __init__(self, container: "PyNestContainer", app_ref: FastAPI) -> None:
+    def __init__(
+        self,
+        container: "PyNestContainer",
+        adapter_or_server: Union[AbstractHttpAdapter, FastAPI],
+    ) -> None:
         self.container = container
-        self.app_ref = app_ref
+        # Backward-compat: accept either an adapter or a raw FastAPI instance.
+        if isinstance(adapter_or_server, AbstractHttpAdapter):
+            self.adapter = adapter_or_server
+        else:
+            from nest.engines.fastapi import FastAPIAdapter
+            self.adapter = FastAPIAdapter(instance=adapter_or_server)
+
+    @property
+    def app_ref(self):
+        """Deprecated — kept for backward compatibility with code that accessed app_ref directly."""
+        return self.adapter.get_http_server()
 
     def register_routes(self) -> None:
         seen_controllers: set = set()
@@ -48,17 +70,13 @@ class RoutesResolver:
         tag = getattr(controller_class, "__controller_tag__", None)
         prefix = getattr(controller_class, "__route_prefix__", None) or ""
 
-        router = APIRouter(tags=[tag] if tag else None)
-
         for method_name, unbound in inspect.getmembers(
             controller_class, predicate=callable
         ):
             if not hasattr(unbound, "__http_method__"):
                 continue
             bound = getattr(instance, method_name)
-            self._add_route(router, bound, unbound, controller_class, prefix)
-
-        self.app_ref.include_router(router)
+            self._add_route(bound, unbound, controller_class, prefix, tag)
 
     def _register_gateway(self, gateway_class: type, gateway_instance: Any) -> None:
         from nest.websockets.gateway import NativeWebSocketGateway
@@ -66,98 +84,62 @@ class RoutesResolver:
         NativeWebSocketGateway(
             gateway=gateway_instance,
             metadata=getattr(gateway_class, "__websocket_gateway__"),
-        ).register(self.app_ref)
+        ).register(self.adapter.get_http_server())
 
     def _add_route(
         self,
-        router: APIRouter,
         bound_method,
         original_method,
         cls: type,
         prefix: str,
+        tag: Any,
     ) -> None:
         from nest.core.decorators.controller import _collect_guards
         from nest.core.decorators.http_method import HTTPMethod
 
         path = getattr(original_method, "__route_path__", "/")
         http_method = getattr(original_method, "__http_method__", None)
-        extra_kwargs = getattr(original_method, "__kwargs__", {})
+        extra_kwargs = dict(getattr(original_method, "__kwargs__", {}))
 
         if not isinstance(http_method, HTTPMethod):
             return
 
         full_path = _join_paths(prefix, path)
+        status_code = getattr(original_method, "status_code", None)
 
-        route_kwargs = {
-            "path": full_path,
-            "endpoint": bound_method,
-            "methods": [http_method.value],
-            **extra_kwargs,
-        }
-
-        if has_param_decorators(bound_method):
-            route_kwargs["endpoint"] = wrap_param_decorators(bound_method)
-
-        if hasattr(original_method, "status_code"):
-            route_kwargs["status_code"] = original_method.status_code
-
-        guards = _collect_guards(cls, original_method)
-        if guards:
-            route_kwargs["dependencies"] = [g.as_dependency() for g in guards]
-
+        guards = tuple(_collect_guards(cls, original_method))
         route_filters = list(getattr(original_method, "__filters__", []))
         controller_filters = list(getattr(cls, "__filters__", []))
-        if route_filters or controller_filters:
-            route_kwargs["endpoint"] = _wrap_with_filters(
-                route_kwargs["endpoint"], route_filters + controller_filters
-            )
+        filters = tuple(route_filters + controller_filters)
 
-        router.add_api_route(**route_kwargs)
+        # Extract ParamSpecs from the bound method signature.
+        params = _extract_param_specs(bound_method)
 
-
-def _wrap_with_filters(endpoint, filters) -> callable:
-    """Wrap a bound-method endpoint with exception filter logic."""
-    from nest.common.exceptions import ArgumentsHost
-
-    original_sig = inspect.signature(endpoint)
-    existing_params = list(original_sig.parameters.values())
-    has_request = any(p.name == "request" for p in existing_params)
-
-    if not has_request:
-        request_param = inspect.Parameter(
-            "request",
-            inspect.Parameter.KEYWORD_ONLY,
-            annotation=Request,
+        spec = RouteSpec(
+            method=HttpMethod(http_method.value),
+            path=full_path,
+            endpoint=bound_method,
+            params=params,
+            guards=guards,
+            filters=filters,
+            status_code=status_code,
+            tags=(tag,) if tag else (),
+            extra=extra_kwargs,
         )
-        wrapper_sig = original_sig.replace(parameters=existing_params + [request_param])
-    else:
-        wrapper_sig = original_sig
+        self.adapter.add_route(spec)
 
-    orig_param_names = {p.name for p in existing_params}
 
-    async def filter_wrapper(*args, **kwargs):
-        request = kwargs.get("request")
-        call_kwargs = {k: v for k, v in kwargs.items() if k in orig_param_names}
-        try:
-            result = endpoint(*args, **call_kwargs)
-            if inspect.isawaitable(result):
-                result = await result
-            return result
-        except Exception as exc:
-            host = ArgumentsHost(request=request)
-            for raw_filter in filters:
-                f = raw_filter() if isinstance(raw_filter, type) else raw_filter
-                caught = getattr(f, "__caught_exceptions__", ())
-                if not caught or isinstance(exc, caught):
-                    result = f.catch(exc, host)
-                    if inspect.isawaitable(result):
-                        return await result
-                    return result
-            raise
-
-    filter_wrapper.__name__ = getattr(endpoint, "__name__", "filter_wrapper")
-    filter_wrapper.__signature__ = wrapper_sig
-    return filter_wrapper
+def _extract_param_specs(endpoint) -> tuple:
+    """Read ParamSpec defaults off the endpoint's signature into a tuple."""
+    try:
+        signature = inspect.signature(endpoint)
+    except (TypeError, ValueError):
+        return ()
+    specs = []
+    for parameter in signature.parameters.values():
+        if isinstance(parameter.default, ParamSpec):
+            specs.append(parameter.default)
+    return tuple(specs)
 
 
 def _join_paths(prefix: str, path: str) -> str:
