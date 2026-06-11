@@ -60,6 +60,7 @@ nav:
     - Guards: guards.md
     - Exception Filters: exception_filters.md
     - WebSockets: websockets.md
+    - Testing: testing.md
   - Dependency Injection: dependency_injection.md
   - Deployment:
     - Docker: docker.md

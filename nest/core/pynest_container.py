@@ -117,6 +117,30 @@ class PyNestContainer:
         """Get a controller instance with all its service dependencies injected."""
         return self.get(controller_class)
 
+    @property
+    def provider_descriptors(self) -> List[ProviderDescriptor]:
+        """Snapshot of every registered provider descriptor."""
+        return list(self._all_descriptors)
+
+    def replace_provider(
+        self, token: Union[Type, InjectionToken, str], descriptor: ProviderDescriptor
+    ) -> int:
+        """
+        Replace every registered descriptor bound to `token` with `descriptor`.
+        Must be called after add_module() and before build().
+        Returns the number of descriptors replaced (0 if the token is unknown).
+        """
+        if self._injector is not None:
+            raise RuntimeError(
+                "Container already built. replace_provider() must be called before build()."
+            )
+        count = 0
+        for index, desc in enumerate(self._all_descriptors):
+            if desc.provide == token:
+                self._all_descriptors[index] = descriptor
+                count += 1
+        return count
+
     def clear(self) -> None:
         """Reset container state. Useful in tests."""
         self._injector = None
