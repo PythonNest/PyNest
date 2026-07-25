@@ -31,3 +31,10 @@ from nest.common.interfaces import (
     OnModuleDestroy,
     OnModuleInit,
 )
+from nest.common.background_worker import (
+    BackgroundWorker,
+    IntervalWorker,
+    RestartPolicy,
+    WorkerState,
+    WorkerStatus,
+)

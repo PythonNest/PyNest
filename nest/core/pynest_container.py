@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 import logging
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 
 from nest.common.exceptions import CircularDependencyException
 from nest.common.interfaces import (
@@ -25,6 +25,8 @@ _LIFECYCLE_METHOD_NAMES = (
     "on_module_destroy",
     "on_application_shutdown",
 )
+
+T = TypeVar("T")
 
 
 class ModuleRef:
@@ -116,6 +118,33 @@ class PyNestContainer:
     def get_controller_instance(self, controller_class: Type) -> Any:
         """Get a controller instance with all its service dependencies injected."""
         return self.get(controller_class)
+
+    def get_provider_instances(self) -> List[Any]:
+        """Return every registered provider instance once, in module order."""
+        if self._injector is None:
+            raise RuntimeError(
+                "Container not built. Call container.build() before resolving providers."
+            )
+
+        instances: List[Any] = []
+        seen: set[int] = set()
+        for module_ref in self._modules.values():
+            for descriptor in module_ref.compiled.provider_descriptors:
+                instance = self.get(descriptor.provide)
+                instance_id = id(instance)
+                if instance_id in seen:
+                    continue
+                seen.add(instance_id)
+                instances.append(instance)
+        return instances
+
+    def get_instances_of(self, base_type: Type[T]) -> List[T]:
+        """Return registered provider instances matching ``base_type``."""
+        return [
+            instance
+            for instance in self.get_provider_instances()
+            if isinstance(instance, base_type)
+        ]
 
     def clear(self) -> None:
         """Reset container state. Useful in tests."""

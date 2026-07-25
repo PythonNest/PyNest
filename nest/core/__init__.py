@@ -13,6 +13,13 @@ from nest.common.decorators import (
     createParamDecorator,
 )
 from nest.common.provider import InjectionToken, Scope
+from nest.common.background_worker import (
+    BackgroundWorker,
+    IntervalWorker,
+    RestartPolicy,
+    WorkerState,
+    WorkerStatus,
+)
 from nest.core.decorators import (
     Catch,
     Controller,
@@ -30,3 +37,9 @@ from nest.core.decorators.guards import BaseGuard, UseGuards
 from nest.core.pynest_application import PyNestApp
 from nest.core.pynest_container import PyNestContainer
 from nest.core.pynest_factory import PyNestFactory
+from nest.core.worker_factory import (
+    WorkerApplication,
+    WorkerAppFactory,
+    run_workers,
+)
+from nest.core.worker_host import WorkerHost

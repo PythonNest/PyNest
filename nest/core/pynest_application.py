@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 
 from nest.common.route_resolver import RoutesResolver
 from nest.core.pynest_container import PyNestContainer
+from nest.core.worker_host import WorkerHost
 
 
 class PyNestApp:
@@ -18,11 +19,20 @@ class PyNestApp:
     Main PyNest application. Wraps a built container and a FastAPI HTTP server.
     """
 
-    def __init__(self, container: PyNestContainer, http_server: FastAPI) -> None:
+    def __init__(
+        self,
+        container: PyNestContainer,
+        http_server: FastAPI,
+        *,
+        worker_grace_timeout: float = 10.0,
+    ) -> None:
         self.container = container
         self.http_server = http_server
+        self._worker_host = WorkerHost.discover(
+            container, grace_timeout=worker_grace_timeout
+        )
         self._closed = False
-        self._closing = False
+        self._close_task: Optional[asyncio.Task[None]] = None
         self._install_lifespan_shutdown()
         routes_resolver = RoutesResolver(self.container, self.http_server)
         routes_resolver.register_routes()
@@ -33,6 +43,10 @@ class PyNestApp:
     def get_http_server(self) -> FastAPI:
         """Alias for get_server() — kept for backward compatibility."""
         return self.http_server
+
+    def get_worker_host(self) -> WorkerHost:
+        """Return the application's background worker supervisor."""
+        return self._worker_host
 
     def use(self, middleware: type, **options: Any) -> "PyNestApp":
         """Add ASGI middleware to the FastAPI server."""
@@ -54,15 +68,21 @@ class PyNestApp:
 
     async def close(self, signal: Optional[str] = None) -> None:
         """Run graceful application shutdown lifecycle hooks once."""
-        if self._closed or self._closing:
+        if self._close_task is not None:
+            await asyncio.shield(self._close_task)
+            return
+        if self._closed:
             return
 
-        self._closing = True
-        try:
-            await self.container.shutdown_lifecycle(signal)
-            self._closed = True
-        finally:
-            self._closing = False
+        self._close_task = asyncio.create_task(
+            self._close(signal), name="pynest-application-close"
+        )
+        await asyncio.shield(self._close_task)
+
+    async def _close(self, signal: Optional[str]) -> None:
+        await self._worker_host.stop()
+        await self.container.shutdown_lifecycle(signal)
+        self._closed = True
 
     def use_global_filters(self, *filters) -> "PyNestApp":
         """Register one or more exception filters that apply to every route.
@@ -132,10 +152,11 @@ class PyNestApp:
 
         @asynccontextmanager
         async def lifespan_context(app: FastAPI):
-            async with original_lifespan_context(app) as state:
-                try:
+            try:
+                async with original_lifespan_context(app) as state:
+                    await self._worker_host.start()
                     yield state
-                finally:
-                    await self.close()
+            finally:
+                await self.close()
 
         self.http_server.router.lifespan_context = lifespan_context
