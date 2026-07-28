@@ -1,42 +1,37 @@
-# Lifaspan tasks in PyNest
+# Lifespan tasks in PyNest
 
-## Introduction
+Long-running coroutines should use PyNest's
+[background worker](background_workers.md) support. Awaiting an infinite
+coroutine directly from a FastAPI startup handler prevents startup from
+completing and does not provide supervised failure or bounded shutdown.
 
-Lifespan tasks - coroutines, which run while app is working. 
-
-## Defining a lifespan task
-As example of lifespan task will use coroutine, which print time every hour. In real user cases can be everything else.
+For a recurring task, extend `IntervalWorker`:
 
 ```python
-import asyncio
 from datetime import datetime
 
-async def print_current_time():
-    while True:
+from nest.core import Injectable, IntervalWorker, Module, PyNestFactory
+
+
+@Injectable
+class ClockWorker(IntervalWorker):
+    interval = 3600
+    run_immediately = True
+
+    async def execute(self) -> None:
         current_time = datetime.now().strftime("%H:%M:%S")
         print(f"Current time: {current_time}")
-        await asyncio.sleep(3600)
+
+
+@Module(providers=[ClockWorker])
+class AppModule:
+    pass
+
+
+app = PyNestFactory.create(AppModule)
 ```
 
-## Implement a lifespan task
-In `app_module.py` we can define a startup handler, and run lifespan inside it
-
-```python
-from nest.core import PyNestFactory
-
-app = PyNestFactory.create(
-    AppModule,
-    description="This is my PyNest app with lifespan task",
-    title="My App",
-    version="1.0.0",
-    debug=True,
-)
-
-http_server = app.get_server()
-
-@http_server.on_event("startup")
-async def startup():
-    await print_current_time()
-```
-
-Now `print_current_time` will work in lifespan after startup.
+PyNest starts the worker inside the ASGI lifespan and stops it when the
+application shuts down. See [Background workers](background_workers.md) for
+long-running consumers, restart policies, status inspection, and standalone
+worker processes.

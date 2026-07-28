@@ -61,6 +61,7 @@ nav:
     - Exception Filters: exception_filters.md
     - WebSockets: websockets.md
     - Testing: testing.md
+    - Background Workers: background_workers.md
   - Dependency Injection: dependency_injection.md
   - Deployment:
     - Docker: docker.md
