@@ -23,7 +23,12 @@ class PyNestFactory(AbstractPyNestFactory):
     """Factory that creates a fully-wired PyNest application from a root module."""
 
     @staticmethod
-    def create(main_module: Type[ModuleType], **kwargs) -> PyNestApp:
+    def create(
+        main_module: Type[ModuleType],
+        *,
+        worker_grace_timeout: float = 10.0,
+        **kwargs,
+    ) -> PyNestApp:
         """
         Build and return a PyNestApp.
 
@@ -39,7 +44,11 @@ class PyNestFactory(AbstractPyNestFactory):
         PyNestFactory._run_async(container.initialize_lifecycle())
 
         http_server = FastAPI(**kwargs)
-        return PyNestApp(container, http_server)
+        return PyNestApp(
+            container,
+            http_server,
+            worker_grace_timeout=worker_grace_timeout,
+        )
 
     @staticmethod
     def _create_server(**kwargs) -> FastAPI:
