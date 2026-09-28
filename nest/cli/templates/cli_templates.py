@@ -131,10 +131,10 @@ class AppService:
         self.create_module(module_name, src_path)
 
     def generate_project(self, project_name: str):
-        self.create_template(self.nest_path / "settings.yaml", self.settings_file())
         root = self.base_path / project_name
         src_path = root / "src"
         self.create_folder(root)
+        self.create_template(root / "settings.yaml", self.settings_file())
         self.create_template(root / "README.md", self.readme_file())
         self.create_template(root / "requirements.txt", self.requirements_file())
         self.create_folder(src_path)
