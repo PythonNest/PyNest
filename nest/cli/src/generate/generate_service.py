@@ -15,11 +15,15 @@ class GenerateService:
     @staticmethod
     def get_metadata():
         config = {"db_type": None, "is_async": False, "is_cli": False}
-        setting_path = Path(__file__).parent.parent.parent.parent / "settings.yaml"
-        if setting_path.exists():
-            with open(setting_path, "r") as file:
-                file = yaml.load(file, Loader=yaml.FullLoader)
-                config = file["config"]
+        # Metadata belongs to the generated project, not the installed package.
+        # Search upward so commands also work from a project's src/ directory.
+        for directory in (Path.cwd(), *Path.cwd().parents):
+            setting_path = directory / "settings.yaml"
+            if setting_path.is_file():
+                with setting_path.open("r") as file:
+                    settings = yaml.safe_load(file) or {}
+                config.update(settings.get("config") or {})
+                break
         db_type = config["db_type"]
         is_async = config["is_async"]
         is_cli = config["is_cli"] if "is_cli" in config else False
