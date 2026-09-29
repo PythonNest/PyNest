@@ -40,3 +40,32 @@ class SharedOptions:
         is_flag=True,
         default=False,
     )
+    PACKAGE_MANAGER = Option(
+        ["--package-manager"],
+        help="Package manager to scaffold (uv or requirements).",
+        required=False,
+        type=click.Choice(["uv", "requirements"]),
+        default="uv",
+        show_default=True,
+    )
+    JSON = Option(
+        ["--json"],
+        help="Output structured JSON.",
+        required=False,
+        is_flag=True,
+        default=False,
+    )
+    DRY_RUN = Option(
+        ["--dry-run"],
+        help="Show the generation plan without writing files.",
+        required=False,
+        is_flag=True,
+        default=False,
+    )
+    FORCE = Option(
+        ["--force"],
+        help="Overwrite supported existing files.",
+        required=False,
+        is_flag=True,
+        default=False,
+    )

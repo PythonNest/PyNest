@@ -1,28 +1,70 @@
 import asyncio
 import contextlib
-import importlib.util
 import json
 import socket
+import sys
 
 import uvicorn
 import websockets
 
 from nest.cli.src.generate.generate_service import GenerateService
-from nest.core import Module, PyNestContainer, PyNestFactory
+from nest.core import PyNestContainer, PyNestFactory
+
+_PYNEST_YAML = """version: 1
+preset: api
+database: none
+async: false
+source_root: src
+"""
+
+_APP_MODULE = """from nest.core import Module
+from nest.core import PyNestFactory
+
+@Module(imports=[], controllers=[], providers=[])
+class AppModule:
+    pass
+
+app = PyNestFactory.create(AppModule)
+http_server = app.get_server()
+"""
 
 
-def test_generate_gateway_creates_gateway_file(tmp_path):
-    GenerateService().generate_gateway("chat", str(tmp_path))
+def _scaffold_minimal_app(tmp_path):
+    (tmp_path / ".pynest.yaml").write_text(_PYNEST_YAML)
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "__init__.py").write_text("")
+    (src / "app_module.py").write_text(_APP_MODULE)
 
-    gateway_file = tmp_path / "chat_gateway.py"
+
+def _purge_generated_src_modules():
+    for key in list(sys.modules):
+        if key == "src" or key.startswith("src."):
+            del sys.modules[key]
+
+
+def test_generate_gateway_creates_package_under_src(tmp_path):
+    _scaffold_minimal_app(tmp_path)
+    result = GenerateService().generate_add_component(
+        "gateway", "chat", path=str(tmp_path), dry_run=False, force=False
+    )
+
+    assert result.status != "error", getattr(result, "error", None)
+    gateway_file = tmp_path / "src" / "chat" / "chat_gateway.py"
+    module_file = tmp_path / "src" / "chat" / "chat_module.py"
 
     assert gateway_file.exists()
+    assert module_file.exists()
+    assert (tmp_path / "src" / "chat" / "__init__.py").exists()
+    gw = gateway_file.read_text()
     assert (
         "from nest.websockets import MessageBody, SubscribeMessage, WebSocketGateway"
-        in gateway_file.read_text()
+        in gw
     )
-    assert '@WebSocketGateway(namespace="/chat")' in gateway_file.read_text()
-    assert '@SubscribeMessage("ping")' in gateway_file.read_text()
+    assert '@WebSocketGateway(namespace="/chat")' in gw
+    assert '@SubscribeMessage("ping")' in gw
+    assert "from .chat_gateway import ChatGateway" in module_file.read_text()
+    assert "providers=[ChatGateway]" in module_file.read_text()
 
 
 def _free_port():
@@ -49,35 +91,34 @@ async def _run_server(app, port):
         await task
 
 
-def _load_module_from_path(name, path):
-    spec = importlib.util.spec_from_file_location(name, path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 def test_generated_gateway_runs_as_real_websocket_app(tmp_path):
+    _scaffold_minimal_app(tmp_path)
     GenerateService().generate_gateway("chat", str(tmp_path))
 
-    chat_module = _load_module_from_path("chat_gateway", tmp_path / "chat_gateway.py")
-    ChatGateway = chat_module.ChatGateway
+    root = str(tmp_path.resolve())
+    inserted = root not in sys.path
+    if inserted:
+        sys.path.insert(0, root)
+    _purge_generated_src_modules()
+    try:
+        from src.chat.chat_module import ChatModule
 
-    @Module(providers=[ChatGateway])
-    class ChatAppModule:
-        pass
+        async def scenario():
+            PyNestContainer._instance = None
+            app = PyNestFactory.create(ChatModule).get_server()
+            port = _free_port()
 
-    async def scenario():
-        PyNestContainer._instance = None
-        app = PyNestFactory.create(ChatAppModule).get_server()
-        port = _free_port()
+            async with _run_server(app, port):
+                async with websockets.connect(f"ws://127.0.0.1:{port}/chat") as ws:
+                    await ws.send(
+                        json.dumps({"event": "ping", "data": {"hello": "world"}})
+                    )
+                    response = json.loads(await ws.recv())
 
-        async with _run_server(app, port):
-            async with websockets.connect(f"ws://127.0.0.1:{port}/chat") as ws:
-                await ws.send(
-                    json.dumps({"event": "ping", "data": {"hello": "world"}})
-                )
-                response = json.loads(await ws.recv())
+            assert response == {"event": "pong", "data": {"hello": "world"}}
 
-        assert response == {"event": "pong", "data": {"hello": "world"}}
-
-    asyncio.run(scenario())
+        asyncio.run(scenario())
+    finally:
+        _purge_generated_src_modules()
+        if inserted:
+            sys.path.remove(root)

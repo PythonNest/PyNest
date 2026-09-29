@@ -393,6 +393,17 @@ class {self.capitalized_module_name}Gateway:
         return {{"event": "pong", "data": data}}
 """
 
+    def generate_gateway_module_file(self) -> str:
+        return f"""from nest.core import Module
+
+from .{self.module_name}_gateway import {self.capitalized_module_name}Gateway
+
+
+@Module(imports=[], controllers=[], providers=[{self.capitalized_module_name}Gateway])
+class {self.capitalized_module_name}Module:
+    pass
+"""
+
     def generate_empty_module_file(self) -> str:
         return f"""from nest.core import Module
 

@@ -33,12 +33,15 @@ jobs:
           if [ "${{ matrix.app_type }}" == "Blank" ]; then
             app_name="NestApp"
             is_async=""
+            extras="http"
           elif [ "${{ matrix.app_type }}" == "SyncORM" ]; then
             app_name="ORMNestApp"
             is_async=""
+            extras="http,sqlite"
           elif [ "${{ matrix.app_type }}" == "AsyncORM" ]; then
             app_name="AsyncORMNestApp"
             is_async="--is-async"
+            extras="http,sqlite-async"
           fi
 
           if [ "${{ matrix.app_type }}" == "Blank" ]; then
@@ -48,6 +51,7 @@ jobs:
           fi
 
           cd "$app_name"
+          uv add --editable "${GITHUB_WORKSPACE}[$extras]"
           uv run pynest generate resource -n user
           uv run uvicorn "src.app_module:http_server" --host "0.0.0.0" --port 8000 --reload &
 
