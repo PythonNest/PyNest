@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(python:*)",
+      "Bash(pytest:*)",
+      "Bash(uvicorn:*)",
+      "Bash(pynest:*)"
+    ]
+  }
+}
