@@ -24,7 +24,7 @@ src/
 from nest.core import Module
 
 @Module(
-    imports=[DatabaseModule],   # other modules whose exports you need
+    imports=[],                 # add modules that export required providers
     controllers=[UsersController],
     providers=[UsersService],
     exports=[UsersService],     # expose to other modules that import this one
@@ -234,26 +234,34 @@ After `generate resource`, the new module **auto-registers** in `app_module.py`.
 ## Testing Patterns
 
 ```python
-import pytest
-from nest.core import PyNestFactory, Module
+from fastapi.testclient import TestClient
+from nest.core import Controller, Get, Injectable, Module, PyNestFactory
 
-@pytest.fixture
-def app():
-    @Module(controllers=[UsersController], providers=[FakeUsersService])
-    class TestModule:
-        pass
+@Injectable
+class UsersService:
+    def get_all(self):
+        return [{"id": 1}]
 
-    nest_app = PyNestFactory.create(TestModule)
-    return nest_app.get_server()
+@Controller("users")
+class UsersController:
+    def __init__(self, service: UsersService):
+        self.service = service
 
-def test_get_users(app):
-    from fastapi.testclient import TestClient
-    client = TestClient(app)
-    response = client.get("/users/")
-    assert response.status_code == 200
+    @Get("/")
+    def get_all(self):
+        return self.service.get_all()
+
+@Module(controllers=[UsersController], providers=[UsersService])
+class TestModule:
+    pass
+
+client = TestClient(PyNestFactory.create(TestModule).get_server())
+response = client.get("/users/")
+assert response.status_code == 200
+assert response.json() == [{"id": 1}]
 ```
 
-Swap real providers with fakes in `TestModule` — no mocking library needed.
+The provider must be registered under the **same type** requested by the controller (`UsersService` here). Registering only a `FakeUsersService` class does not replace that dependency in the current container. For an existing controller, keep its provider type and mock its methods or use a test-specific subclass of the controller that requests the fake type.
 
 ## Running the App
 
